@@ -9,6 +9,10 @@ clean:
 mrproper: clean
 	rm -f configure config.h
 
+.PHONY: test
+test:
+	$(MAKE) -C test
+
 %.d: %.cpp
 	set -e; rm -f "$@"; \
 	$(CXX) -M -MG -MM -MF "$@.$$$$" $(CPPFLAGS) "$<"; \
@@ -17,5 +21,5 @@ mrproper: clean
 DEPS := $(shell find . -name '*.o' )
 include $(DEPS:.o=.d)
 
-velbusd: velbusd.o SockAddr.o Socket.o
+velbusd: velbusd.o VelbusMessage.o SockAddr.o Socket.o
 	$(CXX) $(CXXFLAGS) -o $@ $+
