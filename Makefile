@@ -5,6 +5,7 @@ clean:
 	rm -f *.o *.d
 	rm -f config.log config.status
 	rm -rf autom4te.cache
+	$(MAKE) -C test clean
 
 mrproper: clean
 	rm -f configure config.h
