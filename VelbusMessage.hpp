@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <memory>
 
 class InsufficientData : public std::runtime_error {
 public:
@@ -19,6 +20,8 @@ public:
 		std::runtime_error("Form error in message"),
 		m_details(msg) {}
 	~FormError() throw() {}
+
+	std::string details() throw() { return m_details; }
 };
 
 namespace VelbusMessage {
@@ -36,7 +39,7 @@ public:
 	virtual ~VelbusMessage() {}
 
 	virtual std::string data() throw() =0;
-	std::string get() throw();
+	std::string message() throw();
 	virtual size_t length() throw() =0;
 
 	virtual std::string string() throw() =0;
@@ -55,6 +58,21 @@ public:
 	virtual size_t length() throw() { return 4+m_data.length()+2; }
 	virtual std::string string() throw();
 };
+
+class PushButtonStatus : public VelbusMessage {
+public:
+	char m_just_pressed;
+	char m_just_released;
+	char m_long_pressed;
+
+	PushButtonStatus( unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data)
+		throw(FormError);
+
+	virtual std::string data() throw();
+	virtual size_t length() throw() { return 4; }
+	virtual std::string string() throw();
+};
+
 
 class Deframer {
 protected:

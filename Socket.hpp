@@ -70,9 +70,4 @@ public:
 	}
 };
 
-struct connection {
-	Socket socket;
-	std::auto_ptr<SockAddr::SockAddr> client_address;
-};
-
 #endif // __SOCKET_HPP__
