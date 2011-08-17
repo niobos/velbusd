@@ -1,0 +1,7 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Does the sockaddr_in{,6} structures have sin{,6}_len fields? */
+#undef SOCKADDR_HAS_LEN_FIELD
