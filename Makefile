@@ -21,5 +21,5 @@ test:
 DEPS := $(shell find . -name '*.o' )
 include $(DEPS:.o=.d)
 
-velbusd: velbusd.o VelbusMessage.o SockAddr.o Socket.o
+velbusd: velbusd.o VelbusMessage.o SockAddr.o Socket.o TimestampLog.o
 	$(CXX) $(CXXFLAGS) -o $@ $+

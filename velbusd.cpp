@@ -16,6 +16,7 @@
 #include <syslog.h>
 
 #include "Socket.hpp"
+#include "TimestampLog.hpp"
 
 static const size_t READ_SIZE = 4096;
 static const int MAX_CONN_BACKLOG = 32;
@@ -71,6 +72,8 @@ int main(int argc, char* argv[]) {
 	std::string serial_port("/dev/ttyS0");
 	std::string bind_addr("[::1]:8445");
 
+	TimestampLog log( std::cerr );
+
 	{ // Parse options
 		char optstring[] = "?hs:b:";
 		struct option longopts[] = {
@@ -114,7 +117,7 @@ int main(int argc, char* argv[]) {
 			perror("open()");
 			exit(EX_NOINPUT);
 		}
-		fprintf(stderr, "Opened \"%s\"\n", serial_port.c_str());
+		log << "Opened port \"" << serial_port << "\"\n" << std::flush;
 
 		// Setting up port
 		struct termios options;
@@ -151,7 +154,7 @@ int main(int argc, char* argv[]) {
 		status |= TIOCM_RTS; // RTS = 1
 		ioctl(fd_ser, TIOCMSET, &status); // Write MODEM-bits
 
-		fprintf(stderr, "Configured \"%s\"\n", serial_port.c_str());
+		log << "Configured port \"" << serial_port << "\"\n" << std::flush;
 	}
 
 	Socket sock_listen;
@@ -189,7 +192,7 @@ int main(int argc, char* argv[]) {
 		sock_listen.set_reuseaddr();
 		sock_listen.bind((*bind_sa)[0]);
 		sock_listen.listen(MAX_CONN_BACKLOG);
-		fprintf(stderr, "Listening on %s\n", (*bind_sa)[0].string().c_str());
+		log << "Listening on " << (*bind_sa)[0].string() << "\n" << std::flush;
 	}
 
 	try { // Select loop
@@ -219,7 +222,7 @@ int main(int argc, char* argv[]) {
 					c->sock = sock_listen.accept(&client_addr);
 					c->id = client_addr->string();
 
-					fprintf(stderr, "Connect from %s\n", client_addr->string().c_str());
+					log << "Connect from " << client_addr->string() << "\n" << std::flush;
 
 					FD_SET(c->sock, &rfds_); if( c->sock > fd_max ) fd_max = c->sock; // Add to select
 					sock_clients.push_back( c.release() ); // Keep the client
@@ -243,7 +246,7 @@ int main(int argc, char* argv[]) {
 						try { buf = read(i->sock); }
 						catch( EOFreached &e ) {
 							// EOF reached on socket, remove it from the list
-							fprintf(stderr, "Disconnect from %s\n", i->id.c_str());
+							log << "Disconnect from " << i->id << "\n" << std::flush;
 							typeof(i) temp = i; i--;
 							sock_clients.erase(temp);
 							recalculate_select = 1;
