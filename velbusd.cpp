@@ -19,7 +19,7 @@
 
 #include "Socket.hpp"
 #include "TimestampLog.hpp"
-#include "VelbusMessage.hpp"
+#include "VelbusMessage/VelbusMessage.hpp"
 
 static const size_t READ_SIZE = 4096;
 static const int MAX_CONN_BACKLOG = 32;
