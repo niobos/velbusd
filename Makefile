@@ -1,11 +1,15 @@
 all: velbusd
 
+SUBDIRS := VelbusMessage utils
+VBM := PushButtonStatus
+
 clean:
 	rm -f velbusd
-	rm -f *.o *.d
 	rm -f config.log config.status
 	rm -rf autom4te.cache
 	$(MAKE) -C test clean
+	rm -f *.o *.d
+	$(foreach dir,$(SUBDIRS),rm -f $(dir)/*.o $(dir)/*.d)
 
 mrproper: clean
 	rm -f configure config.h
@@ -23,7 +27,8 @@ DEPS := $(shell find . -name '*.o' )
 include $(DEPS:.o=.d)
 
 velbusd: velbusd.o \
-		VelbusMessage/VelbusMessage.o VelbusMessage/Registrar.o VelbusMessage/PushButtonStatus.o \
+		VelbusMessage/VelbusMessage.o VelbusMessage/Registrar.o \
+		$(foreach msg,$(VBM),VelbusMessage/$(msg).o) \
 		utils/output.o \
 		SockAddr.o Socket.o TimestampLog.o
 	$(CXX) $(CXXFLAGS) -o $@ -lev $+
