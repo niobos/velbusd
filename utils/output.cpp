@@ -16,3 +16,10 @@ std::string bin(int bitmap) {
 	}
 	return o;
 }
+
+int bitnum(int bitmap) {
+	for( int i = 0; i < sizeof(bitmap)*8; i++ ) {
+		if( (bitmap >> i) & 0x01 ) return i;
+	}
+	return -1;
+}

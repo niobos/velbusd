@@ -6,4 +6,6 @@
 std::string hex(int number);
 std::string bin(int bitmap);
 
+int bitnum(int bitmap);
+
 #endif // __UTILS_OUTPUT_HPP__
