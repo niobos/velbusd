@@ -21,7 +21,6 @@ public:
 	}
 
 	virtual std::string data() throw();
-	virtual size_t length() throw() { return 4; }
 	virtual std::string string() throw();
 };
 
