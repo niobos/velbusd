@@ -1,7 +1,7 @@
 all: velbusd
 
 SUBDIRS := VelbusMessage utils
-VBM := PushButtonStatus
+VBM := PushButtonStatus ClearLeds SetLeds SlowBlinkLeds FastBlinkLeds VFastBlinkLeds
 
 clean:
 	rm -f velbusd
