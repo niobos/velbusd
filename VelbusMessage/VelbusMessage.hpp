@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <memory>
 
+namespace VelbusMessage {
+
 class InsufficientData : public std::runtime_error {
 public:
 	InsufficientData() throw() :
@@ -24,8 +26,6 @@ public:
 	std::string details() throw() { return m_details; }
 };
 
-namespace VelbusMessage {
-
 class VelbusMessage {
 public:
 	unsigned char m_prio;
@@ -35,44 +35,34 @@ public:
 protected:
 	VelbusMessage(unsigned char prio, unsigned char addr, unsigned char rtr) throw() :
 		m_prio(prio), m_addr(addr), m_rtr(rtr) {};
+
 public:
 	virtual ~VelbusMessage() {}
 
 	virtual std::string data() throw() =0;
-	std::string message() throw();
-	virtual size_t length() throw() =0;
 
+	std::string message() throw();
 	virtual std::string string() throw() =0;
 };
 
-std::auto_ptr<VelbusMessage> parse(std::string const &msg) throw(InsufficientData, FormError);
+std::auto_ptr<VelbusMessage> parse_and_consume(std::string &msg) throw(InsufficientData, FormError);
 
 class Unknown : public VelbusMessage {
 public:
 	std::string m_data;
 
+protected:
 	Unknown(unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data) :
 		VelbusMessage(prio, addr, rtr), m_data(data) {}
 
-	virtual std::string data() throw() { return m_data; }
-	virtual size_t length() throw() { return 4+m_data.length()+2; }
-	virtual std::string string() throw();
-};
-
-class PushButtonStatus : public VelbusMessage {
 public:
-	char m_just_pressed;
-	char m_just_released;
-	char m_long_pressed;
+	static Unknown* factory(unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data) {
+		return new Unknown(prio, addr, rtr, data);
+	}
 
-	PushButtonStatus( unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data)
-		throw(FormError);
-
-	virtual std::string data() throw();
-	virtual size_t length() throw() { return 4; }
+	virtual std::string data() throw() { return m_data; }
 	virtual std::string string() throw();
 };
-
 
 class Deframer {
 protected:
