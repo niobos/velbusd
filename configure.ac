@@ -24,7 +24,6 @@ AC_PROG_CXXCPP        dnl Check for C++ preprocessor
 AC_PROG_CXX           dnl Check for C++ compiler
 AC_LANG_CPLUSPLUS     dnl Test the C++ compiler
 AC_C_INLINE
-AC_PROG_RANLIB
 
 # Library checks
 ################
@@ -70,7 +69,6 @@ AC_FUNC_STRERROR_R
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
-	src/VelbusMessage/Makefile
 	test/Makefile
 	])
 

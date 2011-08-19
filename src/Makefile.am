@@ -1,5 +1,3 @@
-SUBDIRS = VelbusMessage
-
 bin_PROGRAMS = velbusd
 
 velbusd_SOURCES = velbusd.cpp \
@@ -11,6 +9,14 @@ velbusd_SOURCES = velbusd.cpp \
                   SockAddr.hpp SockAddr.cpp \
                   Socket.hpp Socket.cpp
 velbusd_LDFLAGS = -lev
+
 if WANT_PARSER
-velbusd_LDADD = VelbusMessage/libvelbusmessage.a
+velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonStatus.hpp \
+                   VelbusMessage/SetLeds.cpp VelbusMessage/SetLeds.hpp \
+                   VelbusMessage/ClearLeds.cpp VelbusMessage/ClearLeds.hpp \
+                   VelbusMessage/SlowBlinkLeds.cpp VelbusMessage/SlowBlinkLeds.hpp \
+                   VelbusMessage/FastBlinkLeds.cpp VelbusMessage/FastBlinkLeds.hpp \
+                   VelbusMessage/VFastBlinkLeds.cpp VelbusMessage/VFastBlinkLeds.hpp \
+                   VelbusMessage/RelayStatus.cpp VelbusMessage/RelayStatus.hpp
 endif
+
