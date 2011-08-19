@@ -1,8 +1,10 @@
-*.o
-*.d
-config.h
-config.log
-config.status
+Makefile
+Makefile.in
 configure
+config.h
+config.status
+config.log
 autom4te.cache
-velbusd
+.deps/
+.dirstamp
+stamp-h1

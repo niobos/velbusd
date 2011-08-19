@@ -1,4 +1,4 @@
-#include "config.h"
+#include "../config.h"
 #include "SockAddr.hpp"
 #include <arpa/inet.h>
 #include <errno.h>

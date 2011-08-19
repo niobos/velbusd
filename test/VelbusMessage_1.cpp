@@ -1,4 +1,4 @@
-#include "../VelbusMessage.hpp"
+#include "../src/VelbusMessage/VelbusMessage.hpp"
 
 #include <stdio.h>
 
@@ -7,7 +7,7 @@ int main() {
 	{
 		printf("Testing parse()\n");
 		std::string int_stat_req("\x0f\xf8\x00\x01\x0e\xea\x04", 7);
-		std::auto_ptr<VelbusMessage::VelbusMessage> m = VelbusMessage::parse(int_stat_req);
+		std::auto_ptr<VelbusMessage::VelbusMessage> m = VelbusMessage::parse_and_consume(int_stat_req);
 		if( m.get() == NULL ) return 1;
 	}
 

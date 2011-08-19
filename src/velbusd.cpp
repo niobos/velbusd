@@ -15,7 +15,7 @@
 #include <memory>
 
 #include "Socket.hpp"
-#include "TimestampLog.hpp"
+#include "utils/TimestampLog.hpp"
 #include "VelbusMessage/VelbusMessage.hpp"
 
 static const size_t READ_SIZE = 4096;
