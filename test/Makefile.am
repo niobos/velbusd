@@ -1,6 +1,8 @@
-check_PROGRAMS = 
-dist_check_SCRIPTS = 
-TESTS = 
+check_PROGRAMS = NBcat
+dist_check_SCRIPTS = slow-client.sh
+TESTS = slow-client.sh
+
+NBcat_SOURCES = NBcat.cpp
 
 if WANT_PARSER
 check_PROGRAMS += Parser
