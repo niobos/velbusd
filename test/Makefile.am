@@ -4,8 +4,12 @@ TESTS =
 
 if WANT_PARSER
 check_PROGRAMS += Parser
-dist_check_SCRIPTS += Parser-RelayStatus.sh
-TESTS += Parser-RelayStatus.sh
+Parser_TESTS = Parser-PushButtonStatus.sh \
+               Parser-SetLeds.sh Parser-ClearLeds.sh \
+               Parser-SlowBlinkLeds.sh Parser-FastBlinkLeds.sh Parser-VFastBlinkLeds.sh \
+               Parser-RelayStatus.sh
+dist_check_SCRIPTS += $(Parser_TESTS)
+TESTS += $(Parser_TESTS)
 
 Parser_SOURCES = Parser.cpp \
                  ../src/VelbusMessage/VelbusMessage.cpp ../src/VelbusMessage/VelbusMessage.hpp \
