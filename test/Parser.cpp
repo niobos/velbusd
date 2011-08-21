@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
 
 	std::string data(buffer, std::cin.gcount() );
 
-	std::auto_ptr<VelbusMessage::VelbusMessage> m = VelbusMessage::parse_and_consume( data );
+	std::auto_ptr<VelbusMessage::VelbusMessage> m( VelbusMessage::parse_and_consume( data ) );
 
 	std::cout << m->string() << "\n";
 }

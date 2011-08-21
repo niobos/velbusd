@@ -45,7 +45,7 @@ public:
 	virtual std::string string() throw() =0;
 };
 
-std::auto_ptr<VelbusMessage> parse_and_consume(std::string &msg) throw(InsufficientData, FormError);
+VelbusMessage* parse_and_consume(std::string &msg) throw(InsufficientData, FormError);
 
 class Unknown : public VelbusMessage {
 public:

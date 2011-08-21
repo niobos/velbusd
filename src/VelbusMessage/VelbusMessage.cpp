@@ -8,7 +8,7 @@
 
 namespace VelbusMessage {
 
-std::auto_ptr<VelbusMessage> parse_and_consume(std::string &msg)
+VelbusMessage* parse_and_consume(std::string &msg)
 		throw(InsufficientData, FormError) {
 
 	if( msg.length() < 6 ) throw InsufficientData();
@@ -43,19 +43,19 @@ std::auto_ptr<VelbusMessage> parse_and_consume(std::string &msg)
 
 	// Now identify the type of message
 	if( data.length() == 0 ) {
-		return std::auto_ptr<VelbusMessage>( Unknown::factory(prio, addr, rtr, data) );
+		return Unknown::factory(prio, addr, rtr, data);
 	}
 
 	// length > 0
 	try {
 		struct factory_methods f = Registrar::get_instance().get( data[0] );
-		return std::auto_ptr<VelbusMessage>( f.factory(prio, addr, rtr, data) );
+		return f.factory(prio, addr, rtr, data);
 
 	} catch( NotFound &e ) {
-		return std::auto_ptr<VelbusMessage>( Unknown::factory(prio, addr, rtr, data) );
+		return Unknown::factory(prio, addr, rtr, data);
 
 	} catch( FormError &e ) {
-		return std::auto_ptr<VelbusMessage>( Unknown::factory(prio, addr, rtr, data) );
+		return Unknown::factory(prio, addr, rtr, data);
 	}
 }
 
