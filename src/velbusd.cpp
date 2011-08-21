@@ -88,6 +88,11 @@ void kill_connection(EV_P_ ev_io *w) {
 	}
 }
 
+void received_sigint(EV_P_ ev_signal *w, int revents) throw() {
+	*log << "Received SIGINT, exiting\n" << std::flush;
+	ev_unloop(EV_A_ EVUNLOOP_ALL);
+}
+
 void serial_ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 	std::string buf;
 	try {
@@ -318,6 +323,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	{
+		ev_signal ev_signal_watcher;
+		ev_signal_init( &ev_signal_watcher, received_sigint, SIGINT);
+		ev_signal_start( EV_DEFAULT_ &ev_signal_watcher);
+
 		ev_io_init( &c_serial.watcher, serial_ready_to_read, c_serial.sock, EV_READ );
 		ev_io_start( EV_DEFAULT_ &c_serial.watcher );
 
