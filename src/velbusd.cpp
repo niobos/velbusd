@@ -93,46 +93,7 @@ void received_sigint(EV_P_ ev_signal *w, int revents) throw() {
 	ev_unloop(EV_A_ EVUNLOOP_ALL);
 }
 
-void serial_ready_to_read(EV_P_ ev_io *w, int revents) throw() {
-	std::string buf;
-	try {
-		buf = read(c_serial.sock);
-	} catch( IOError &e ) {
-		*log << c_serial.id << " : IO error: " << e.what() << "\n" << std::flush;
-		throw;
-	} catch( EOFreached &e ) {
-		*log << c_serial.id << " : EOF reached\n" << std::flush;
-		throw;
-	}
-
-	c_serial.buf.append(buf);
-	while(1) {
-		std::auto_ptr<VelbusMessage::VelbusMessage> m;
-		try {
-			m.reset( VelbusMessage::parse_and_consume(c_serial.buf) );
-			*log << c_serial.id << " : " << m->string() << "\n" << std::flush;
-
-		} catch( VelbusMessage::InsufficientData &e ) {
-			break; // out of while, and wait for more data
-		} catch( VelbusMessage::FormError &e ) {
-			*log << c_serial.id << " : Form Error in data, ignoring byte "
-			     << "0x" << hex(c_serial.buf[0]) << "\n" << std::flush;
-			c_serial.buf = c_serial.buf.substr(1);
-		}
-
-		for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
-			try {
-				write(i->sock, m->message());
-				// TODO: maybe write in non-blocking mode?
-			} catch( IOError &e ) {
-				*log << i->id << " : IO error, closing connection: " << e.what() << "\n" << std::flush;
-				kill_connection(EV_A_ w);
-			}
-		}
-	}
-}
-
-void socket_ready_to_read(EV_P_ ev_io *w, int revents) throw() {
+void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 	struct connection *c = reinterpret_cast<struct connection*>(w->data);
 	std::string buf;
 	try {
@@ -140,11 +101,13 @@ void socket_ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 
 	} catch( IOError &e ) {
 		*log << c->id << " : IO error, closing connection: " << e.what() << "\n" << std::flush;
+		if( c == &c_serial ) throw;
 		kill_connection(EV_A_ w);
 		return; // early
 
 	} catch( EOFreached &e ) {
 		*log << c->id << " : Disconnect\n" << std::flush;
+		if( c == &c_serial ) throw;
 		kill_connection(EV_A_ w);
 		return; // early
 	}
@@ -162,12 +125,15 @@ void socket_ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 			*log << c->id << " : Form Error in data, ignoring byte "
 			     << "0x" << hex(c->buf[0]) << "\n" << std::flush;
 			c->buf = c->buf.substr(1);
+			continue; // retry from next byte
 		}
 
-		try {
-			write(c_serial.sock, m->message());
-		} catch( IOError &e ) {
-			throw;
+		if( c != &c_serial ) {
+			try {
+				write(c_serial.sock, m->message());
+			} catch( IOError &e ) {
+				throw;
+			}
 		}
 		for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
 			if( &(*i) == c ) continue; // Don't loop input to same socket
@@ -188,7 +154,7 @@ void incomming_connection(EV_P_ ev_io *w, int revents) {
 	new_con->id = client_addr->string();
 	*log << new_con->id << " : Connection opened\n" << std::flush;
 
-	ev_io_init( &new_con->watcher, socket_ready_to_read, new_con->sock, EV_READ );
+	ev_io_init( &new_con->watcher, ready_to_read, new_con->sock, EV_READ );
 	new_con->watcher.data = new_con.get();
 	ev_io_start( EV_A_ &new_con->watcher );
 
@@ -327,7 +293,8 @@ int main(int argc, char* argv[]) {
 		ev_signal_init( &ev_signal_watcher, received_sigint, SIGINT);
 		ev_signal_start( EV_DEFAULT_ &ev_signal_watcher);
 
-		ev_io_init( &c_serial.watcher, serial_ready_to_read, c_serial.sock, EV_READ );
+		ev_io_init( &c_serial.watcher, ready_to_read, c_serial.sock, EV_READ );
+		c_serial.watcher.data = &c_serial;
 		ev_io_start( EV_DEFAULT_ &c_serial.watcher );
 
 		ev_io e_listen;
