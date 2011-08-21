@@ -5,6 +5,7 @@
 #include "VelbusMessage.hpp"
 
 namespace VelbusMessage {
+	typedef VelbusMessage* (*VMB_factory)(unsigned char, unsigned char, unsigned char, std::string const &);
 	struct factory_methods {
 		VelbusMessage* (*factory)(unsigned char, unsigned char, unsigned char, std::string const &);
 	};
