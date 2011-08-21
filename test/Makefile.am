@@ -1,5 +1,5 @@
 check_PROGRAMS = NBcat
-dist_check_SCRIPTS = slow-client.sh
+dist_check_SCRIPTS = simply-run.sh echo.sh slow-client.sh
 TESTS = simply-run.sh echo.sh slow-client.sh
 
 NBcat_SOURCES = NBcat.cpp
