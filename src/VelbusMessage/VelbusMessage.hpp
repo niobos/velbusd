@@ -64,14 +64,6 @@ public:
 	virtual std::string string() throw();
 };
 
-class Deframer {
-protected:
-	std::string m_buffer;
-public:
-	void add_data(std::string const &data) throw() { m_buffer.append(data); }
-	std::auto_ptr< VelbusMessage > get_message() throw();
-};
-
 } // Namespace
 
 #endif // __VELBUSMESSAGE_HPP__

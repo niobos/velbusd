@@ -97,20 +97,4 @@ std::string Unknown::string() throw() {
 	return o.str();
 }
 
-std::auto_ptr<VelbusMessage> Deframer::get_message() throw() {
-	std::auto_ptr<VelbusMessage> ret;
-	while(1) {
-		try {
-			ret = parse_and_consume( m_buffer );
-			return ret;
-		} catch( InsufficientData &e ) {
-			// try again later
-			return ret; // NULL pointer
-		} catch( FormError &e ) {
-			// Strip of first byte and try again
-			m_buffer = m_buffer.substr(1);
-		}
-	}
-}
-
 } // namespace

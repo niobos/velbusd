@@ -16,6 +16,7 @@
 
 #include "Socket.hpp"
 #include "utils/TimestampLog.hpp"
+#include "utils/output.hpp"
 #include "VelbusMessage/VelbusMessage.hpp"
 
 static const size_t READ_SIZE = 4096;
@@ -34,7 +35,7 @@ public:
 
 struct connection {
 	Socket sock;
-	VelbusMessage::Deframer buf;
+	std::string buf;
 	std::string id;
 	ev_io watcher;
 };
@@ -99,11 +100,20 @@ void serial_ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 		throw;
 	}
 
-	c_serial.buf.add_data(buf);
+	c_serial.buf.append(buf);
 	while(1) {
-		std::auto_ptr<VelbusMessage::VelbusMessage> m = c_serial.buf.get_message();
-		if( m.get() == NULL ) break;
-		*log << c_serial.id << " : " << m->string() << "\n" << std::flush;
+		std::auto_ptr<VelbusMessage::VelbusMessage> m;
+		try {
+			m.reset( VelbusMessage::parse_and_consume(c_serial.buf) );
+			*log << c_serial.id << " : " << m->string() << "\n" << std::flush;
+
+		} catch( VelbusMessage::InsufficientData &e ) {
+			break; // out of while, and wait for more data
+		} catch( VelbusMessage::FormError &e ) {
+			*log << c_serial.id << " : Form Error in data, ignoring byte "
+			     << "0x" << hex(c_serial.buf[0]) << "\n" << std::flush;
+			c_serial.buf = c_serial.buf.substr(1);
+		}
 
 		for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
 			try {
@@ -134,11 +144,20 @@ void socket_ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 		return; // early
 	}
 
-	c->buf.add_data(buf);
+	c->buf.append(buf);
 	while(1) {
-		std::auto_ptr<VelbusMessage::VelbusMessage> m = c->buf.get_message();
-		if( m.get() == NULL ) break;
-		*log << c->id << " : " << m->string() << "\n" << std::flush;
+		std::auto_ptr<VelbusMessage::VelbusMessage> m;
+		try {
+			m.reset( VelbusMessage::parse_and_consume(c->buf) );
+			*log << c->id << " : " << m->string() << "\n" << std::flush;
+
+		} catch( VelbusMessage::InsufficientData &e ) {
+			break; // out of while, and wait for more data
+		} catch( VelbusMessage::FormError &e ) {
+			*log << c->id << " : Form Error in data, ignoring byte "
+			     << "0x" << hex(c->buf[0]) << "\n" << std::flush;
+			c->buf = c->buf.substr(1);
+		}
 
 		try {
 			write(c_serial.sock, m->message());
