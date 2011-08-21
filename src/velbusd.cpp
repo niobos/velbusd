@@ -27,6 +27,11 @@ public:
 	IOError( const std::string &what ) :
 	    std::runtime_error( what ) {}
 };
+class WouldBlock : public IOError {
+public:
+	WouldBlock() :
+	    IOError("Would block") {}
+};
 class EOFreached : public std::runtime_error {
 public:
 	EOFreached() :
@@ -64,6 +69,10 @@ std::string read(int from) throw(IOError, EOFreached) {
 void write(int to, std::string const &what) throw(IOError) {
 	int rv = write(to, what.data(), what.length());
 	if( rv == -1 ) {
+		if( errno == EAGAIN ) {
+			throw WouldBlock();
+		} // else
+
 		char error_descr[256];
 		strerror_r(errno, error_descr, sizeof(error_descr));
 		std::string e;
@@ -141,7 +150,9 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 				write(i->sock, m->message());
 			} catch( IOError &e ) {
 				*log << i->id << " : IO error, closing connection: " << e.what() << "\n" << std::flush;
-				kill_connection(EV_A_ w);
+				ev_io *w = &( i->watcher );
+				--i; // Prepare iterator for deletion
+				kill_connection(EV_A_ w );
 			}
 		}
 	}
@@ -153,6 +164,24 @@ void incomming_connection(EV_P_ ev_io *w, int revents) {
 	new_con->sock = s_listen.accept(&client_addr);
 	new_con->id = client_addr->string();
 	*log << new_con->id << " : Connection opened\n" << std::flush;
+
+	// Set socket non-blocking
+	int flags = fcntl(new_con->sock, F_GETFL);
+	if( flags == -1 ) {
+		char error_descr[256];
+		strerror_r(errno, error_descr, sizeof(error_descr));
+		*log << new_con->id << " : Could not fcntl(, F_GETFL): " << error_descr << "\n" << std::flush;
+		*log << new_con->id << " : Closing connection\n" << std::flush;
+		return; // Without setting watcher & without keeping connection
+	}
+	int rv = fcntl(new_con->sock, F_SETFL, flags | O_NONBLOCK);
+	if( rv == -1 ) {
+		char error_descr[256];
+		strerror_r(errno, error_descr, sizeof(error_descr));
+		*log << new_con->id << " : Could not fcntl(, F_SETFL): " << error_descr << "\n" << std::flush;
+		*log << new_con->id << " : Closing connection\n" << std::flush;
+		return; // Without setting watcher & without keeping connection
+	}
 
 	ev_io_init( &new_con->watcher, ready_to_read, new_con->sock, EV_READ );
 	new_con->watcher.data = new_con.get();
