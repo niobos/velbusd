@@ -18,6 +18,7 @@ velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonSt
                    VelbusMessage/FastBlinkLeds.cpp VelbusMessage/FastBlinkLeds.hpp \
                    VelbusMessage/VFastBlinkLeds.cpp VelbusMessage/VFastBlinkLeds.hpp \
                    VelbusMessage/RelayStatus.cpp VelbusMessage/RelayStatus.hpp \
-                   VelbusMessage/UpdateLeds.cpp VelbusMessage/UpdateLeds.hpp
+                   VelbusMessage/UpdateLeds.cpp VelbusMessage/UpdateLeds.hpp \
+                   VelbusMessage/MemoryData.cpp VelbusMessage/MemoryData.hpp
 endif
 

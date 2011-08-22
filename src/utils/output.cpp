@@ -5,7 +5,7 @@
 
 std::string hex(int number) {
 	std::ostringstream o;
-	o << std::hex << std::setw(2) << std::setfill('0') << (number&0xff);
+	o << std::hex << std::setw(2) << std::setfill('0') << (number);
 	return o.str();
 }
 
