@@ -9,7 +9,14 @@ int main(int argc, char* argv[]) {
 
 	std::string data(buffer, std::cin.gcount() );
 
-	std::auto_ptr<VelbusMessage::VelbusMessage> m( VelbusMessage::parse_and_consume( data ) );
+	try {
+		std::auto_ptr<VelbusMessage::VelbusMessage> m( VelbusMessage::parse_and_consume( data ) );
+		std::cout << m->string() << "\n";
 
-	std::cout << m->string() << "\n";
+	} catch( VelbusMessage::InsufficientData &e ) {
+		std::cout << "InsufficientData\n";
+
+	} catch( VelbusMessage::FormError &e ) {
+		std::cout << "FormError\n";
+	}
 }

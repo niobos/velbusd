@@ -1,12 +1,13 @@
 check_PROGRAMS = NBcat
-dist_check_SCRIPTS = simply-run.sh echo.sh slow-client.sh
-TESTS = simply-run.sh echo.sh slow-client.sh
+dist_check_SCRIPTS = simply-run.sh echo.sh echo-with-garbage.sh slow-client.sh
+TESTS = $(dist_check_SCRIPTS)
 
 NBcat_SOURCES = NBcat.cpp
 
 if WANT_PARSER
 check_PROGRAMS += Parser
-Parser_TESTS = Parser-PushButtonStatus.sh \
+Parser_TESTS = Parser-garbage.sh \
+               Parser-PushButtonStatus.sh \
                Parser-SetLeds.sh Parser-ClearLeds.sh \
                Parser-SlowBlinkLeds.sh Parser-FastBlinkLeds.sh Parser-VFastBlinkLeds.sh \
                Parser-RelayStatus.sh
