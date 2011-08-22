@@ -8,3 +8,4 @@ autom4te.cache
 .deps/
 .dirstamp
 stamp-h1
+*.o
