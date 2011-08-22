@@ -192,8 +192,13 @@ void incomming_connection(EV_P_ ev_io *w, int revents) {
 
 int main(int argc, char* argv[]) {
 	// Defaults
-	std::string serial_port("/dev/ttyS0");
-	std::string bind_addr("[::1]:8445");
+	struct {
+		std::string serial_port;
+		std::string bind_addr;
+	} options = {
+		/* serial_port = */ "/dev/ttyS0",
+		/* bind_addr = */ "[::1]:[8445]"
+		};
 
 	log.reset( new TimestampLog( std::cerr ) );
 
@@ -222,10 +227,10 @@ int main(int argc, char* argv[]) {
 					;
 				exit(EX_USAGE);
 			case 's':
-				serial_port = optarg;
+				options.serial_port = optarg;
 				break;
 			case 'b':
-				bind_addr = optarg;
+				options.bind_addr = optarg;
 				break;
 			}
 		}
@@ -233,42 +238,42 @@ int main(int argc, char* argv[]) {
 
 	{ // Open serial port
 		c_serial.id = "SERIAL";
-		c_serial.sock = open(serial_port.c_str(), O_RDWR | O_NOCTTY);
+		c_serial.sock = open(options.serial_port.c_str(), O_RDWR | O_NOCTTY);
 		// Open in Read-Write; don't become controlling TTY
 		if( c_serial.sock == -1 ) {
-			std::cerr << "Could not open \"" << serial_port << "\": ";
+			std::cerr << "Could not open \"" << options.serial_port << "\": ";
 			perror("open()");
 			exit(EX_NOINPUT);
 		}
-		*log << "Opened port \"" << serial_port << "\"\n" << std::flush;
+		*log << "Opened port \"" << options.serial_port << "\"\n" << std::flush;
 
 		// Setting up port
-		struct termios options;
-		tcgetattr(c_serial.sock, &options);
+		struct termios port_options;
+		tcgetattr(c_serial.sock, &port_options);
 
-		cfsetispeed(&options, B38400);
-		cfsetospeed(&options, B38400);
+		cfsetispeed(&port_options, B38400);
+		cfsetospeed(&port_options, B38400);
 
-		options.c_cflag |= CLOCAL; // Don't change owner of port
-		options.c_cflag |= CREAD; // Enable receiver
+		port_options.c_cflag |= CLOCAL; // Don't change owner of port
+		port_options.c_cflag |= CREAD; // Enable receiver
 
-		options.c_cflag &= ~CSIZE; // Mask the character size bits
-		options.c_cflag |= CS8;    // Select 8 data bits
+		port_options.c_cflag &= ~CSIZE; // Mask the character size bits
+		port_options.c_cflag |= CS8;    // Select 8 data bits
 
-		options.c_cflag &= ~PARENB; // Clear parity
-		options.c_cflag &= ~CSTOPB; // Clear "2 Stopbits" => 1 stopbit
+		port_options.c_cflag &= ~PARENB; // Clear parity
+		port_options.c_cflag &= ~CSTOPB; // Clear "2 Stopbits" => 1 stopbit
 
-		options.c_cflag &= ~CRTSCTS; // Disable hardware flow control
+		port_options.c_cflag &= ~CRTSCTS; // Disable hardware flow control
 
-		options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // Raw mode
+		port_options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // Raw mode
 
-		options.c_iflag |= IGNPAR; // Ignore parity (since none is used)
-		options.c_iflag &= ~(IXON | IXOFF | IXANY); // Disable software flow control
+		port_options.c_iflag |= IGNPAR; // Ignore parity (since none is used)
+		port_options.c_iflag &= ~(IXON | IXOFF | IXANY); // Disable software flow control
 
-		options.c_oflag &= ~OPOST; // Disable output processing = raw mode
+		port_options.c_oflag &= ~OPOST; // Disable output processing = raw mode
 
-		// Apply options
-		tcsetattr(c_serial.sock, TCSANOW, &options);
+		// Apply port_options
+		tcsetattr(c_serial.sock, TCSANOW, &port_options);
 
 		// Manually setting RTS high & DTR low
 		int status;
@@ -277,7 +282,7 @@ int main(int argc, char* argv[]) {
 		status |= TIOCM_RTS; // RTS = 1
 		ioctl(c_serial.sock, TIOCMSET, &status); // Write MODEM-bits
 
-		*log << "Configured port \"" << serial_port << "\"\n" << std::flush;
+		*log << "Configured port \"" << options.serial_port << "\"\n" << std::flush;
 	}
 
 	{ // Open listening socket
@@ -289,22 +294,22 @@ int main(int argc, char* argv[]) {
 		 *   - hostname:[portnumber]
 		 *   - [numeric ip:[portnumber]
 		 */
-		size_t c = bind_addr.rfind(":");
+		size_t c = options.bind_addr.rfind(":");
 		if( c == std::string::npos ) {
-			std::cerr << "Invalid bind string \"" << bind_addr << "\": could not find ':'\n";
+			std::cerr << "Invalid bind string \"" << options.bind_addr << "\": could not find ':'\n";
 			exit(EX_DATAERR);
 		}
-		host = bind_addr.substr(0, c);
-		port = bind_addr.substr(c+1);
+		host = options.bind_addr.substr(0, c);
+		port = options.bind_addr.substr(c+1);
 
 		std::auto_ptr< boost::ptr_vector< SockAddr::SockAddr> > bind_sa
 			= SockAddr::resolve( host, port, 0, SOCK_STREAM, 0);
 		if( bind_sa->size() == 0 ) {
-			std::cerr << "Can not bind to \"" << bind_addr << "\": Could not resolve\n";
+			std::cerr << "Can not bind to \"" << options.bind_addr << "\": Could not resolve\n";
 			exit(EX_DATAERR);
 		} else if( bind_sa->size() > 1 ) {
 			// TODO: allow this
-			std::cerr << "Can not bind to \"" << bind_addr << "\": Resolves to multiple entries:\n";
+			std::cerr << "Can not bind to \"" << options.bind_addr << "\": Resolves to multiple entries:\n";
 			for( typeof(bind_sa->begin()) i = bind_sa->begin(); i != bind_sa->end(); i++ ) {
 				std::cerr << "  " << i->string() << "\n";
 			}
