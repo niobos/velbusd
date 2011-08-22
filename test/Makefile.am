@@ -1,5 +1,8 @@
 check_PROGRAMS = NBcat
-dist_check_SCRIPTS = simply-run.sh echo.sh echo-with-garbage.sh slow-client.sh
+dist_check_SCRIPTS = simply-run.sh \
+                     echo.sh echo-with-garbage.sh read-only-socket.sh \
+                     logging.sh \
+                     slow-client.sh
 TESTS = $(dist_check_SCRIPTS)
 
 NBcat_SOURCES = NBcat.cpp
