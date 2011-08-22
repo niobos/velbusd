@@ -10,6 +10,7 @@ Parser_TESTS = Parser-garbage.sh \
                Parser-PushButtonStatus.sh \
                Parser-SetLeds.sh Parser-ClearLeds.sh \
                Parser-SlowBlinkLeds.sh Parser-FastBlinkLeds.sh Parser-VFastBlinkLeds.sh \
+               Parser-UpdateLeds.sh \
                Parser-RelayStatus.sh
 dist_check_SCRIPTS += $(Parser_TESTS)
 TESTS += $(Parser_TESTS)
@@ -24,5 +25,6 @@ Parser_SOURCES = Parser.cpp \
                  ../src/VelbusMessage/SlowBlinkLeds.cpp ../src/VelbusMessage/SlowBlinkLeds.hpp \
                  ../src/VelbusMessage/FastBlinkLeds.cpp ../src/VelbusMessage/FastBlinkLeds.hpp \
                  ../src/VelbusMessage/VFastBlinkLeds.cpp ../src/VelbusMessage/VFastBlinkLeds.hpp \
-                 ../src/VelbusMessage/RelayStatus.cpp ../src/VelbusMessage/RelayStatus.hpp
+                 ../src/VelbusMessage/RelayStatus.cpp ../src/VelbusMessage/RelayStatus.hpp \
+                 ../src/VelbusMessage/UpdateLeds.cpp ../src/VelbusMessage/UpdateLeds.hpp
 endif
