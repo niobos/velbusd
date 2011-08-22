@@ -26,8 +26,7 @@ RelayStatus::RelayStatus( unsigned char prio, unsigned char addr, unsigned char 
 	if( data.length() != 8 ) throw FormError("Incorrect length");
 	if( data[0] != (char)0xfb ) throw FormError("Wrong type");
 
-	m_relay_num = bitnum(data[1]);
-	if( m_relay_num == -1 ) throw FormError("RelayStatus: No relay bit set");
+	m_relay_num = data[1];
 	m_channel_mode = data[2];
 	m_relay_status = data[3];
 	m_led_status = data[4];
@@ -36,7 +35,7 @@ RelayStatus::RelayStatus( unsigned char prio, unsigned char addr, unsigned char 
 
 std::string RelayStatus::data() throw() {
 	std::string ret("\xfb", 1);
-	ret.append(1, (1<<m_relay_num));
+	ret.append(1, m_relay_num);
 	ret.append(1, m_channel_mode);
 	ret.append(1, m_relay_status);
 	ret.append(1, m_led_status);
@@ -46,9 +45,21 @@ std::string RelayStatus::data() throw() {
 
 std::string RelayStatus::string() throw() {
 	std::ostringstream o;
-	o << "RelayStatus of 0x" << hex(m_addr) << " / " << static_cast<int>(m_relay_num) << " : "
-	  << "relay=";
+	o << "RelayStatus of 0x" << hex(m_addr) << " / ";
 
+	switch(m_relay_num) {
+	case 0x01:
+	case 0x02:
+	case 0x04:
+	case 0x08:
+	case 0x10:
+		o << bitnum(m_relay_num);
+		break;
+	default:
+		o << "Unknown[" << bin(m_relay_num) << "]";
+	}
+
+	o << " : relay=";
 	switch(m_relay_status) {
 	case 0: o << "off"; break;
 	case 1: o << "on"; break;

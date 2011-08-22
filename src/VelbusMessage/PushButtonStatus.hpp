@@ -7,9 +7,9 @@ namespace VelbusMessage {
 
 class PushButtonStatus : public VelbusMessage {
 public:
-	char m_just_pressed;
-	char m_just_released;
-	char m_long_pressed;
+	unsigned char m_just_pressed;
+	unsigned char m_just_released;
+	unsigned char m_long_pressed;
 
 protected:
 	PushButtonStatus( unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data)

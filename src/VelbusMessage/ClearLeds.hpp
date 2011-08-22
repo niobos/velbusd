@@ -7,7 +7,7 @@ namespace VelbusMessage {
 
 class ClearLeds : public VelbusMessage {
 public:
-	char m_led_bitmap;
+	unsigned char m_led_bitmap;
 
 protected:
 	ClearLeds( unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data)
