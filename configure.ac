@@ -31,25 +31,10 @@ AC_C_INLINE
 
 # Header checks
 ###############
-AC_CHECK_HEADERS([arpa/inet.h])
-AC_CHECK_HEADERS([fcntl.h])
-AC_CHECK_HEADERS([netdb.h])
-AC_CHECK_HEADERS([netinet/in.h])
-AC_CHECK_HEADERS([stdlib.h])
-AC_CHECK_HEADERS([string.h])
-AC_CHECK_HEADERS([strings.h])
-AC_CHECK_HEADERS([sys/ioctl.h])
-AC_CHECK_HEADERS([sys/socket.h])
-AC_CHECK_HEADERS([sys/time.h])
-AC_CHECK_HEADERS([termios.h])
-AC_CHECK_HEADERS([unistd.h])
-AC_HEADER_STDBOOL
 
 
 # Typedefs & structs
 ####################
-AC_TYPE_SIZE_T
-AC_TYPE_SSIZE_T
 
 # Check for the sin_len field in sockaddr_in
 AC_CHECK_MEMBER([struct sockaddr_in.sin_len],
@@ -59,10 +44,7 @@ AC_CHECK_MEMBER([struct sockaddr_in.sin_len],
 
 # Functions
 ###########
-AC_CHECK_FUNCS([bzero])
-AC_CHECK_FUNCS([socket])
-AC_CHECK_FUNCS([strerror])
-AC_FUNC_STRERROR_R
+
 
 # Output
 ########
