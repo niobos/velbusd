@@ -24,4 +24,6 @@ int TimestampLogBuffer::sync() {
 	
 	m_output << date_str << " " << m_buffer.str() << std::flush;
 	m_buffer.str("");
+
+	return 0;
 }
