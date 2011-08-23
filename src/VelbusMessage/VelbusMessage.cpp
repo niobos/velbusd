@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdio.h>
 #include "Unknown.hpp"
+#include "ModuleTypeRequest.hpp"
 
 namespace VelbusMessage {
 
@@ -41,13 +42,13 @@ VelbusMessage* parse_and_consume(std::string &msg)
 
 	msg = msg.substr(4+length+2); // Consume
 
-	// Now identify the type of message
-	if( data.length() == 0 ) {
-		return Unknown::factory(prio, addr, rtr, data);
-	}
 
-	// length > 0
+	// Now identify the type of message
 	try {
+		if( data.length() == 0 ) {
+			return ModuleTypeRequest::factory(prio, addr, rtr, data);
+		}
+
 		struct factory_methods f = Registrar::get_instance().get( data[0] );
 		return f.factory(prio, addr, rtr, data);
 

@@ -4,6 +4,7 @@ velbusd_SOURCES = velbusd.cpp \
                   VelbusMessage/VelbusMessage.hpp VelbusMessage/VelbusMessage.cpp \
                   VelbusMessage/Registrar.hpp VelbusMessage/Registrar.cpp \
                   VelbusMessage/Unknown.cpp VelbusMessage/Unknown.hpp \
+                  VelbusMessage/ModuleTypeRequest.cpp VelbusMessage/ModuleTypeRequest.hpp \
                   VelbusMessage/BusOff.cpp VelbusMessage/BusOff.hpp \
                   VelbusMessage/BusActive.cpp VelbusMessage/BusActive.hpp \
                   VelbusMessage/RxBuffFull.cpp VelbusMessage/RxBuffFull.hpp \
