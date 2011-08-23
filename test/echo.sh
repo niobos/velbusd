@@ -16,7 +16,11 @@ echo -ne "\x0f\xfb\x02\x08\xfb\x01\x00\x00\x00\x00\x00\x00\xf0\x04" > input.bin.
 
 RV=0
 if ! diff input.bin.$$ output.bin.$$; then
-	echo "Echoed data does not match"
+	echo "Echoed data does not match:"
+	echo "input:"
+	hexdump -C input.bin.$$
+	echo "output:"
+	hexdump -C output.bin.$$
 	RV=1
 fi
 
