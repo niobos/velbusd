@@ -14,11 +14,18 @@
 #include <boost/ptr_container/ptr_list.hpp>
 #include <ev.h>
 #include <memory>
+#include <typeinfo>
+#include <assert.h>
 
 #include "Socket.hpp"
 #include "utils/TimestampLog.hpp"
 #include "utils/output.hpp"
 #include "VelbusMessage/VelbusMessage.hpp"
+#include "VelbusMessage/IntStatusRequest.hpp"
+#include "VelbusMessage/BusOff.hpp"
+#include "VelbusMessage/BusActive.hpp"
+#include "VelbusMessage/RxBuffFull.hpp"
+#include "VelbusMessage/RxReady.hpp"
 
 static const size_t READ_SIZE = 4096;
 static const int MAX_CONN_BACKLOG = 32;
@@ -101,6 +108,25 @@ void kill_connection(EV_P_ ev_io *w) {
 		}
 	}
 }
+void kill_all_connections(EV_P) {
+	typeof(c_network.begin()) i;
+	while( i = c_network.begin(),  i != c_network.end() ) {
+		ev_io_stop(EV_A_ &i->watcher );
+		c_network.erase(i);
+	}
+}
+
+
+void stop_all_watchers(EV_P) {
+	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
+		ev_io_stop(EV_A_ &i->watcher );
+	}
+}
+void start_all_watchers(EV_P) {
+	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
+		ev_io_start(EV_A_ &i->watcher );
+	}
+}
 
 void received_sigint(EV_P_ ev_signal *w, int revents) throw() {
 	*log << "Received SIGINT, exiting\n" << std::flush;
@@ -145,6 +171,27 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 			continue; // retry from next byte
 		}
 
+		if( c == &serial.conn ) {
+			// Do flow control for serial line
+			if( typeid(*m) ==typeid(VelbusMessage::BusOff) ) {
+				serial.bus_active = false;
+				kill_all_connections(EV_A);
+
+			} else if( typeid(*m) ==typeid(VelbusMessage::BusActive) ) {
+				serial.bus_active = true;
+
+			} else if( typeid(*m) ==typeid(VelbusMessage::RxBuffFull) ) {
+				serial.rx_ready = false;
+				stop_all_watchers(EV_A);
+				// TODO: Do we need to check for pending callbacks?
+
+			} else if( typeid(*m) ==typeid(VelbusMessage::RxReady) ) {
+				serial.rx_ready = true;
+				start_all_watchers(EV_A);
+			}
+
+		}
+
 		if( c != &serial.conn ) {
 			try {
 				write(serial.conn.sock, m->message());
@@ -172,6 +219,10 @@ void incomming_connection(EV_P_ ev_io *w, int revents) {
 	new_con->sock = s_listen.accept(&client_addr);
 	new_con->id = client_addr->string();
 	*log << new_con->id << " : Connection opened\n" << std::flush;
+
+	if( ! serial.bus_active ) {
+		return; // Without keeping the connection => close it
+	}
 
 	// Set socket non-blocking
 	int flags = fcntl(new_con->sock, F_GETFL);
