@@ -48,7 +48,11 @@ struct connection {
 
 std::auto_ptr<std::ostream> log;
 Socket s_listen;
-struct connection c_serial;
+struct {
+	struct connection conn;
+	bool bus_active;
+	bool rx_ready;
+	} serial;
 boost::ptr_list< struct connection > c_network;
 
 std::string read(int from) throw(IOError, EOFreached) {
@@ -105,19 +109,22 @@ void received_sigint(EV_P_ ev_signal *w, int revents) throw() {
 
 void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 	struct connection *c = reinterpret_cast<struct connection*>(w->data);
+
+	assert( serial.rx_ready || c == &serial.conn );
+
 	std::string buf;
 	try {
 		buf = read(c->sock);
 
 	} catch( IOError &e ) {
 		*log << c->id << " : IO error, closing connection: " << e.what() << "\n" << std::flush;
-		if( c == &c_serial ) throw;
+		if( c == &serial.conn ) throw;
 		kill_connection(EV_A_ w);
 		return; // early
 
 	} catch( EOFreached &e ) {
 		*log << c->id << " : Disconnect\n" << std::flush;
-		if( c == &c_serial ) throw;
+		if( c == &serial.conn ) throw;
 		kill_connection(EV_A_ w);
 		return; // early
 	}
@@ -138,9 +145,9 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 			continue; // retry from next byte
 		}
 
-		if( c != &c_serial ) {
+		if( c != &serial.conn ) {
 			try {
-				write(c_serial.sock, m->message());
+				write(serial.conn.sock, m->message());
 			} catch( IOError &e ) {
 				throw;
 			}
@@ -251,10 +258,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	{ // Open serial port
-		c_serial.id = "SERIAL";
-		c_serial.sock = open(options.serial_port.c_str(), O_RDWR | O_NOCTTY);
+		serial.conn.id = "SERIAL";
+		serial.conn.sock = open(options.serial_port.c_str(), O_RDWR | O_NOCTTY);
 		// Open in Read-Write; don't become controlling TTY
-		if( c_serial.sock == -1 ) {
+		if( serial.conn.sock == -1 ) {
 			std::cerr << "Could not open \"" << options.serial_port << "\": ";
 			perror("open()");
 			exit(EX_NOINPUT);
@@ -263,7 +270,7 @@ int main(int argc, char* argv[]) {
 
 		// Setting up port
 		struct termios port_options;
-		tcgetattr(c_serial.sock, &port_options);
+		tcgetattr(serial.conn.sock, &port_options);
 
 		cfsetispeed(&port_options, B38400);
 		cfsetospeed(&port_options, B38400);
@@ -287,14 +294,14 @@ int main(int argc, char* argv[]) {
 		port_options.c_oflag &= ~OPOST; // Disable output processing = raw mode
 
 		// Apply port_options
-		tcsetattr(c_serial.sock, TCSANOW, &port_options);
+		tcsetattr(serial.conn.sock, TCSANOW, &port_options);
 
 		// Manually setting RTS high & DTR low
 		int status;
-		ioctl(c_serial.sock, TIOCMGET, &status); // Get MODEM-bits
+		ioctl(serial.conn.sock, TIOCMGET, &status); // Get MODEM-bits
 		status &= ~TIOCM_DTR; // DTR = 0
 		status |= TIOCM_RTS; // RTS = 1
-		ioctl(c_serial.sock, TIOCMSET, &status); // Write MODEM-bits
+		ioctl(serial.conn.sock, TIOCMSET, &status); // Write MODEM-bits
 
 		*log << "Configured port \"" << options.serial_port << "\"\n" << std::flush;
 	}
@@ -362,14 +369,20 @@ int main(int argc, char* argv[]) {
 		if( options.pid_file.length() > 0 ) pid_file << getpid();
 	}
 
+	{ // Initialize the serial state
+		VelbusMessage::IntStatusRequest m;
+		write(serial.conn.sock, m.message());
+		// This will trigger a combination of (BusActive,BusOff)x(RxReady,RxBuffFull)
+	}
+
 	{
 		ev_signal ev_signal_watcher;
 		ev_signal_init( &ev_signal_watcher, received_sigint, SIGINT);
 		ev_signal_start( EV_DEFAULT_ &ev_signal_watcher);
 
-		ev_io_init( &c_serial.watcher, ready_to_read, c_serial.sock, EV_READ );
-		c_serial.watcher.data = &c_serial;
-		ev_io_start( EV_DEFAULT_ &c_serial.watcher );
+		ev_io_init( &serial.conn.watcher, ready_to_read, serial.conn.sock, EV_READ );
+		serial.conn.watcher.data = &serial.conn;
+		ev_io_start( EV_DEFAULT_ &serial.conn.watcher );
 
 		ev_io e_listen;
 		ev_io_init( &e_listen, incomming_connection, s_listen, EV_READ );
