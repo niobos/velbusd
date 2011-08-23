@@ -165,7 +165,7 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 		} catch( VelbusMessage::InsufficientData &e ) {
 			break; // out of while, and wait for more data
 		} catch( VelbusMessage::FormError &e ) {
-			*log << c->id << " : Form Error in data, ignoring byte "
+			*log << c->id << " : Form Error in data (" << e.details() << "), ignoring byte "
 			     << "0x" << hex(c->buf[0]) << "\n" << std::flush;
 			c->buf = c->buf.substr(1);
 			continue; // retry from next byte
