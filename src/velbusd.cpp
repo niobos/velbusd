@@ -258,7 +258,7 @@ int main(int argc, char* argv[]) {
 		std::string bind_addr;
 	} options = {
 		/* fork = */ true,
-		/* fid_file = */ "",
+		/* pid_file = */ "",
 		/* serial_port = */ "/dev/ttyS0",
 		/* bind_addr = */ "[::1]:[8445]"
 		};
