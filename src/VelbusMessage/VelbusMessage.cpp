@@ -31,7 +31,7 @@ VelbusMessage* parse_and_consume(std::string &msg)
 
 	if( msg.length() < 6+length ) throw InsufficientData();
 
-	for(int i=4; i<4+length; i++) sum += msg[i];
+	for(unsigned int i=4; i<4+length; i++) sum += msg[i];
 	std::string data = msg.substr(4, length);
 
 	sum = (-sum)&0xff;
@@ -91,7 +91,7 @@ std::string Unknown::string() throw() {
 	  << " Addr=0x" << std::hex << static_cast<int>(m_addr) << std::dec
 	  << " RTR=" << static_cast<unsigned int>(m_rtr)
 	  << " data[" << m_data.length() << "]=";
-	for( int i = 0; i < m_data.length(); i++ ) {
+	for( unsigned int i = 0; i < m_data.length(); i++ ) {
 		o << hex(m_data[i]) << " "; // Ugly hex-dump hack
 	}
 	return o.str();

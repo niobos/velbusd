@@ -5,8 +5,12 @@
 
 std::string hex(int number) {
 	std::ostringstream o;
-	o << std::hex << std::setw(2) << std::setfill('0') << (number);
+	o << std::hex << std::setw(2) << std::setfill('0') << number;
 	return o.str();
+}
+std::string hex(char num) {
+	unsigned char temp = num;
+	return hex( temp );
 }
 
 std::string bin(int bitmap) {
@@ -18,7 +22,7 @@ std::string bin(int bitmap) {
 }
 
 int bitnum(int bitmap) {
-	for( int i = 0; i < sizeof(bitmap)*8; i++ ) {
+	for( unsigned int i = 0; i < sizeof(bitmap)*8; i++ ) {
 		if( (bitmap >> i) & 0x01 ) return i;
 	}
 	return -1;

@@ -160,7 +160,7 @@ Inet6::Inet6(struct sockaddr_in6 const &addr) throw() {
 	m_addr.sin6_family = AF_INET6;
 	m_addr.sin6_port = addr.sin6_port;
 	m_addr.sin6_flowinfo = addr.sin6_flowinfo;
-	for( int i = 0; i < sizeof(addr.sin6_addr.s6_addr); i++) m_addr.sin6_addr.s6_addr[i] = addr.sin6_addr.s6_addr[i];
+	for( unsigned int i = 0; i < sizeof(addr.sin6_addr.s6_addr); i++) m_addr.sin6_addr.s6_addr[i] = addr.sin6_addr.s6_addr[i];
 	m_addr.sin6_scope_id = addr.sin6_scope_id;
 }
 

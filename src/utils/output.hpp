@@ -4,6 +4,8 @@
 #include <string>
 
 std::string hex(int number);
+std::string hex(char num);
+
 std::string bin(int bitmap);
 
 int bitnum(int bitmap);
