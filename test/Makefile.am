@@ -26,9 +26,9 @@ Parser_TESTS = Parser-PushButtonStatus.sh \
                Parser-SetLeds.sh Parser-ClearLeds.sh \
                Parser-SlowBlinkLeds.sh Parser-FastBlinkLeds.sh Parser-VFastBlinkLeds.sh \
                Parser-UpdateLeds.sh \
-               Parser-RelayStatus.sh
+               Parser-RelayStatus.sh \
+               Parser-MemoryData.sh Parser-MemoryBlock.sh
 dist_check_SCRIPTS += $(Parser_TESTS)
-TESTS += $(Parser_TESTS)
 
 Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage/PushButtonStatus.hpp \
                   ../src/VelbusMessage/SetLeds.cpp ../src/VelbusMessage/SetLeds.hpp \
@@ -38,5 +38,6 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/VFastBlinkLeds.cpp ../src/VelbusMessage/VFastBlinkLeds.hpp \
                   ../src/VelbusMessage/RelayStatus.cpp ../src/VelbusMessage/RelayStatus.hpp \
                   ../src/VelbusMessage/UpdateLeds.cpp ../src/VelbusMessage/UpdateLeds.hpp \
-                  ../src/VelbusMessage/MemoryData.cpp ../src/VelbusMessage/MemoryData.hpp
+                  ../src/VelbusMessage/MemoryData.cpp ../src/VelbusMessage/MemoryData.hpp \
+                  ../src/VelbusMessage/MemoryBlock.cpp ../src/VelbusMessage/MemoryBlock.hpp
 endif
