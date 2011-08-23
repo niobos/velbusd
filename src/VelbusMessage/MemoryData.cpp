@@ -25,7 +25,7 @@ MemoryData::MemoryData( unsigned char prio, unsigned char addr, unsigned char rt
 	if( rtr != 0 ) throw FormError("Wrong RTR");
 	if( data.length() != 4 ) throw FormError("Incorrect length");
 	if( data[0] != (char)0xfe ) throw FormError("Wrong type");
-	m_address = (data[1] << 8) | data[2];
+	m_address = ((data[1]&0xff) << 8) | (data[2]&0xff);
 	m_data = data[3];
 }
 
