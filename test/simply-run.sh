@@ -7,7 +7,7 @@ PORT=61234
 
 mkfifo pipe.$$
 
-../src/velbusd -s pipe.$$ -b [::1]:[${PORT}] >/dev/null 2>&1 &
+../src/velbusd -f -s pipe.$$ -b [::1]:[${PORT}] >/dev/null 2>&1 &
 PID_VELBUSD=$!
 
 sleep $SECONDS

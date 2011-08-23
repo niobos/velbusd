@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <getopt.h>
 #include <fcntl.h>
 #include <termios.h>
@@ -193,9 +194,13 @@ void incomming_connection(EV_P_ ev_io *w, int revents) {
 int main(int argc, char* argv[]) {
 	// Defaults
 	struct {
+		bool fork;
+		std::string pid_file;
 		std::string serial_port;
 		std::string bind_addr;
 	} options = {
+		/* fork = */ true,
+		/* fid_file = */ "",
 		/* serial_port = */ "/dev/ttyS0",
 		/* bind_addr = */ "[::1]:[8445]"
 		};
@@ -203,9 +208,11 @@ int main(int argc, char* argv[]) {
 	log.reset( new TimestampLog( std::cerr ) );
 
 	{ // Parse options
-		char optstring[] = "?hs:b:";
+		char optstring[] = "?hfp:s:b:";
 		struct option longopts[] = {
 			{"help",			no_argument, NULL, '?'},
+			{"forgeground",		no_argument, NULL, 'f'},
+			{"pid-file",		required_argument, NULL, 'p'},
 			{"serialport",		required_argument, NULL, 's'},
 			{"bind",			required_argument, NULL, 'b'},
 			{NULL, 0, 0, 0}
@@ -220,12 +227,19 @@ int main(int argc, char* argv[]) {
 				//  >---------------------- Standard terminal width ---------------------------------<
 					"Options:\n"
 					"  -h -? --help                    Displays this help message and exits\n"
+					"  --foreground -f                 Don't fork into the background after init\n"
 					"  --serialport -s  /dev/ttyS0     The serial device to use\n"
 					"  --bind -b host:port             Bind to the specified address\n"
 					"                                  host and port resolving can be bypassed by\n"
 					"                                  placing [] around them\n"
 					;
 				exit(EX_USAGE);
+			case 'f':
+				options.fork = false;
+				break;
+			case 'p':
+				options.pid_file = optarg;
+				break;
 			case 's':
 				options.serial_port = optarg;
 				break;
@@ -320,6 +334,32 @@ int main(int argc, char* argv[]) {
 		s_listen.bind((*bind_sa)[0]);
 		s_listen.listen(MAX_CONN_BACKLOG);
 		*log << "Listening on " << (*bind_sa)[0].string() << "\n" << std::flush;
+	}
+
+	{
+		/* Open pid-file before fork()
+		 * That way, failing to open the pid-file will cause a pre-fork-abort
+		 */
+		std::ofstream pid_file;
+		if( options.pid_file.length() > 0 ) pid_file.open( options.pid_file.c_str() );
+
+		if( options.fork ) {
+			pid_t child = fork();
+			if( child == -1 ) {
+				char error_descr[256];
+				strerror_r(errno, error_descr, sizeof(error_descr));
+				*log << "Could not fork: " << error_descr << "\n" << std::flush;
+				exit(EX_OSERR);
+			} else if( child == 0 ) {
+				// We are the child
+				// continue on with the program
+			} else {
+				// We are the parent
+				exit(0);
+			}
+		}
+
+		if( options.pid_file.length() > 0 ) pid_file << getpid();
 	}
 
 	{

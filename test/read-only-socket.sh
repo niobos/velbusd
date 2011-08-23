@@ -7,7 +7,7 @@ PORTRO=61235
 
 mkfifo pipe.$$ # Will loop all input to output
 
-../src/velbusd -s pipe.$$ -b [::1]:[${PORT}] -r [::1]:[${PORTRO}] >/dev/null 2>&1 &
+../src/velbusd -f -s pipe.$$ -b [::1]:[${PORT}] -r [::1]:[${PORTRO}] >/dev/null 2>&1 &
 PID_VELBUSD=$!
 
 sleep 1

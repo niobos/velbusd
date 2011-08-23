@@ -1,5 +1,5 @@
 check_PROGRAMS = NBcat Parser
-dist_check_SCRIPTS = simply-run.sh \
+dist_check_SCRIPTS = simply-run.sh fork.sh \
                      echo.sh echo-with-garbage.sh read-only-socket.sh \
                      logging.sh \
                      slow-client.sh \
