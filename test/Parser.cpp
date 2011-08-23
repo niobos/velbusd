@@ -17,6 +17,6 @@ int main(int argc, char* argv[]) {
 		std::cout << "InsufficientData\n";
 
 	} catch( VelbusMessage::FormError &e ) {
-		std::cout << "FormError\n";
+		std::cout << "FormError: " << e.details() << "\n";
 	}
 }
