@@ -17,6 +17,8 @@ public:
 		return new IntStatusRequest(prio, addr, rtr, data);
 	}
 
+	IntStatusRequest();
+
 	virtual std::string data() throw();
 	virtual std::string string() throw();
 };

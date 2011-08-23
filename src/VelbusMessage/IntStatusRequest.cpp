@@ -29,6 +29,10 @@ IntStatusRequest::IntStatusRequest( unsigned char prio, unsigned char addr, unsi
 	if( addr != 0x00 ) throw FormError("VMB1RS command not from address 0x00");
 }
 
+IntStatusRequest::IntStatusRequest() :
+		VelbusMessage(0, 0, 0) {
+}
+
 std::string IntStatusRequest::data() throw() {
 	std::string ret("\x0E", 1);
 	return ret;
