@@ -421,6 +421,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	{ // Initialize the serial state
+		serial.bus_active = false;
+		serial.rx_ready = false;
 		VelbusMessage::IntStatusRequest m;
 		write(serial.conn.sock, m.message());
 		// This will trigger a combination of (BusActive,BusOff)x(RxReady,RxBuffFull)
