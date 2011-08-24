@@ -17,14 +17,6 @@ AC_ARG_ENABLE([parser],
 	esac],[enable_parser=true])
 AM_CONDITIONAL([WANT_PARSER], [test x$enable_parser = xtrue])
 
-AC_DEFINE([WANT_CHECKSUM_VERIFY],[true],[Verify the checksums])
-AC_ARG_ENABLE([checksum],
-	[  --enable-checksum    Verify the checksums (default enabled)],
-	[case "${enableval}" in
-	  yes) AC_DEFINE([WANT_CHECKSUM_VERIFY],[true]);;
-	  no)  AC_DEFINE([WANT_CHECKSUM_VERIFY],[false]);;
-	  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-checksum]) ;;
-	esac],[])
 
 # Checks for programs
 #####################

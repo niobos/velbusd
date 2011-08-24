@@ -36,7 +36,7 @@ VelbusMessage* parse_and_consume(std::string &msg)
 	std::string data = msg.substr(4, length);
 
 	sum = (-sum)&0xff;
-	if( WANT_CHECKSUM_VERIFY && (msg[4+length]&0xff) != sum ) throw FormError("Checksum incorrect");
+	if( (msg[4+length]&0xff) != sum ) throw FormError("Checksum incorrect");
 
 	if( msg[4+length+1] != 0x04 ) throw FormError("data[-1] != 0x04");
 
