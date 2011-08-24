@@ -133,6 +133,7 @@ void received_sigint(EV_P_ ev_signal *w, int revents) throw() {
 	ev_unloop(EV_A_ EVUNLOOP_ALL);
 }
 
+void process_read_data(EV_P_ struct connection *c); // Declare before use
 void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 	struct connection *c = reinterpret_cast<struct connection*>(w->data);
 
@@ -156,6 +157,11 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 	}
 
 	c->buf.append(buf);
+
+	process_read_data(EV_A_ c);
+}
+
+void process_read_data(EV_P_ struct connection *c) {
 	while(1) {
 		std::auto_ptr<VelbusMessage::VelbusMessage> m;
 		try {
