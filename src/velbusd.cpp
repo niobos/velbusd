@@ -443,6 +443,7 @@ int main(int argc, char* argv[]) {
 		ev_signal_start( EV_DEFAULT_ &ev_signal_watcher);
 
 		ev_io_init( &serial.conn.read_ready, ready_to_read, serial.conn.sock, EV_READ );
+		ev_set_priority( &serial.conn.read_ready, 1); // Always process serial first
 		serial.conn.read_ready.data = &serial.conn;
 		ev_io_start( EV_DEFAULT_ &serial.conn.read_ready );
 
