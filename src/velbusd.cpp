@@ -215,6 +215,16 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 	if( c != &serial.conn ) {
 		try {
 			write(serial.conn.sock, m->message());
+			/* Force the bytes to hit the wire
+			 * We do software flow control, so we need caching disabled */
+			if( tcdrain(serial.conn.sock) != 0 ) {
+				char error_descr[256];
+				strerror_r(errno, error_descr, sizeof(error_descr));
+				std::string e;
+				e = "Could not fcdrain(): ";
+				e.append(error_descr);
+				throw IOError( e );
+			}
 		} catch( IOError &e ) {
 			throw;
 		}
