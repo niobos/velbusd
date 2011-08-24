@@ -50,7 +50,7 @@ struct connection {
 	Socket sock;
 	std::string buf;
 	std::string id;
-	ev_io watcher;
+	ev_io read_ready;
 };
 
 std::auto_ptr<std::ostream> log;
@@ -102,7 +102,7 @@ void kill_connection(EV_P_ ev_io *w) {
 
 	// Find and erase this connection in the list
 	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
-		if( &(i->watcher) == w ) {
+		if( &(i->read_ready) == w ) {
 			c_network.erase(i);
 			break; // Stop searching
 		}
@@ -111,7 +111,7 @@ void kill_connection(EV_P_ ev_io *w) {
 void kill_all_connections(EV_P) {
 	typeof(c_network.begin()) i;
 	while( i = c_network.begin(),  i != c_network.end() ) {
-		ev_io_stop(EV_A_ &i->watcher );
+		ev_io_stop(EV_A_ &i->read_ready );
 		c_network.erase(i);
 	}
 }
@@ -119,12 +119,12 @@ void kill_all_connections(EV_P) {
 
 void stop_all_watchers(EV_P) {
 	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
-		ev_io_stop(EV_A_ &i->watcher );
+		ev_io_stop(EV_A_ &i->read_ready );
 	}
 }
 void start_all_watchers(EV_P) {
 	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
-		ev_io_start(EV_A_ &i->watcher );
+		ev_io_start(EV_A_ &i->read_ready );
 	}
 }
 
@@ -205,7 +205,7 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 				write(i->sock, m->message());
 			} catch( IOError &e ) {
 				*log << i->id << " : IO error, closing connection: " << e.what() << "\n" << std::flush;
-				ev_io *w = &( i->watcher );
+				ev_io *w = &( i->read_ready );
 				--i; // Prepare iterator for deletion
 				kill_connection(EV_A_ w );
 			}
@@ -242,9 +242,9 @@ void incomming_connection(EV_P_ ev_io *w, int revents) {
 		return; // Without setting watcher & without keeping connection
 	}
 
-	ev_io_init( &new_con->watcher, ready_to_read, new_con->sock, EV_READ );
-	new_con->watcher.data = new_con.get();
-	ev_io_start( EV_A_ &new_con->watcher );
+	ev_io_init( &new_con->read_ready, ready_to_read, new_con->sock, EV_READ );
+	new_con->read_ready.data = new_con.get();
+	ev_io_start( EV_A_ &new_con->read_ready );
 
 	c_network.push_back( new_con.release() );
 }
@@ -436,9 +436,9 @@ int main(int argc, char* argv[]) {
 		ev_signal_init( &ev_signal_watcher, received_sigint, SIGINT);
 		ev_signal_start( EV_DEFAULT_ &ev_signal_watcher);
 
-		ev_io_init( &serial.conn.watcher, ready_to_read, serial.conn.sock, EV_READ );
-		serial.conn.watcher.data = &serial.conn;
-		ev_io_start( EV_DEFAULT_ &serial.conn.watcher );
+		ev_io_init( &serial.conn.read_ready, ready_to_read, serial.conn.sock, EV_READ );
+		serial.conn.read_ready.data = &serial.conn;
+		ev_io_start( EV_DEFAULT_ &serial.conn.read_ready );
 
 		ev_io e_listen;
 		ev_io_init( &e_listen, incomming_connection, s_listen, EV_READ );
