@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -430,8 +432,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	{ // Initialize the serial state
-		serial.bus_active = false;
-		serial.rx_ready = false;
+		serial.bus_active = WANT_OPTIMISTIC_BUS;
+		serial.rx_ready = WANT_OPTIMISTIC_BUS;
 		VelbusMessage::IntStatusRequest m;
 		write(serial.conn.sock, m.message());
 		// This will trigger a combination of (BusActive,BusOff)x(RxReady,RxBuffFull)

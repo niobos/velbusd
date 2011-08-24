@@ -17,6 +17,14 @@ AC_ARG_ENABLE([parser],
 	esac],[enable_parser=true])
 AM_CONDITIONAL([WANT_PARSER], [test x$enable_parser = xtrue])
 
+AC_DEFINE([WANT_OPTIMISTIC_BUS],[false],[Assume the bus is free on start])
+AC_ARG_ENABLE([optimistic-bus],
+	[  --enable-optimistic-bus    Assume the bus is ready unless we receive the contrary (default disabled)],
+	[case "${enableval}" in
+	  yes) AC_DEFINE([WANT_OPTIMISTIC_BUS],[true]);;
+	  no)  AC_DEFINE([WANT_OPTIMISTIC_BUS],[false]);;
+	  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-optimistic-bus]) ;;
+	esac],[])
 
 # Checks for programs
 #####################
