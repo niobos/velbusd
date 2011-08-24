@@ -341,6 +341,9 @@ int main(int argc, char* argv[]) {
 
 		port_options.c_iflag |= IGNPAR; // Ignore parity (since none is used)
 		port_options.c_iflag &= ~(IXON | IXOFF | IXANY); // Disable software flow control
+		port_options.c_iflag &= ~INLCR; // Turn off any conversions
+		port_options.c_iflag &= ~ICRNL;
+		port_options.c_iflag &= ~IGNCR;
 
 		port_options.c_oflag &= ~OPOST; // Disable output processing = raw mode
 
