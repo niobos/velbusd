@@ -53,6 +53,7 @@ struct connection {
 	std::string buf;
 	std::string id;
 	ev_io read_ready;
+	ev_idle processing_todo;
 };
 
 std::auto_ptr<std::ostream> log;
@@ -135,7 +136,6 @@ void received_sigint(EV_P_ ev_signal *w, int revents) throw() {
 	ev_unloop(EV_A_ EVUNLOOP_ALL);
 }
 
-void process_read_data(EV_P_ struct connection *c); // Declare before use
 void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 	struct connection *c = reinterpret_cast<struct connection*>(w->data);
 
@@ -160,63 +160,69 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 
 	c->buf.append(buf);
 
-	process_read_data(EV_A_ c);
+	// Queue the processing job
+	ev_idle_start(EV_A_ &c->processing_todo );
+	// We're no longer interested in reading (until processing is done)
+	ev_io_stop(EV_A_ &c->read_ready );
 }
 
-void process_read_data(EV_P_ struct connection *c) {
-	while(1) {
-		std::auto_ptr<VelbusMessage::VelbusMessage> m;
+void process_read_data(EV_P_ ev_idle *w, int revents) {
+	struct connection *c = reinterpret_cast<struct connection*>(w->data);
+
+	std::auto_ptr<VelbusMessage::VelbusMessage> m;
+	try {
+		m.reset( VelbusMessage::parse_and_consume(c->buf) );
+		*log << c->id << " : " << m->string() << "\n" << std::flush;
+
+	} catch( VelbusMessage::InsufficientData &e ) {
+		ev_idle_stop(EV_A_ &c->processing_todo ); // No more processing to do
+		ev_io_start(EV_A_ &c->read_ready ); // We're ready to read again
+		return; // and wait for more data
+
+	} catch( VelbusMessage::FormError &e ) {
+		*log << c->id << " : Form Error in data (" << e.details() << "), ignoring byte "
+			 << "0x" << hex(c->buf[0]) << "\n" << std::flush;
+		c->buf = c->buf.substr(1);
+		return; // and retry from next byte in the next event-loop
+	}
+
+	if( c == &serial.conn ) {
+		// Do flow control for serial line
+		if( typeid(*m) ==typeid(VelbusMessage::BusOff) ) {
+			serial.bus_active = false;
+			kill_all_connections(EV_A);
+
+		} else if( typeid(*m) ==typeid(VelbusMessage::BusActive) ) {
+			serial.bus_active = true;
+
+		} else if( typeid(*m) ==typeid(VelbusMessage::RxBuffFull) ) {
+			serial.rx_ready = false;
+			stop_all_watchers(EV_A);
+			// TODO: Do we need to check for pending callbacks?
+
+		} else if( typeid(*m) ==typeid(VelbusMessage::RxReady) ) {
+			serial.rx_ready = true;
+			start_all_watchers(EV_A);
+		}
+
+	}
+
+	if( c != &serial.conn ) {
 		try {
-			m.reset( VelbusMessage::parse_and_consume(c->buf) );
-			*log << c->id << " : " << m->string() << "\n" << std::flush;
-
-		} catch( VelbusMessage::InsufficientData &e ) {
-			break; // out of while, and wait for more data
-		} catch( VelbusMessage::FormError &e ) {
-			*log << c->id << " : Form Error in data (" << e.details() << "), ignoring byte "
-			     << "0x" << hex(c->buf[0]) << "\n" << std::flush;
-			c->buf = c->buf.substr(1);
-			continue; // retry from next byte
+			write(serial.conn.sock, m->message());
+		} catch( IOError &e ) {
+			throw;
 		}
-
-		if( c == &serial.conn ) {
-			// Do flow control for serial line
-			if( typeid(*m) ==typeid(VelbusMessage::BusOff) ) {
-				serial.bus_active = false;
-				kill_all_connections(EV_A);
-
-			} else if( typeid(*m) ==typeid(VelbusMessage::BusActive) ) {
-				serial.bus_active = true;
-
-			} else if( typeid(*m) ==typeid(VelbusMessage::RxBuffFull) ) {
-				serial.rx_ready = false;
-				stop_all_watchers(EV_A);
-				// TODO: Do we need to check for pending callbacks?
-
-			} else if( typeid(*m) ==typeid(VelbusMessage::RxReady) ) {
-				serial.rx_ready = true;
-				start_all_watchers(EV_A);
-			}
-
-		}
-
-		if( c != &serial.conn ) {
-			try {
-				write(serial.conn.sock, m->message());
-			} catch( IOError &e ) {
-				throw;
-			}
-		}
-		for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
-			if( &(*i) == c ) continue; // Don't loop input to same socket
-			try {
-				write(i->sock, m->message());
-			} catch( IOError &e ) {
-				*log << i->id << " : IO error, closing connection: " << e.what() << "\n" << std::flush;
-				ev_io *w = &( i->read_ready );
-				--i; // Prepare iterator for deletion
-				kill_connection(EV_A_ w );
-			}
+	}
+	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
+		if( &(*i) == c ) continue; // Don't loop input to same socket
+		try {
+			write(i->sock, m->message());
+		} catch( IOError &e ) {
+			*log << i->id << " : IO error, closing connection: " << e.what() << "\n" << std::flush;
+			ev_io *w = &( i->read_ready );
+			--i; // Prepare iterator for deletion
+			kill_connection(EV_A_ w );
 		}
 	}
 }
@@ -253,6 +259,9 @@ void incomming_connection(EV_P_ ev_io *w, int revents) {
 	ev_io_init( &new_con->read_ready, ready_to_read, new_con->sock, EV_READ );
 	new_con->read_ready.data = new_con.get();
 	ev_io_start( EV_A_ &new_con->read_ready );
+
+	ev_idle_init( &new_con->processing_todo, process_read_data );
+	new_con->processing_todo.data = new_con.get();
 
 	c_network.push_back( new_con.release() );
 }
@@ -448,6 +457,10 @@ int main(int argc, char* argv[]) {
 		ev_set_priority( &serial.conn.read_ready, 1); // Always process serial first
 		serial.conn.read_ready.data = &serial.conn;
 		ev_io_start( EV_DEFAULT_ &serial.conn.read_ready );
+
+		ev_idle_init( & serial.conn.processing_todo, process_read_data );
+		serial.conn.processing_todo.data = &serial.conn;
+		// Don't start
 
 		ev_io e_listen;
 		ev_io_init( &e_listen, incomming_connection, s_listen, EV_READ );
