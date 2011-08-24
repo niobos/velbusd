@@ -36,10 +36,12 @@ AC_C_INLINE
 
 # Library checks
 ################
+AC_CHECK_LIB(ev, ev_loop, [], [AC_MSG_ERROR([Couldn't find libev])], [])
 
 
 # Header checks
 ###############
+AC_CHECK_HEADER([boost/ptr_container/ptr_list.hpp], [], [AC_MSG_ERROR([Couldn't find boost library])], [])
 
 
 # Typedefs & structs
