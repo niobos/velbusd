@@ -24,7 +24,7 @@ if ! diff input.bin.$$ output.bin.$$; then
 fi
 
 kill -INT $PID_VELBUSD
-kill -INT $BUSSIM
+kill $BUSSIM
 rm -f tty.$$ input.bin.$$ output.bin.$$
 
 if ! wait $PID_VELBUSD; then
