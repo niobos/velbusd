@@ -369,7 +369,7 @@ int main(int argc, char* argv[]) {
 
 		port_options.c_cflag &= ~CRTSCTS; // Disable hardware flow control
 
-		port_options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // Raw mode
+		port_options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG | IEXTEN); // Raw mode
 
 		port_options.c_iflag |= IGNPAR; // Ignore parity (since none is used)
 		port_options.c_iflag &= ~(IXON | IXOFF | IXANY); // Disable software flow control
