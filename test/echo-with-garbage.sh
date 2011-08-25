@@ -4,9 +4,12 @@ echo "Checking that messages pass through..."
 
 PORT=61234
 
-mkfifo pipe.$$ # Will loop all input to output
+./VMB1RS-sim > tty.$$ &
+BUSSIM=$!
 
-../src/velbusd -f -s pipe.$$ -b [::1]:[${PORT}] >/dev/null 2>&1 &
+sleep 1
+
+../src/velbusd -f -s $(<tty.$$) -b [::1]:[${PORT}] >/dev/null 2>&1 &
 PID_VELBUSD=$!
 
 sleep 1
@@ -21,7 +24,8 @@ if ! diff input.bin.$$ output.bin.$$; then
 fi
 
 kill -INT $PID_VELBUSD
-rm -f pipe.$$ input.bin.$$ output.bin.$$
+kill -INT $BUSSIM
+rm -f tty.$$ input.bin.$$ output.bin.$$
 
 if ! wait $PID_VELBUSD; then
 	echo "program exited uncleanly"

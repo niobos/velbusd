@@ -5,9 +5,12 @@ TIME=15
 BANDWIDTH=100000
 
 echo "Testing behaviour when a slow client is connected for $TIME seconds..."
-mkfifo pipe.$$
 
-../src/velbusd -f -s pipe.$$ -b [::1]:[${PORT}] >/dev/null 2>&1 &
+./VMB1RS-sim > tty.$$ &
+BUSSIM=$!
+sleep 1
+
+../src/velbusd -f -s $(<tty.$$) -b [::1]:[${PORT}] >/dev/null 2>&1 &
 PID_VELBUSD=$!
 
 sleep 1
@@ -23,6 +26,7 @@ RV=$?
 
 kill $PID_VELBUSD
 kill $PID_SLOW
-rm -f pipe.$$
+kill $BUSSIM
+rm -f tty.$$
 
 exit $RV
