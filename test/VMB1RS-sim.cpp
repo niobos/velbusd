@@ -83,7 +83,10 @@ int main(int argc, char *argv[]) {
 			// Reply with Bus Active & Receive Ready
 			msg.assign("\x0f\xf8\x00\x01\x0a\xee\x04\x0f\xf8\x00\x01\x0c\xec\x04", 7+7);
 
-		} /* else echo back */
+		} else {
+			// else echo back message
+			//msg = msg;
+		}
 
 		int rv = write(s_master, msg.data(), msg.length());
 		if( rv == -1 ) {
