@@ -2,7 +2,7 @@
 
 PORT=61234
 TIME=15
-BANDWIDTH=100000
+BANDWIDTH=10000
 
 echo "Testing behaviour when a slow client is connected for $TIME seconds..."
 
@@ -15,7 +15,7 @@ PID_VELBUSD=$!
 
 sleep 1
 
-socat TCP6:localhost:$PORT,rcvbuf=1024 EXEC:"sleep 15" &
+socat TCP6:localhost:$PORT,rcvbuf=10 EXEC:"sleep 15" &
 PID_SLOW=$!
 
 # Spit 1.4MB/second
