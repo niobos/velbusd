@@ -1,13 +1,4 @@
-check_PROGRAMS = NBcat Parser
-dist_check_SCRIPTS = simply-run.sh fork.sh \
-                     echo.sh echo-with-garbage.sh read-only-socket.sh \
-                     logging.sh \
-                     slow-client.sh \
-                     Parser-garbage.sh \
-                     Parser-BusOff.sh Parser-BusActive.sh \
-                     Parser-RxBuffFull.sh Parser-RxReady.sh \
-                     Parser-IntStatusRequest.sh
-TESTS = $(dist_check_SCRIPTS)
+check_PROGRAMS = NBcat Parser VMB1RS-sim
 
 NBcat_SOURCES = NBcat.cpp
 
@@ -23,14 +14,28 @@ Parser_SOURCES = Parser.cpp \
                  ../src/VelbusMessage/RxReady.cpp ../src/VelbusMessage/RxReady.hpp \
                  ../src/VelbusMessage/IntStatusRequest.cpp ../src/VelbusMessage/IntStatusRequest.hpp
 
+VMB1RS_sim_SOURCES = VMB1RS-sim.cpp \
+                     ../src/utils/output.cpp ../src/utils/output.hpp
+
+testscripts = simply-run.sh fork.sh \
+              echo.sh echo-with-garbage.sh read-only-socket.sh \
+              logging.sh \
+              slow-client.sh \
+              Parser-garbage.sh \
+              Parser-BusOff.sh Parser-BusActive.sh \
+              Parser-RxBuffFull.sh Parser-RxReady.sh \
+              Parser-IntStatusRequest.sh
+
+dist_check_SCRIPTS = $(testscripts)
+TESTS = $(testscripts)
+
 if WANT_PARSER
-Parser_TESTS = Parser-PushButtonStatus.sh \
+testscripts += Parser-PushButtonStatus.sh \
                Parser-SetLeds.sh Parser-ClearLeds.sh \
                Parser-SlowBlinkLeds.sh Parser-FastBlinkLeds.sh Parser-VFastBlinkLeds.sh \
                Parser-UpdateLeds.sh \
                Parser-RelayStatus.sh \
                Parser-MemoryData.sh Parser-MemoryBlock.sh
-dist_check_SCRIPTS += $(Parser_TESTS)
 
 Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage/PushButtonStatus.hpp \
                   ../src/VelbusMessage/SetLeds.cpp ../src/VelbusMessage/SetLeds.hpp \

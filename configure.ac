@@ -42,6 +42,7 @@ AC_CHECK_LIB(ev, ev_loop, [], [AC_MSG_ERROR([Couldn't find libev])], [])
 # Header checks
 ###############
 AC_CHECK_HEADER([boost/ptr_container/ptr_list.hpp], [], [AC_MSG_ERROR([Couldn't find boost library])], [])
+AC_CHECK_HEADERS([pty.h util.h], [break;], [], [])
 
 
 # Typedefs & structs
