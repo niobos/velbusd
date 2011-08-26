@@ -37,7 +37,10 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-SlowBlinkLeds.sh Parser-FastBlinkLeds.sh Parser-VFastBlinkLeds.sh \
                Parser-UpdateLeds.sh \
                Parser-RelayStatus.sh \
-               Parser-MemoryData.sh Parser-MemoryBlock.sh
+               Parser-MemoryData.sh Parser-MemoryBlock.sh \
+               Parser-BusErrorCounter.sh \
+               Parser-BlindStatus.sh \
+               Parser-ModuleType.sh
 
 Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage/PushButtonStatus.hpp \
                   ../src/VelbusMessage/SetLeds.cpp ../src/VelbusMessage/SetLeds.hpp \
