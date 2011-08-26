@@ -18,8 +18,9 @@ VMB1RS_sim_SOURCES = VMB1RS-sim.cpp \
                      ../src/utils/output.cpp ../src/utils/output.hpp
 
 testscripts = simply-run.sh fork.sh \
-              echo.sh echo-with-garbage.sh read-only-socket.sh \
-              logging.sh \
+              echo.sh echo-with-garbage.sh \
+              RxBuffFull.sh \
+              read-only-socket.sh logging.sh \
               slow-client.sh \
               Parser-garbage.sh \
               Parser-BusOff.sh Parser-BusActive.sh \

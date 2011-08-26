@@ -8,7 +8,21 @@
  #include <util.h>
 #endif
 #include <unistd.h>
+#include <fcntl.h>
 #include "../src/utils/output.hpp"
+
+int write(int to, std::string const &what) {
+	int rv = write(to, what.data(), what.length());
+	if( rv == -1 ) {
+		perror("write()");
+		return 1;
+	}
+	if( rv != what.length() ) {
+		std::cerr << "Write count does not match\n";
+		return 1;
+	}
+	return 0;
+}
 
 int main(int argc, char *argv[]) {
 	int s_master, s_slave;
@@ -82,21 +96,31 @@ int main(int argc, char *argv[]) {
 			// Interface Status request
 			// Reply with Bus Active & Receive Ready
 			msg.assign("\x0f\xf8\x00\x01\x0a\xee\x04\x0f\xf8\x00\x01\x0c\xec\x04", 7+7);
+			if( write(s_master, msg) ) return 1;
+
+		} else if( msg.compare(0,6,"\x0f\xfb\xff\x40\xb7\x04",6) == 0 ) {
+			// Module type request for module 0xff
+			// Pretend buffer is full for 1 second
+			msg.assign("\x0f\xf8\x00\x01\x0b\xed\x04", 7);
+			if( write(s_master, msg) ) return 1;
+			sleep(1);
+
+			// Now discard whatever we read and is available for read (after all, the buffer is full)
+			buf.clear();
+			fcntl(s_master, F_SETFL, fcntl(s_master, F_GETFL) | O_NONBLOCK );
+			read(s_master, rxbuf, sizeof(rxbuf));
+			fcntl(s_master, F_SETFL, fcntl(s_master, F_GETFL) & ~O_NONBLOCK );
+
+			// Ok, we're ready for Rx again
+			msg.assign("\x0f\xf8\x00\x01\x0c\xec\x04", 7);
+			if( write(s_master, msg) ) return 1;
 
 		} else {
 			// else echo back message
 			//msg = msg;
+			if( write(s_master, msg) ) return 1;
 		}
 
-		int rv = write(s_master, msg.data(), msg.length());
-		if( rv == -1 ) {
-			perror("write()");
-			return 1;
-		}
-		if( rv != msg.length() ) {
-			std::cerr << "Write count does not match\n";
-			return 1;
-		}
 	}
 
 	return 0;
