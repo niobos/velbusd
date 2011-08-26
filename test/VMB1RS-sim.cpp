@@ -1,10 +1,11 @@
 #include <config.h>
 
 #include <iostream>
+#include <stdio.h>
 #include <string>
 #ifdef HAVE_PTY_H
  #include <pty.h>
-#elif HAVE_UTIL_H
+#elif defined HAVE_UTIL_H
  #include <util.h>
 #endif
 #include <unistd.h>

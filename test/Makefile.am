@@ -16,6 +16,7 @@ Parser_SOURCES = Parser.cpp \
 
 VMB1RS_sim_SOURCES = VMB1RS-sim.cpp \
                      ../src/utils/output.cpp ../src/utils/output.hpp
+VMB1RS_sim_LDADD = -lutil
 
 testscripts = simply-run.sh fork.sh \
               echo.sh echo-with-garbage.sh \

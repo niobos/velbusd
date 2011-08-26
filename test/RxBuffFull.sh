@@ -9,7 +9,7 @@ BUSSIM=$!
 
 sleep 1
 
-../src/velbusd -f -s $(<tty.$$) -b [::1]:[${PORT}] &
+../src/velbusd -f -s $(<tty.$$) -b [::1]:[${PORT}] >/dev/null 2>&1 &
 PID_VELBUSD=$!
 
 sleep 1
