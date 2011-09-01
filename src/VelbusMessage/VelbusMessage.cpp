@@ -5,7 +5,10 @@
 #include <sstream>
 #include <stdio.h>
 #include "Unknown.hpp"
+
+#ifdef WANT_PARSER
 #include "ModuleTypeRequest.hpp"
+#endif
 
 namespace VelbusMessage {
 
@@ -45,12 +48,16 @@ VelbusMessage* parse_and_consume(std::string &msg)
 
 	// Now identify the type of message
 	try {
+#ifdef WANT_PARSER
 		if( data.length() == 0 ) {
 			return ModuleTypeRequest::factory(prio, addr, rtr, data);
 		}
 
 		struct factory_methods f = Registrar::get_instance().get( data[0] );
 		return f.factory(prio, addr, rtr, data);
+#else
+		throw NotFound(""); // no parsers present
+#endif
 
 	} catch( NotFound &e ) {
 		return Unknown::factory(prio, addr, rtr, data);
