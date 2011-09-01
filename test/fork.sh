@@ -1,10 +1,11 @@
 #!/bin/bash
 
+PORT=61234
 RV=0
 
 mkfifo pipe.$$
 
-../src/velbusd -s pipe.$$ -f >/dev/null 2>&1 &
+../src/velbusd -s pipe.$$ -f -b [::1]:[$PORT] >/dev/null 2>&1 &
 PID=$!
 sleep 1
 kill -INT $PID
@@ -14,7 +15,7 @@ if [ $? -ne 0 ]; then
 	RV=1
 fi
 
-../src/velbusd -s pipe.$$ -f -p pid.$$ >/dev/null 2>&1 &
+../src/velbusd -s pipe.$$ -f -p pid.$$ -b [::1]:[$PORT] >/dev/null 2>&1 &
 PID=$!
 sleep 1
 if [ "$(<pid.$$)" -ne "$PID" ]; then
@@ -28,7 +29,7 @@ if [ $? -ne 0 ]; then
 	RV=1
 fi
 
-../src/velbusd -s pipe.$$ -p pid.$$ >/dev/null 2>&1
+../src/velbusd -s pipe.$$ -p pid.$$ -b [::1]:[$PORT] >/dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo "Background spawn failed"
 	RV=1

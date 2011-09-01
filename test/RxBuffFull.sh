@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "Checking that software flow control works..."
-
 PORT=61234
 
 ./VMB1RS-sim > tty.$$ &
@@ -25,7 +23,7 @@ sleep 1
 	echo -ne "\x0f\xfb\x02\x08\xfb\x01\x00\x00\x00\x00\x00\x00\xf0\x04" # data
 	echo -ne "\x0f\xfb\xff\x40\xb7\x04" # cause RxBuffFull for 1 second
 	echo -ne "\x0f\xfb\x02\x08\xfb\x01\x00\x00\x00\x00\x00\x00\xf0\x04" # data
-	sleep 2
+	sleep 3
 ) | socat - TCP6:localhost:$PORT > output.bin.$$
 
 RV=0

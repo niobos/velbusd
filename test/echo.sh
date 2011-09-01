@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "Checking that messages pass through..."
-
 PORT=61234
 
 ./VMB1RS-sim > tty.$$ &
