@@ -56,6 +56,7 @@ struct connection {
 	ev_idle processing_todo;
 };
 
+std::ofstream logfile;
 std::auto_ptr<std::ostream> log;
 Socket s_listen;
 struct {
@@ -312,17 +313,17 @@ int main(int argc, char* argv[]) {
 		/* serial_port = */ "/dev/ttyS0",
 		/* bind_addr = */ "[::1]:[8445]"
 		};
-
 	log.reset( new TimestampLog( std::cerr ) );
 
 	{ // Parse options
-		char optstring[] = "?hfp:s:b:";
+		char optstring[] = "?hfp:s:b:l:";
 		struct option longopts[] = {
 			{"help",			no_argument, NULL, '?'},
 			{"forgeground",		no_argument, NULL, 'f'},
 			{"pid-file",		required_argument, NULL, 'p'},
 			{"serialport",		required_argument, NULL, 's'},
 			{"bind",			required_argument, NULL, 'b'},
+			{"log",				required_argument, NULL, 'l'},
 			{NULL, 0, 0, 0}
 		};
 		int longindex;
@@ -340,6 +341,7 @@ int main(int argc, char* argv[]) {
 					"  --bind -b host:port             Bind to the specified address\n"
 					"                                  host and port resolving can be bypassed by\n"
 					"                                  placing [] around them\n"
+					"  --log -l file                   Log to file\n"
 					;
 				exit(EX_USAGE);
 			case 'f':
@@ -353,6 +355,10 @@ int main(int argc, char* argv[]) {
 				break;
 			case 'b':
 				options.bind_addr = optarg;
+				break;
+			case 'l':
+				logfile.open(optarg, std::ios_base::app | std::ios_base::out );
+				log.reset( new TimestampLog( logfile ) );
 				break;
 			}
 		}
