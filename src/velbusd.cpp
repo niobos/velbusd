@@ -337,6 +337,8 @@ int main(int argc, char* argv[]) {
 					"Options:\n"
 					"  -h -? --help                    Displays this help message and exits\n"
 					"  --foreground -f                 Don't fork into the background after init\n"
+					"  --pid-file -p file              The file to write the PID to, especially\n"
+					"                                  usefull when running as a daemon\n"
 					"  --serialport -s  /dev/ttyS0     The serial device to use\n"
 					"  --bind -b host:port             Bind to the specified address\n"
 					"                                  host and port resolving can be bypassed by\n"
