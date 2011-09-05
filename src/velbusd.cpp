@@ -56,6 +56,7 @@ struct connection {
 	ev_idle processing_todo;
 };
 
+std::string logfilename;
 std::ofstream logfile;
 std::auto_ptr<std::ostream> log;
 Socket s_listen;
@@ -136,6 +137,13 @@ void start_all_watchers(EV_P) {
 void received_sigint(EV_P_ ev_signal *w, int revents) throw() {
 	*log << "Received SIGINT, exiting\n" << std::flush;
 	ev_unloop(EV_A_ EVUNLOOP_ALL);
+}
+
+void received_sighup(EV_P_ ev_signal *w, int revents) throw() {
+	*log << "Received SIGHUP, closing this logfile\n" << std::flush;
+	logfile.close();
+	logfile.open(logfilename.c_str(), std::ios_base::app | std::ios_base::out );
+	*log << "Received SIGHUP, (re)opening this logfile\n" << std::flush;
 }
 
 void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
@@ -359,7 +367,8 @@ int main(int argc, char* argv[]) {
 				options.bind_addr = optarg;
 				break;
 			case 'l':
-				logfile.open(optarg, std::ios_base::app | std::ios_base::out );
+				logfilename = optarg;
+				logfile.open(logfilename.c_str(), std::ios_base::app | std::ios_base::out );
 				log.reset( new TimestampLog( logfile ) );
 				break;
 			}
@@ -490,9 +499,13 @@ int main(int argc, char* argv[]) {
 	}
 
 	{
-		ev_signal ev_signal_watcher;
-		ev_signal_init( &ev_signal_watcher, received_sigint, SIGINT);
-		ev_signal_start( EV_DEFAULT_ &ev_signal_watcher);
+		ev_signal ev_sigint_watcher;
+		ev_signal_init( &ev_sigint_watcher, received_sigint, SIGINT);
+		ev_signal_start( EV_DEFAULT_ &ev_sigint_watcher);
+
+		ev_signal ev_sighup_watcher;
+		ev_signal_init( &ev_sighup_watcher, received_sighup, SIGHUP);
+		ev_signal_start( EV_DEFAULT_ &ev_sighup_watcher);
 
 		ev_io_init( &serial.conn.read_ready, ready_to_read, serial.conn.sock, EV_READ );
 		ev_set_priority( &serial.conn.read_ready, 1); // Always process serial first
