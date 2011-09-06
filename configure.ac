@@ -8,23 +8,13 @@ AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects -Wall])
 
 # Options
 #########
-AC_ARG_ENABLE([parser],
-	[  --enable-parser	Include parser modules (default enabled)],
-	[case "${enableval}" in
-	  yes) enable_parser=true;;
-	  no)  enable_parser=false;;
-	  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-parser]) ;;
-	esac],[enable_parser=true])
+AC_ARG_ENABLE([parser],AC_HELP_STRING([--disable-parser],[Disable parsing modules]))
+AS_IF([test x$enable_parser != xno], [ AC_DEFINE([WANT_PARSER], [1], [Include parsing modules]) ])
 AM_CONDITIONAL([WANT_PARSER], [test x$enable_parser = xtrue])
 
-AC_DEFINE([WANT_OPTIMISTIC_BUS],[false],[Assume the bus is free on start])
-AC_ARG_ENABLE([optimistic-bus],
-	[  --enable-optimistic-bus    Assume the bus is ready unless we receive the contrary (default disabled)],
-	[case "${enableval}" in
-	  yes) AC_DEFINE([WANT_OPTIMISTIC_BUS],[true]);;
-	  no)  AC_DEFINE([WANT_OPTIMISTIC_BUS],[false]);;
-	  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-optimistic-bus]) ;;
-	esac],[])
+AC_DEFINE([WANT_OPTIMISTIC_BUS],[true],[Assume the bus is free on start])
+AC_ARG_ENABLE([optimistic-bus], AC_HELP_STRING([--enable-optimistic-bus],[Assume the bus is ready unless we receive the contrary]))
+AS_IF([test x$enable_optimistic_bus != xyes], [AC_DEFINE([WANT_OPTIMISTIC_BUS],[false])] )
 
 # Checks for programs
 #####################
