@@ -37,4 +37,10 @@ fi
 sleep 1
 kill -INT $(<pid.$$)
 
+sleep 1
+if [ -e pid.$$ ]; then
+	echo "Failed to remove pid-file"
+	RV=1
+fi
+
 rm -f pipe.$$ pid.$$

@@ -525,5 +525,7 @@ int main(int argc, char* argv[]) {
 		ev_loop(EV_DEFAULT_ 0);
 	}
 
+	if( options.pid_file.length() > 0 ) remove( options.pid_file.c_str() );
+
 	return 0;
 }
