@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects -Wall])
 #########
 AC_ARG_ENABLE([parser],AC_HELP_STRING([--disable-parser],[Disable parsing modules]))
 AS_IF([test x$enable_parser != xno], [ AC_DEFINE([WANT_PARSER], [1], [Include parsing modules]) ])
-AM_CONDITIONAL([WANT_PARSER], [test x$enable_parser = xtrue])
+AM_CONDITIONAL([WANT_PARSER], [test x$enable_parser != xno])
 
 AC_DEFINE([WANT_OPTIMISTIC_BUS],[true],[Assume the bus is free on start])
 AC_ARG_ENABLE([optimistic-bus], AC_HELP_STRING([--enable-optimistic-bus],[Assume the bus is ready unless we receive the contrary]))
