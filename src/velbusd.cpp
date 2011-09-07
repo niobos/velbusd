@@ -146,6 +146,12 @@ void received_sighup(EV_P_ ev_signal *w, int revents) throw() {
 	*log << "Received SIGHUP, (re)opening this logfile\n" << std::flush;
 }
 
+void send_int_status_request(Socket &s) {
+	VelbusMessage::IntStatusRequest m;
+	write(s, m.message());
+	// This will trigger a combination of (BusActive,BusOff)x(RxReady,RxBuffFull)
+}
+
 void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 	struct connection *c = reinterpret_cast<struct connection*>(w->data);
 
@@ -494,13 +500,11 @@ int main(int argc, char* argv[]) {
 		if( options.pid_file.length() > 0 ) pid_file << getpid();
 	}
 
-	{ // Initialize the serial state
-		serial.bus_active = WANT_OPTIMISTIC_BUS;
-		serial.rx_ready = WANT_OPTIMISTIC_BUS;
-		VelbusMessage::IntStatusRequest m;
-		write(serial.conn.sock, m.message());
-		// This will trigger a combination of (BusActive,BusOff)x(RxReady,RxBuffFull)
-	}
+	// Initialize the serial state
+	serial.bus_active = WANT_OPTIMISTIC_BUS;
+	serial.rx_ready = WANT_OPTIMISTIC_BUS;
+	send_int_status_request(serial.conn.sock);
+	// This will trigger a combination of (BusActive,BusOff)x(RxReady,RxBuffFull)
 
 	{
 		ev_signal ev_sigint_watcher;
