@@ -172,7 +172,10 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 
 	// Queue the processing job
 	ev_idle_start(EV_A_ &c->processing_todo );
-	// We're no longer interested in reading (until processing is done)
+	/* We're no longer interested in reading (until processing is done)
+	 * Or more accurately: we don't want to be responsible for the buffering
+	 * the data until processing is done; let the kernel handle that
+	 */
 	ev_io_stop(EV_A_ &c->read_ready );
 }
 
