@@ -122,13 +122,13 @@ void kill_all_connections(EV_P) {
 }
 
 
-void stop_all_watchers(EV_P) {
+void stop_all_net_watchers(EV_P) {
 	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
 		ev_io_stop(EV_A_ &i->read_ready );
 		ev_idle_stop(EV_A_ &i->processing_todo );
 	}
 }
-void start_all_watchers(EV_P) {
+void start_all_net_watchers(EV_P) {
 	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
 		ev_idle_start(EV_A_ &i->processing_todo );
 	}
@@ -232,12 +232,12 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 		} else if( typeid(*m) ==typeid(VelbusMessage::RxBuffFull) ) {
 			serial.rx_ready = false;
 			// Stop all processing_todo and read_ready watchers
-			stop_all_watchers(EV_A);
+			stop_all_net_watchers(EV_A);
 
 		} else if( typeid(*m) ==typeid(VelbusMessage::RxReady) ) {
 			serial.rx_ready = true;
 			// Start all processing_todo watchers
-			start_all_watchers(EV_A);
+			start_all_net_watchers(EV_A);
 			/* If there is no processing to be done, they will reactivate
 			 * the read_ready watchers by themselves
 			 */
