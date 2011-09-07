@@ -280,6 +280,7 @@ void incomming_connection(EV_P_ ev_io *w, int revents) {
 	*log << new_con->id << " : Connection opened\n" << std::flush;
 
 	if( ! serial.bus_active ) {
+		*log << new_con->id << " : Bus is off; Closing connection\n" << std::flush;
 		return; // Without keeping the connection => close it
 	}
 
