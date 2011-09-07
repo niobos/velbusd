@@ -188,30 +188,6 @@ void ready_to_read(EV_P_ ev_io *w, int revents) throw() {
 void process_read_data(EV_P_ ev_idle *w, int revents) {
 	struct connection *c = reinterpret_cast<struct connection*>(w->data);
 
-	if( c != &serial.conn ) {
-		/* We will need to write to the serial port
-		 * Are there bytes to drain from the output buffer?
-		 */
-		int buffsize;
-		int rv = 0;
-		rv = ioctl(serial.conn.sock, TIOCOUTQ, &buffsize);
-		if( rv == 0 ) {
-			if( buffsize > 0 ) {
-				// Yes, bytes to drain; drain them now
-				rv = tcdrain(serial.conn.sock);
-			}
-		}
-		if( rv != 0 ) {
-			char error_descr[256];
-			strerror_r(errno, error_descr, sizeof(error_descr));
-			std::string e;
-			e = "Could not fcdrain(): ";
-			e.append(error_descr);
-			throw IOError( e );
-		}
-		if( buffsize > 0 ) return; // and allow serial Rx
-	}
-
 	std::auto_ptr<VelbusMessage::VelbusMessage> m;
 	try {
 		m.reset( VelbusMessage::parse_and_consume(c->buf) );
@@ -256,11 +232,14 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 
 	if( c != &serial.conn ) {
 		try {
+			// Send the message, followed by on interface status request
 			write(serial.conn.sock, m->message());
-			/* We need to call tcdrain() here to make sure all bytes hit
-			 * the wire in order to do software flow control
-			 * But to avoid wasting time, only call it on the next invocation
-			 */
+			send_int_status_request(serial.conn.sock);
+
+			// And wait until the module replies it's free
+			serial.rx_ready = false;
+			stop_all_net_watchers(EV_A);
+
 		} catch( IOError &e ) {
 			throw;
 		}
