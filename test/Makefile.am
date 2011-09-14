@@ -21,7 +21,7 @@ VMB1RS_sim_LDADD = -lutil
 testscripts = simply-run.sh fork.sh \
               echo.sh echo-with-garbage.sh \
               RxBuffFull.sh \
-              read-only-socket.sh logging.sh log-rotating.sh \
+              logging.sh log-rotating.sh \
               slow-client.sh \
               Parser-garbage.sh \
               Parser-BusOff.sh Parser-BusActive.sh \
