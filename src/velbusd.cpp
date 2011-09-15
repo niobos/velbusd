@@ -138,6 +138,10 @@ void received_sigint(EV_P_ ev_signal *w, int revents) throw() {
 	*log << "Received SIGINT, exiting\n" << std::flush;
 	ev_unloop(EV_A_ EVUNLOOP_ALL);
 }
+void received_sigterm(EV_P_ ev_signal *w, int revents) throw() {
+	*log << "Received SIGTERM, exiting\n" << std::flush;
+	ev_unloop(EV_A_ EVUNLOOP_ALL);
+}
 
 void received_sighup(EV_P_ ev_signal *w, int revents) throw() {
 	*log << "Received SIGHUP, closing this logfile\n" << std::flush;
@@ -489,6 +493,9 @@ int main(int argc, char* argv[]) {
 		ev_signal ev_sigint_watcher;
 		ev_signal_init( &ev_sigint_watcher, received_sigint, SIGINT);
 		ev_signal_start( EV_DEFAULT_ &ev_sigint_watcher);
+		ev_signal ev_sigterm_watcher;
+		ev_signal_init( &ev_sigterm_watcher, received_sigterm, SIGTERM);
+		ev_signal_start( EV_DEFAULT_ &ev_sigterm_watcher);
 
 		ev_signal ev_sighup_watcher;
 		ev_signal_init( &ev_sighup_watcher, received_sighup, SIGHUP);
