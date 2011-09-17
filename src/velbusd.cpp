@@ -72,12 +72,12 @@ std::string read(int from) throw(IOError, EOFreached) {
 	char buf[READ_SIZE];
 	int n = read(from, buf, sizeof(buf));
 	if( n == -1 ) {
+		std::ostringstream e;
+		e << "Could not read(): " << errno << " ";
 		char error_descr[256];
 		strerror_r(errno, error_descr, sizeof(error_descr));
-		std::string e;
-		e = "Could not read(): ";
-		e.append(error_descr);
-		throw IOError( e );
+		e << error_descr;
+		throw IOError( e.str() );
 	} else if( n == 0 ) {
 		throw EOFreached();
 	}
@@ -91,12 +91,12 @@ void write(int to, std::string const &what) throw(IOError) {
 			throw WouldBlock();
 		} // else
 
+		std::ostringstream e;
+		e << "Could not write(): " << errno << " ";
 		char error_descr[256];
 		strerror_r(errno, error_descr, sizeof(error_descr));
-		std::string e;
-		e = "Could not write(): ";
-		e.append(error_descr);
-		throw IOError( e );
+		e << error_descr;
+		throw IOError( e.str() );
 	} else if( rv != what.length() ) {
 		throw IOError( "Not enough bytes written" );
 	}
