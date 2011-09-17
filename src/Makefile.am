@@ -31,5 +31,7 @@ velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonSt
                    VelbusMessage/BusErrorCounter.cpp VelbusMessage/BusErrorCounter.hpp \
                    VelbusMessage/BlindStatus.cpp VelbusMessage/BlindStatus.hpp \
                    VelbusMessage/ModuleType.cpp VelbusMessage/ModuleType.hpp \
-                   VelbusMessage/Name.cpp VelbusMessage/Name.hpp
+                   VelbusMessage/Name.cpp VelbusMessage/Name.hpp \
+                   VelbusMessage/SwitchBlindOff.cpp VelbusMessage/SwitchBlindOff.hpp \
+                   VelbusMessage/SwitchBlindUpDown.cpp VelbusMessage/SwitchBlindUpDown.hpp
 endif

@@ -41,7 +41,9 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-BusErrorCounter.sh \
                Parser-BlindStatus.sh \
                Parser-ModuleType.sh \
-               Parser-Name.sh
+               Parser-Name.sh \
+               Parser-SwitchBlindOff.sh \
+               Parser-SwitchBlindUpDown.sh
 
 Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage/PushButtonStatus.hpp \
                   ../src/VelbusMessage/SetLeds.cpp ../src/VelbusMessage/SetLeds.hpp \
@@ -56,5 +58,7 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/BusErrorCounter.cpp ../src/VelbusMessage/BusErrorCounter.hpp \
                   ../src/VelbusMessage/BlindStatus.cpp ../src/VelbusMessage/BlindStatus.hpp \
                   ../src/VelbusMessage/ModuleType.cpp ../src/VelbusMessage/ModuleType.hpp \
-                  ../src/VelbusMessage/Name.cpp ../src/VelbusMessage/Name.hpp
+                  ../src/VelbusMessage/Name.cpp ../src/VelbusMessage/Name.hpp \
+                  ../src/VelbusMessage/SwitchBlindOff.cpp ../src/VelbusMessage/SwitchBlindOff.hpp \
+                  ../src/VelbusMessage/SwitchBlindUpDown.cpp ../src/VelbusMessage/SwitchBlindUpDown.hpp
 endif
