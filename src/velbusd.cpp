@@ -18,6 +18,7 @@
 #include <memory>
 #include <typeinfo>
 #include <assert.h>
+#include <signal.h>
 
 #include "Socket.hpp"
 #include "utils/TimestampLog.hpp"
@@ -458,6 +459,19 @@ int main(int argc, char* argv[]) {
 	}
 
 	{
+		struct sigaction act;
+		if( sigaction(SIGPIPE, NULL, &act) == -1) {
+			std::cerr << "Can not get signal handler for SIGPIPE\n";
+			exit(EX_OSERR);
+		}
+		act.sa_handler = SIG_IGN; // Ignore SIGPIPE (we'll handle the write()-error)
+		if( sigaction(SIGPIPE, &act, NULL) == -1 ) {
+			std::cerr << "Can not set signal handler for SIGPIPE\n";
+			exit(EX_OSERR);
+		}
+	}
+
+	{
 		/* Open pid-file before fork()
 		 * That way, failing to open the pid-file will cause a pre-fork-abort
 		 */
@@ -519,6 +533,7 @@ int main(int argc, char* argv[]) {
 		ev_loop(EV_DEFAULT_ 0);
 	}
 
+	*log << "Cleaning up\n" << std::flush;
 	if( options.pid_file.length() > 0 ) remove( options.pid_file.c_str() );
 
 	return 0;
