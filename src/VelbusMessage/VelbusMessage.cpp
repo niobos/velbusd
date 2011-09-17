@@ -39,7 +39,12 @@ VelbusMessage* parse_and_consume(std::string &msg)
 	std::string data = msg.substr(4, length);
 
 	sum = (-sum)&0xff;
-	if( (msg[4+length]&0xff) != sum ) throw FormError("Checksum incorrect");
+	if( (msg[4+length]&0xff) != sum ) {
+		std::ostringstream e("Checksum incorrect");
+		e << ": got " << (msg[4+length]&0xff)
+		  << " expected " << sum;
+		throw FormError(e.str());
+	}
 
 	if( msg[4+length+1] != 0x04 ) throw FormError("data[-1] != 0x04");
 

@@ -196,7 +196,6 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 	std::auto_ptr<VelbusMessage::VelbusMessage> m;
 	try {
 		m.reset( VelbusMessage::parse_and_consume(c->buf) );
-		*log << c->id << " : " << m->string() << "\n" << std::flush;
 
 	} catch( VelbusMessage::InsufficientData &e ) {
 		ev_idle_stop(EV_A_ &c->processing_todo ); // No more processing to do
@@ -218,6 +217,7 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 
 		} else if( typeid(*m) ==typeid(VelbusMessage::BusActive) ) {
 			serial.bus_active = true;
+			return; // don't relay flow control messages
 
 		} else if( typeid(*m) ==typeid(VelbusMessage::RxBuffFull) ) {
 			serial.rx_ready = false;
@@ -231,10 +231,12 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 			/* If there is no processing to be done, they will reactivate
 			 * the read_ready watchers by themselves
 			 */
+			return; // don't relay flow control messages
 		}
 
 	}
 
+	*log << c->id << " : " << m->string() << "\n" << std::flush;
 	if( c != &serial.conn ) {
 		try {
 			// Send the message, followed by on interface status request
