@@ -40,7 +40,8 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-MemoryData.sh Parser-MemoryBlock.sh \
                Parser-BusErrorCounter.sh \
                Parser-BlindStatus.sh \
-               Parser-ModuleType.sh
+               Parser-ModuleType.sh \
+               Parser-Name.sh
 
 Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage/PushButtonStatus.hpp \
                   ../src/VelbusMessage/SetLeds.cpp ../src/VelbusMessage/SetLeds.hpp \
@@ -54,5 +55,6 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/MemoryBlock.cpp ../src/VelbusMessage/MemoryBlock.hpp \
                   ../src/VelbusMessage/BusErrorCounter.cpp ../src/VelbusMessage/BusErrorCounter.hpp \
                   ../src/VelbusMessage/BlindStatus.cpp ../src/VelbusMessage/BlindStatus.hpp \
-                  ../src/VelbusMessage/ModuleType.cpp ../src/VelbusMessage/ModuleType.hpp
+                  ../src/VelbusMessage/ModuleType.cpp ../src/VelbusMessage/ModuleType.hpp \
+                  ../src/VelbusMessage/Name.cpp ../src/VelbusMessage/Name.hpp
 endif
