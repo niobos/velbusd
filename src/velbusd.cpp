@@ -194,8 +194,9 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 	struct connection *c = reinterpret_cast<struct connection*>(w->data);
 
 	std::auto_ptr<VelbusMessage::VelbusMessage> m;
+	std::string msg;
 	try {
-		m.reset( VelbusMessage::parse_and_consume(c->buf) );
+		m.reset( VelbusMessage::parse_and_consume(c->buf, &msg) );
 
 	} catch( VelbusMessage::InsufficientData &e ) {
 		ev_idle_stop(EV_A_ &c->processing_todo ); // No more processing to do
@@ -240,7 +241,7 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 	if( c != &serial.conn ) {
 		try {
 			// Send the message, followed by on interface status request
-			write(serial.conn.sock, m->message());
+			write(serial.conn.sock, msg);
 			send_int_status_request(serial.conn.sock);
 
 			// And wait until the module replies it's free
@@ -254,7 +255,7 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
 		if( &(*i) == c ) continue; // Don't loop input to same socket
 		try {
-			write(i->sock, m->message());
+			write(i->sock, msg);
 		} catch( IOError &e ) {
 			*log << i->id << " : IO error, closing connection: " << e.what() << "\n" << std::flush;
 			ev_io *w = &( i->read_ready );

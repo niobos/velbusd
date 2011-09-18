@@ -12,7 +12,7 @@
 
 namespace VelbusMessage {
 
-VelbusMessage* parse_and_consume(std::string &msg)
+VelbusMessage* parse_and_consume(std::string &msges, std::string *msg)
 		throw(InsufficientData, FormError) {
 
 	if( msges.length() < 6 ) throw InsufficientData();
@@ -48,6 +48,7 @@ VelbusMessage* parse_and_consume(std::string &msg)
 
 	if( msges[4+length+1] != 0x04 ) throw FormError("data[-1] != 0x04");
 
+	if( msg != NULL ) *msg = msges.substr(0, 4+length+2); // Copy
 	msges = msges.substr(4+length+2); // Consume
 
 

@@ -45,7 +45,12 @@ public:
 	virtual std::string string() throw() =0;
 };
 
-VelbusMessage* parse_and_consume(std::string &msges) throw(InsufficientData, FormError);
+VelbusMessage* parse_and_consume(std::string &msges, std::string *msg = NULL) throw(InsufficientData, FormError);
+/* Try to extract a message from msges
+ * And return the corresponding VelbusMessage object or throw an eror
+ * When a message is extracted, it is removed from the msges variable
+ * and placed in *msg (unless msg is NULL)
+ */
 
 } // Namespace
 
