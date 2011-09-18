@@ -15,7 +15,6 @@ velbusd_SOURCES = velbusd.cpp \
                   utils/Registrar.t \
                   SockAddr.hpp SockAddr.cpp \
                   Socket.hpp Socket.cpp
-velbusd_LDFLAGS = -lev
 
 if WANT_PARSER
 velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonStatus.hpp \
