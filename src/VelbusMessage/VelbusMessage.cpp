@@ -15,40 +15,40 @@ namespace VelbusMessage {
 VelbusMessage* parse_and_consume(std::string &msg)
 		throw(InsufficientData, FormError) {
 
-	if( msg.length() < 6 ) throw InsufficientData();
+	if( msges.length() < 6 ) throw InsufficientData();
 	int sum = 0;
 
-	sum += msg[0];
-	if( msg[0] != 0x0f ) throw FormError("data[0] != 0x0f");
+	sum += msges[0];
+	if( msges[0] != 0x0f ) throw FormError("data[0] != 0x0f");
 
-	sum += msg[1];
-	if( (msg[1] & 0xfc) != 0xf8 ) throw FormError("data[1] & 0xfc != 0xf8");
-	unsigned char prio = msg[1] & 0x03;
+	sum += msges[1];
+	if( (msges[1] & 0xfc) != 0xf8 ) throw FormError("data[1] & 0xfc != 0xf8");
+	unsigned char prio = msges[1] & 0x03;
 
-	sum += msg[2];
-	unsigned char addr = msg[2];
+	sum += msges[2];
+	unsigned char addr = msges[2];
 
-	sum += msg[3];
-	if( (msg[3] & 0xb0) != 0x00 ) throw FormError("data[3] & 0xb0 != 0x00");
-	unsigned char rtr = (msg[3]>>6)&0x01;
-	size_t length = msg[3] & 0x0f;
+	sum += msges[3];
+	if( (msges[3] & 0xb0) != 0x00 ) throw FormError("data[3] & 0xb0 != 0x00");
+	unsigned char rtr = (msges[3]>>6)&0x01;
+	size_t length = msges[3] & 0x0f;
 
-	if( msg.length() < 6+length ) throw InsufficientData();
+	if( msges.length() < 6+length ) throw InsufficientData();
 
-	for(unsigned int i=4; i<4+length; i++) sum += msg[i];
-	std::string data = msg.substr(4, length);
+	for(unsigned int i=4; i<4+length; i++) sum += msges[i];
+	std::string data = msges.substr(4, length);
 
 	sum = (-sum)&0xff;
-	if( (msg[4+length]&0xff) != sum ) {
+	if( (msges[4+length]&0xff) != sum ) {
 		std::ostringstream e("Checksum incorrect");
-		e << ": got " << (msg[4+length]&0xff)
+		e << ": got " << (msges[4+length]&0xff)
 		  << " expected " << sum;
 		throw FormError(e.str());
 	}
 
-	if( msg[4+length+1] != 0x04 ) throw FormError("data[-1] != 0x04");
+	if( msges[4+length+1] != 0x04 ) throw FormError("data[-1] != 0x04");
 
-	msg = msg.substr(4+length+2); // Consume
+	msges = msges.substr(4+length+2); // Consume
 
 
 	// Now identify the type of message

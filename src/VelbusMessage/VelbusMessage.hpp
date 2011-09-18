@@ -45,7 +45,7 @@ public:
 	virtual std::string string() throw() =0;
 };
 
-VelbusMessage* parse_and_consume(std::string &msg) throw(InsufficientData, FormError);
+VelbusMessage* parse_and_consume(std::string &msges) throw(InsufficientData, FormError);
 
 } // Namespace
 
