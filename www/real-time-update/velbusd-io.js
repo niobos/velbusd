@@ -51,6 +51,7 @@ vb.on('data', function(data) {
 	data.copy(vb_buffer, vb_buffer_len, 0);
 	vb_buffer_len += data.length;
 
+next_message:
 	while( vb_buffer_len > 6 ) { // Try to parse a message
 		if( vb_buffer[0] != 0x0f ) { // Unaligned read
 			console.log(ISO_datetimestamp() + " backend: unaligned read, skipping byte");
@@ -81,6 +82,29 @@ vb.on('data', function(data) {
 		vb_buffer.copy(vb_buffer, 0, 6+len, vb_buffer.length-6-len);
 		vb_buffer_len -= 6+len;
 
-		io.sockets.emit('message', msg);
+		// Parse the message
+		if( msg.data[0] == 0xfb ) {
+			var rs = {};
+
+			var relay;
+			switch(msg.data[1]) {
+			case 0x01: relay = 0; break;
+			case 0x02: relay = 1; break;
+			case 0x04: relay = 2; break;
+			case 0x08: relay = 3; break;
+			case 0x10: relay = 4; break;
+			default: continue next_message;
+			}
+
+			rs.id = pad(msg.addr.toString(16), 2) + "." + relay
+			switch(msg.data[3]) {
+			case 0x00: rs.status="off"; break;
+			case 0x01: rs.status="on"; break;
+			case 0x03: rs.status="interval"; break;
+			default: continue next_message;
+			}
+
+			io.sockets.emit('RelayStatus', rs);
+		}
 	}
 });
