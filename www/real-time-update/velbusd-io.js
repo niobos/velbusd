@@ -32,6 +32,13 @@ vb.on('connect', function() {
 	console.log(ISO_datetimestamp() + " Connected to backend");
 });
 
+VbState = function() {};
+VbState.prototype.update = function(id, state) {
+	this[id] = state;
+	console.log(ISO_datetimestamp() + " VB: " + id + " : " + state);
+	io.sockets.emit('message', { "id": id, "state": state } );
+};
+var vb_state = new VbState();
 
 var io = require('socket.io').listen(8080, null, "::").set('log level', 0);
 io.sockets.on('connection', function (socket) {
@@ -40,6 +47,11 @@ io.sockets.on('connection', function (socket) {
 	socket.on('disconnect', function () {
 		console.log(ISO_datetimestamp() + " Disconnect from [" + socket.handshake.address.address + "]:" + socket.handshake.address.port);
 	});
+
+	for(var id in vb_state) {
+		if( typeof(vb_state[id]) == 'function' ) continue;
+		socket.emit('message', {"id": id, "state": vb_state[id]} );
+	}
 });
 
 
@@ -84,8 +96,6 @@ next_message:
 
 		// Parse the message
 		if( msg.data[0] == 0xfb ) {
-			var rs = {};
-
 			var relay;
 			switch(msg.data[1]) {
 			case 0x01: relay = 0; break;
@@ -95,16 +105,41 @@ next_message:
 			case 0x10: relay = 4; break;
 			default: continue next_message;
 			}
+			var id = pad(msg.addr.toString(16), 2) + "." + relay
 
-			rs.id = pad(msg.addr.toString(16), 2) + "." + relay
+			var state;
 			switch(msg.data[3]) {
-			case 0x00: rs.status="off"; break;
-			case 0x01: rs.status="on"; break;
-			case 0x03: rs.status="interval"; break;
+			case 0x00: state="off"; break;
+			case 0x01: state="on"; break;
+			case 0x03: state="interval"; break;
 			default: continue next_message;
 			}
 
-			io.sockets.emit('RelayStatus', rs);
+			vb_state.update(id, state);
+		} else if( msg.data[0] == 0xec ) {
+			var blind;
+			switch(msg.data[1]) {
+			case 0x03: blind = 0; break;
+			case 0x0c: blind = 1; break;
+			default: continue next_message;
+			}
+			var id = pad(msg.addr.toString(16), 2) + "." + blind;
+
+			var state;
+			switch(msg.data[3]) {
+			case 0x00:
+				if( vb_state[id] == 'going up' ) state="up";
+				else if( vb_state[id] == 'going down' ) state="down";
+				else state="stopped";
+				break;
+			case 0x01:
+			case 0x04: state="going up"; break;
+			case 0x02:
+			case 0x08: state="going down"; break;
+			default: continue next_message;
+			}
+
+			vb_state.update(id, state);
 		}
 	}
 });
