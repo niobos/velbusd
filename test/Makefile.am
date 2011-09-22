@@ -44,7 +44,7 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-Name.sh \
                Parser-SwitchBlindOff.sh \
                Parser-SwitchBlindUpDown.sh \
-               Parser-BlindStatusRequest.sh
+               Parser-BlindRelayStatusRequest.sh
 
 Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage/PushButtonStatus.hpp \
                   ../src/VelbusMessage/SetLeds.cpp ../src/VelbusMessage/SetLeds.hpp \
@@ -62,5 +62,5 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/Name.cpp ../src/VelbusMessage/Name.hpp \
                   ../src/VelbusMessage/SwitchBlindOff.cpp ../src/VelbusMessage/SwitchBlindOff.hpp \
                   ../src/VelbusMessage/SwitchBlindUpDown.cpp ../src/VelbusMessage/SwitchBlindUpDown.hpp \
-                  ../src/VelbusMessage/BlindStatusRequest.cpp ../src/VelbusMessage/BlindStatusRequest.hpp
+                  ../src/VelbusMessage/BlindRelayStatusRequest.cpp ../src/VelbusMessage/BlindRelayStatusRequest.hpp
 endif
