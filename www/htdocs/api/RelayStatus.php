@@ -9,7 +9,9 @@ if( preg_match("%^/([0-9a-fA-F]{2})\.(\d)$%", $_SERVER["PATH_INFO"], $matches) =
 $addr = hexdec($matches[1]);
 $relay = (int)($matches[2]);
 
-if( $relay > 4 ) fail('Invalid relay number');
+if( $relay == 0 ) fail('Invalid relay number');
+if( $relay > 5 ) fail('Invalid relay number');
+$relay_byte = chr(1 << ($relay-1));
 
 $sock = socket_create(AF_INET6, SOCK_STREAM, 0);
 if( $sock === FALSE ) trigger_error("Could not create backend socket", E_ERROR_USER);
@@ -30,7 +32,9 @@ case "POST":
 	default: fail("invalid POST argument");
 	}
 
-	$msg = message($addr, 0, 0, chr($cmd) . chr(1 << $relay) );
+	$msg = message($addr, 0, 0, chr($cmd) . $relay_byte );
+	if( socket_send($sock, $msg, strlen($msg), 0) != strlen($msg) )
+		trigger_error("Send failed", E_ERROR_USER);
 	// DON'T break, fall through to GET
 
 case "GET":
@@ -39,10 +43,10 @@ case "GET":
 		"addr" => $addr,
 		"relay" => $relay,
 		);
-	$msg = message($addr, 3, 0, chr(0xfa) . chr(1 << $relay) );
+	$msg = message($addr, 3, 0, chr(0xfa) . $relay_byte );
 	if( socket_send($sock, $msg, strlen($msg), 0) != strlen($msg) )
 		trigger_error("Send failed", E_ERROR_USER);
-	$msg = expect_answer($sock, $addr, "\xfb".chr(1 << $relay), 1);
+	$msg = expect_answer($sock, $addr, "\xfb".$relay_byte, 1);
 
 	if( $msg !== NULL ) {
 		switch( ord($msg[7]) ) {
