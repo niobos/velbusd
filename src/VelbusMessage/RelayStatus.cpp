@@ -53,7 +53,7 @@ std::string RelayStatus::string() throw() {
 	case 0x04:
 	case 0x08:
 	case 0x10:
-		o << bitnum(m_relay_num);
+		o << bitnum(m_relay_num)+1;
 		break;
 	default:
 		o << "Unknown[" << bin(m_relay_num) << "]";
