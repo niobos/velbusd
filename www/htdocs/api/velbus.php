@@ -73,7 +73,7 @@ function expect_answer($sock, $addr, $msg_filter=NULL, $timeout=1) {
 		$a = str_split($msg);
 		if( ord($a[2]) != $addr ) continue; # read next message
 		if( $msg_filter != NULL ) {
-			for( $i = 0; $i < strlen($msg); $i++ ) {
+			for( $i = 0; $i < strlen($msg_filter); $i++ ) {
 				if( $a[4+$i] != $msg_filter[$i] ) continue 2;
 			}
 		}
