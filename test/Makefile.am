@@ -64,5 +64,6 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/SwitchBlindOff.cpp ../src/VelbusMessage/SwitchBlindOff.hpp \
                   ../src/VelbusMessage/SwitchBlindUpDown.cpp ../src/VelbusMessage/SwitchBlindUpDown.hpp \
                   ../src/VelbusMessage/BlindRelayStatusRequest.cpp ../src/VelbusMessage/BlindRelayStatusRequest.hpp \
-                  ../src/VelbusMessage/SensorTempRequest.cpp ../src/VelbusMessage/SensorTempRequest.hpp
+                  ../src/VelbusMessage/SensorTempRequest.cpp ../src/VelbusMessage/SensorTempRequest.hpp \
+                  ../src/VelbusMessage/SensorTemp.cpp ../src/VelbusMessage/SensorTemp.hpp
 endif

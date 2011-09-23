@@ -34,5 +34,6 @@ velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonSt
                    VelbusMessage/SwitchBlindOff.cpp VelbusMessage/SwitchBlindOff.hpp \
                    VelbusMessage/SwitchBlindUpDown.cpp VelbusMessage/SwitchBlindUpDown.hpp \
                    VelbusMessage/BlindRelayStatusRequest.cpp VelbusMessage/BlindRelayStatusRequest.hpp \
-                   VelbusMessage/SensorTempRequest.cpp VelbusMessage/SensorTempRequest.hpp
+                   VelbusMessage/SensorTempRequest.cpp VelbusMessage/SensorTempRequest.hpp \
+                   VelbusMessage/SensorTemp.cpp VelbusMessage/SensorTemp.hpp
 endif
