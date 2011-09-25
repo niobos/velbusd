@@ -57,6 +57,7 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/UpdateLeds.cpp ../src/VelbusMessage/UpdateLeds.hpp \
                   ../src/VelbusMessage/MemoryDataRequest.cpp ../src/VelbusMessage/MemoryDataRequest.hpp \
                   ../src/VelbusMessage/MemoryData.cpp ../src/VelbusMessage/MemoryData.hpp \
+                  ../src/VelbusMessage/MemoryBlockRequest.cpp ../src/VelbusMessage/MemoryBlockRequest.hpp \
                   ../src/VelbusMessage/MemoryBlock.cpp ../src/VelbusMessage/MemoryBlock.hpp \
                   ../src/VelbusMessage/BusErrorCounter.cpp ../src/VelbusMessage/BusErrorCounter.hpp \
                   ../src/VelbusMessage/BlindStatus.cpp ../src/VelbusMessage/BlindStatus.hpp \
