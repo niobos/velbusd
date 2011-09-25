@@ -45,6 +45,19 @@ public:
 	virtual std::string string() throw();
 };
 
+class VMB4RYNO : public ModuleType {
+public:
+	unsigned short m_serial_number;
+	unsigned char m_memorymap;
+	unsigned char m_build_year;
+	unsigned char m_build_week;
+
+	VMB4RYNO(unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data);
+
+	virtual std::string data() throw();
+	virtual std::string string() throw();
+};
+
 }} // Namespace
 
 #endif // __VELBUSMESSAGE_ModuleType_HPP__

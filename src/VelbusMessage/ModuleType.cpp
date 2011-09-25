@@ -27,6 +27,8 @@ VelbusMessage* ModuleType::factory( unsigned char prio, unsigned char addr, unsi
 	switch(data[1]) {
 	case '\x09':
 		return new VMB2BL(prio, addr, rtr, data.substr(2) );
+	case '\x11':
+		return new VMB4RYNO(prio, addr, rtr, data.substr(2) );
 	default:
 		return new Unknown(prio, addr, rtr, data.substr(1) );
 	}
@@ -96,6 +98,38 @@ std::string VMB2BL::string() throw() {
 	}
 
 	o << " Build " << static_cast<int>(m_build_year)
+	  << "-W" << static_cast<int>(m_build_week);
+
+	return o.str();
+}
+
+VMB4RYNO::VMB4RYNO(unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data) :
+		ModuleType(prio, addr, rtr, 0x11) {
+	if( data.length() != 5 ) throw FormError("Incorrect length");
+	m_serial_number = ((unsigned char)data[0] << 8) | ((unsigned char)data[1]);
+	m_memorymap = data[2];
+	m_build_year = data[3];
+	m_build_week = data[4];
+}
+
+std::string VMB4RYNO::data() throw() {
+	std::string ret("\xff", 1);
+	ret.append(1, m_module_type);
+	ret.append(1, m_serial_number >> 8);
+	ret.append(1, m_serial_number);
+	ret.append(1, m_memorymap);
+	ret.append(1, m_build_year);
+	ret.append(1, m_build_week);
+	return ret;
+}
+
+std::string VMB4RYNO::string() throw() {
+	std::ostringstream o;
+	o << "ModuleType from 0x" << hex(m_addr) << ": "
+	  << "VMB4RYNO  "
+	  << "S/N: 0x" << hex(m_serial_number)
+	  << " mmap v" << (int)m_memorymap
+	  << " Build " << static_cast<int>(m_build_year)
 	  << "-W" << static_cast<int>(m_build_week);
 
 	return o.str();

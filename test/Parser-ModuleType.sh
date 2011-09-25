@@ -13,3 +13,10 @@ if [ $? -ne 0 ]; then
 	echo "Wrong output: $OUTPUT"
 	exit 1
 fi
+
+OUTPUT="$( echo -ne "\x0f\xfb\x05\x07\xff\x11\x98\x76\x03\x0b\x05\xb9\x04" | ./Parser )"
+test "$OUTPUT" == "ModuleType from 0x05: VMB4RYNO  S/N: 0x9876 mmap v3 Build 11-W5"
+if [ $? -ne 0 ]; then
+	echo "Wrong output: $OUTPUT"
+	exit 1
+fi
