@@ -27,6 +27,7 @@ velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonSt
                    VelbusMessage/UpdateLeds.cpp VelbusMessage/UpdateLeds.hpp \
                    VelbusMessage/MemoryDataRequest.cpp VelbusMessage/MemoryDataRequest.hpp \
                    VelbusMessage/MemoryData.cpp VelbusMessage/MemoryData.hpp \
+                   VelbusMessage/MemoryDataWrite.cpp VelbusMessage/MemoryDataWrite.hpp \
                    VelbusMessage/MemoryBlockRequest.cpp VelbusMessage/MemoryBlockRequest.hpp \
                    VelbusMessage/MemoryBlock.cpp VelbusMessage/MemoryBlock.hpp \
                    VelbusMessage/MemoryDumpRequest.cpp VelbusMessage/MemoryDumpRequest.hpp \

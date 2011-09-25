@@ -37,7 +37,7 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-SlowBlinkLeds.sh Parser-FastBlinkLeds.sh Parser-VFastBlinkLeds.sh \
                Parser-UpdateLeds.sh \
                Parser-RelayStatus.sh \
-               Parser-MemoryDataRequest.sh Parser-MemoryData.sh \
+               Parser-MemoryDataRequest.sh Parser-MemoryData.sh Parser-MemoryDataWrite.sh \
                Parser-MemoryBlockRequest.sh Parser-MemoryBlock.sh \
                Parser-MemoryDumpRequest.sh \
                Parser-BusErrorCounterRequest.sh Parser-BusErrorCounter.sh \
@@ -60,6 +60,7 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/UpdateLeds.cpp ../src/VelbusMessage/UpdateLeds.hpp \
                   ../src/VelbusMessage/MemoryDataRequest.cpp ../src/VelbusMessage/MemoryDataRequest.hpp \
                   ../src/VelbusMessage/MemoryData.cpp ../src/VelbusMessage/MemoryData.hpp \
+                  ../src/VelbusMessage/MemoryDataWrite.cpp ../src/VelbusMessage/MemoryDataWrite.hpp \
                   ../src/VelbusMessage/MemoryBlockRequest.cpp ../src/VelbusMessage/MemoryBlockRequest.hpp \
                   ../src/VelbusMessage/MemoryBlock.cpp ../src/VelbusMessage/MemoryBlock.hpp \
                   ../src/VelbusMessage/MemoryDumpRequest.cpp ../src/VelbusMessage/MemoryDumpRequest.hpp \
