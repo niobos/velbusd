@@ -21,6 +21,12 @@ std::string bin(int bitmap) {
 	return o;
 }
 
+std::string format_fixed_point(float f, int decimals) {
+	std::ostringstream o;
+	o << std::setiosflags(std::ios::fixed) << std::setprecision(decimals) << f;
+	return o.str();
+}
+
 int bitnum(int bitmap) {
 	for( unsigned int i = 0; i < sizeof(bitmap)*8; i++ ) {
 		if( (bitmap >> i) & 0x01 ) return i;
