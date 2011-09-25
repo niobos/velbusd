@@ -60,6 +60,7 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/BusErrorCounter.cpp ../src/VelbusMessage/BusErrorCounter.hpp \
                   ../src/VelbusMessage/BlindStatus.cpp ../src/VelbusMessage/BlindStatus.hpp \
                   ../src/VelbusMessage/ModuleType.cpp ../src/VelbusMessage/ModuleType.hpp \
+                  ../src/VelbusMessage/NameRequest.cpp ../src/VelbusMessage/NameRequest.hpp \
                   ../src/VelbusMessage/Name.cpp ../src/VelbusMessage/Name.hpp \
                   ../src/VelbusMessage/SwitchBlindOff.cpp ../src/VelbusMessage/SwitchBlindOff.hpp \
                   ../src/VelbusMessage/SwitchBlindUpDown.cpp ../src/VelbusMessage/SwitchBlindUpDown.hpp \
