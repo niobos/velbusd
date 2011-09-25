@@ -38,7 +38,7 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-UpdateLeds.sh \
                Parser-RelayStatus.sh \
                Parser-MemoryDataRequest.sh Parser-MemoryData.sh Parser-MemoryDataWrite.sh \
-               Parser-MemoryBlockRequest.sh Parser-MemoryBlock.sh \
+               Parser-MemoryBlockRequest.sh Parser-MemoryBlock.sh Parser-MemoryBlockWrite.sh \
                Parser-MemoryDumpRequest.sh \
                Parser-BusErrorCounterRequest.sh Parser-BusErrorCounter.sh \
                Parser-BlindStatus.sh \
@@ -63,6 +63,7 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/MemoryDataWrite.cpp ../src/VelbusMessage/MemoryDataWrite.hpp \
                   ../src/VelbusMessage/MemoryBlockRequest.cpp ../src/VelbusMessage/MemoryBlockRequest.hpp \
                   ../src/VelbusMessage/MemoryBlock.cpp ../src/VelbusMessage/MemoryBlock.hpp \
+                  ../src/VelbusMessage/MemoryBlockWrite.cpp ../src/VelbusMessage/MemoryBlockWrite.hpp \
                   ../src/VelbusMessage/MemoryDumpRequest.cpp ../src/VelbusMessage/MemoryDumpRequest.hpp \
                   ../src/VelbusMessage/BusErrorCounterRequest.cpp ../src/VelbusMessage/BusErrorCounterRequest.hpp \
                   ../src/VelbusMessage/BusErrorCounter.cpp ../src/VelbusMessage/BusErrorCounter.hpp \

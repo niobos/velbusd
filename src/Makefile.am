@@ -30,6 +30,7 @@ velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonSt
                    VelbusMessage/MemoryDataWrite.cpp VelbusMessage/MemoryDataWrite.hpp \
                    VelbusMessage/MemoryBlockRequest.cpp VelbusMessage/MemoryBlockRequest.hpp \
                    VelbusMessage/MemoryBlock.cpp VelbusMessage/MemoryBlock.hpp \
+                   VelbusMessage/MemoryBlockWrite.cpp VelbusMessage/MemoryBlockWrite.hpp \
                    VelbusMessage/MemoryDumpRequest.cpp VelbusMessage/MemoryDumpRequest.hpp \
                    VelbusMessage/BusErrorCounterRequest.cpp VelbusMessage/BusErrorCounterRequest.hpp \
                    VelbusMessage/BusErrorCounter.cpp VelbusMessage/BusErrorCounter.hpp \
