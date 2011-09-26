@@ -25,11 +25,12 @@ Name::Name( unsigned char prio, unsigned char addr, unsigned char rtr, std::stri
 		VelbusMessage(prio, addr, rtr) {
 	if( prio != 3 ) throw FormError("Wrong prio");
 	if( rtr != 0 ) throw FormError("Wrong RTR");
-	if( data.length() != 8 ) throw FormError("Incorrect length");
 	if( data[0] != (char)0xf0 &&
 	    data[0] != (char)0xf1 &&
 	    data[0] != (char)0xf2
 	  ) throw FormError("Wrong type");
+	if( data[0] != (char)0xf2 && data.length() != 8 ) throw FormError("Incorrect length");
+	if( data[0] == (char)0xf2 && data.length() != 6 ) throw FormError("Incorrect length");
 
 	m_part = data[0] & 0x03;
 	m_channel = data[1];
@@ -44,7 +45,9 @@ std::string Name::data() throw() {
 	ret.append(1, 0xf0+m_part);
 	ret.append(1, m_channel);
 	ret.append(m_name.data(), m_name.length());
-	if( m_name.length() < 6 ) ret.append("\xff\xff\xff\xff\xff\xff", 6-m_name.length());
+	if( m_name.length() < (m_part != 2 ? 6 : 4) ) {
+		ret.append("\xff\xff\xff\xff\xff\xff", (m_part != 2 ? 6 : 4)-m_name.length());
+	}
 	return ret;
 }
 
