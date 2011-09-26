@@ -35,7 +35,7 @@ Name::Name( unsigned char prio, unsigned char addr, unsigned char rtr, std::stri
 	m_part = data[0] & 0x03;
 	m_channel = data[1];
 	int i = 2-1;
-	while( data[++i] != (char)0xff ) {
+	while( data[++i] != (char)0xff && i < data.length() ) {
 		m_name.append(1, data[i]);
 	}
 }
