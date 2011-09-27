@@ -26,7 +26,8 @@ AC_C_INLINE
 
 # Library checks
 ################
-AC_CHECK_LIB(ev, ev_loop, [], [AC_MSG_ERROR([Couldn't find libev])], [])
+# Don't check for ev_{loop,run} or ev_{unloop,break} since they changed from libev-3 to libev4
+AC_CHECK_LIB(ev, ev_io_start, [], [AC_MSG_ERROR([Couldn't find libev])], [])
 
 
 # Header checks
