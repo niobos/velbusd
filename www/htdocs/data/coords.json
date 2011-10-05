@@ -1,11 +1,13 @@
 [
 	{
 		"id": "02.1",
+		"name": "Master bedroom light",
 		"left": 612, "top": 477,
 		"type": "light"
 	},
 	{
 		"id": "01.1",
+		"name": "Master bedroom blind",
 		"left": 706, "top": 477,
 		"type": "blind"
 	}
