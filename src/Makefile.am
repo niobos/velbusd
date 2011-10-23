@@ -43,6 +43,7 @@ velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonSt
                    VelbusMessage/BlindRelayStatusRequest.cpp VelbusMessage/BlindRelayStatusRequest.hpp \
                    VelbusMessage/SwitchRelayOnOff.cpp VelbusMessage/SwitchRelayOnOff.hpp \
                    VelbusMessage/StartRelayTimer.cpp VelbusMessage/StartRelayTimer.hpp \
+                   VelbusMessage/WriteAddr.cpp VelbusMessage/WriteAddr.hpp \
                    VelbusMessage/SensorTempRequest.cpp VelbusMessage/SensorTempRequest.hpp \
                    VelbusMessage/SensorTemp.cpp VelbusMessage/SensorTemp.hpp
 endif

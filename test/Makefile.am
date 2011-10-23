@@ -49,6 +49,7 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-BlindRelayStatusRequest.sh \
                Parser-SwitchRelayOnOff.sh \
                Parser-StartRelayTimer.sh \
+               Parser-WriteAddr.sh \
                Parser-SensorTempRequest.sh \
                Parser-SensorTemp.sh
 
@@ -78,6 +79,7 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/BlindRelayStatusRequest.cpp ../src/VelbusMessage/BlindRelayStatusRequest.hpp \
                   ../src/VelbusMessage/SwitchRelayOnOff.cpp ../src/VelbusMessage/SwitchRelayOnOff.hpp \
                   ../src/VelbusMessage/StartRelayTimer.cpp ../src/VelbusMessage/StartRelayTimer.hpp \
+                  ../src/VelbusMessage/WriteAddr.cpp ../src/VelbusMessage/WriteAddr.hpp \
                   ../src/VelbusMessage/SensorTempRequest.cpp ../src/VelbusMessage/SensorTempRequest.hpp \
                   ../src/VelbusMessage/SensorTemp.cpp ../src/VelbusMessage/SensorTemp.hpp
 endif
