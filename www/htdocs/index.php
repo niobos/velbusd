@@ -24,6 +24,7 @@
 	var icon = {};
 	icon.unknown = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/unknown.png"/></a></div>');
 	icon.light = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/light.png"/></a></div>');
+	icon.blind = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/blind.png"/></a></div>');
 
     var control = {};
 	control.unknown = $('<div class="popover"><div class="name">Name</div><div class="id">id</div></div>');
@@ -43,6 +44,22 @@
 		});
 	});
 
+	control.blind = $('<div class="popover"><div class="name">Name</div>' + 
+			'<div class="id">id</div>' +
+			'<input type="button" name="up" value="Up" /><br/>' +
+			'<input type="button" name="stop" value="Stop" /><br/>' +
+			'<input type="button" name="down" value="Down" />' +
+			'</div>');
+	control.blind.find('input').click( function() {
+		var id = $(this).parent().find(".id").text();
+		$.ajax({
+			type: 'POST',
+			url: 'api/BlindStatus.php/' + id,
+			data: 'state=' + this.name,
+			error: function(jqXHR, textStatus, errorThrown) { alert(textStatus); }
+		});
+	});
+
 	function detachAll() {
 		for( var i in control ) {
 			control[i].detach();
@@ -52,7 +69,8 @@
 		var c;
 		switch( el.type ) {
 		case "light":
-			c = control.light;
+		case "blind":
+			c = control[ el.type ];
 			break;
 		default:
 			c = control.unknown;
@@ -71,6 +89,7 @@
 			var domel;
 			switch( el.type ) {
 			case "light":
+			case "blind":
 				domel = icon[ el.type ].clone();
 				break;
 			default:
