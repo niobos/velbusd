@@ -14,10 +14,10 @@ if( $blind > 2 ) fail('Invalid blind number');
 $blind_byte = chr(3 << (($blind-1)*2) );
 
 $sock = socket_create(AF_INET6, SOCK_STREAM, 0);
-if( $sock === FALSE ) trigger_error("Could not create backend socket", E_ERROR_USER);
+if( $sock === FALSE ) fail("Could not create backend socket");
 
-if( socket_connect($sock, $config["host"], $config["port"]) === FALSE ) {
-	trigger_error("Could not connect", E_USER_ERROR);
+if( @socket_connect($sock, $config["host"], $config["port"]) === FALSE ) {
+	fail("Could not connect");
 }
 
 switch( $_SERVER["REQUEST_METHOD"] ) {
@@ -37,7 +37,7 @@ case "POST":
 
 	$msg = message($addr, 0, 0, $cmd );
 	if( socket_send($sock, $msg, strlen($msg), 0) != strlen($msg) )
-		trigger_error("Send failed", E_ERROR_USER);
+		fail("Send failed");
 	// DON'T break, fall through to GET
 
 case "GET":
@@ -48,7 +48,7 @@ case "GET":
 		);
 	$msg = message($addr, 3, 0, chr(0xfa) . $blind_byte );
 	if( socket_send($sock, $msg, strlen($msg), 0) != strlen($msg) )
-		trigger_error("Send failed", E_ERROR_USER);
+		fail("Send failed");
 	$msg = expect_answer($sock, $addr, "\xec".$blind_byte, 1);
 
 	if( $msg !== NULL ) {
