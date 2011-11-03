@@ -1,1 +1,1 @@
-SUBDIRS = src test www
+SUBDIRS = bin src test www
