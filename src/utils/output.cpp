@@ -3,6 +3,12 @@
 #include <sstream>
 #include <iomanip>
 
+std::string dec(int number, int total_digits) {
+	std::ostringstream o;
+	o << std::dec << std::setw(total_digits) << std::setfill('0') << number;
+	return o.str();
+}
+
 std::string hex(int number) {
 	std::ostringstream o;
 	o << std::hex << std::setw(2) << std::setfill('0') << number;

@@ -3,6 +3,8 @@
 
 #include <string>
 
+std::string dec(int number, int total_digits=0);
+
 std::string hex(int number);
 std::string hex(char num);
 
