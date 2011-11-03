@@ -81,5 +81,6 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/StartRelayTimer.cpp ../src/VelbusMessage/StartRelayTimer.hpp \
                   ../src/VelbusMessage/WriteAddr.cpp ../src/VelbusMessage/WriteAddr.hpp \
                   ../src/VelbusMessage/SensorTempRequest.cpp ../src/VelbusMessage/SensorTempRequest.hpp \
-                  ../src/VelbusMessage/SensorTemp.cpp ../src/VelbusMessage/SensorTemp.hpp
+                  ../src/VelbusMessage/SensorTemp.cpp ../src/VelbusMessage/SensorTemp.hpp \
+                  ../src/VelbusMessage/RTCstatus.cpp ../src/VelbusMessage/RTCstatus.hpp
 endif
