@@ -2,6 +2,7 @@
 
 require_once("config.php");
 require_once("velbus.php");
+require_once("output.php");
 
 if( preg_match("%^/([0-9a-fA-F]{2})\.(\d)$%", $_SERVER["PATH_INFO"], $matches) == 0 ) {
 	fail('Invalid syntax in URL');
@@ -56,7 +57,7 @@ case "GET":
 		}
 	}
 
-	print json_encode($ret);
+	output($ret);
 	break;
 
 default:
