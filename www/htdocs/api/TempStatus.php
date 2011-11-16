@@ -63,8 +63,8 @@ case "GET":
 		$ret["low alarm"] = (bool)(ord($msg[7]) & 0x20);
 		$ret["high alarm"] = (bool)(ord($msg[7]) & 0x40);
 
-		$ret["temp"] = twoscomplement(ord($msg[8])) / 2;
-		$ret["target temp"] = twoscomplement(ord($msg[9])) / 2;
+		$ret["temp"] = (float)twoscomplement(ord($msg[8])) / 2;
+		$ret["target temp"] = (float)twoscomplement(ord($msg[9])) / 2;
 
 		$ret["sleep timer"] = ord($msg[10]) * 256 + ord($msg[11]);
 	}
