@@ -69,6 +69,15 @@ case "GET":
 		$ret["sleep timer"] = ord($msg[10]) * 256 + ord($msg[11]);
 	}
 
+	$msg = message($addr, 3, 0, chr(0xe5).chr(0) );
+	if( socket_send($sock, $msg, strlen($msg), 0) != strlen($msg) )
+		fail("Send failed");
+	$msg = expect_answer($sock, $addr, chr(0xe6));
+
+	if( $msg !== NULL ) {
+		$ret["temp"] = (float)twoscomplement(ord($msg[5])*256+ord($msg[6]),2) / 512;
+	}
+
 	output($ret);
 	break;
 
