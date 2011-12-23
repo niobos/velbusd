@@ -28,7 +28,7 @@ function twoscomplement ($tc, $bytes = 1) {
 switch( $_SERVER["REQUEST_METHOD"] ) {
 case "GET":
 	$ret = array(
-		"id" => "$addr",
+		"id" => sprintf("%02d", $addr),
 		"addr" => $addr,
 		);
 	$msg = message($addr, 3, 0, chr(0xfa) . chr(0) );

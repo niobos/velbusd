@@ -372,6 +372,8 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	*log << "Parsed options, opening serial port \"" << options.serial_port << "\"\n" << std::flush;
+
 	{ // Open serial port
 		serial.conn.id = "SERIAL";
 		serial.conn.sock = open(options.serial_port.c_str(), O_RDWR | O_NOCTTY);

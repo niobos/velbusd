@@ -45,7 +45,10 @@ function text ($o) {
 	$ret = '';
 	foreach( $o as $k => $v ) {
 		$k = preg_replace('/ /', '_', $k);
-		$ret .= "$k:$v\n";
+		$ret .= "$k:";
+		if( is_bool($v) ) { $ret .= $v ? "1" : "0"; }
+		else { $ret .= $v; }
+		$ret .= "\n";
 	}
 	return $ret;
 }
@@ -68,7 +71,7 @@ function output ($o) {
 	}
 
 	# default
-	print text($o);
+	print json_encode($o);
 }
 
 ?>
