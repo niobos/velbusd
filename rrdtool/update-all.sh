@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /mnt/data/rrdtool
+cd ${RRDDIR:-/var/lib/rrd/} || exit 1
 
 for f in *-TS.rrd; do
 	ADDR="${f%%-TS.rrd}"
