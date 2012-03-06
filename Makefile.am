@@ -1,1 +1,1 @@
-SUBDIRS = bin src test www
+SUBDIRS = bin rrdtool src test www

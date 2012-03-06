@@ -54,6 +54,7 @@ AC_CHECK_MEMBER([struct sockaddr_in.sin_len],
 AC_CONFIG_FILES([
 	Makefile
 	bin/Makefile
+	rrdtool/Makefile
 	src/Makefile
 	test/Makefile
 	www/Makefile
