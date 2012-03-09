@@ -2,27 +2,22 @@
 
 require_once('config.php');
 
-if( preg_match("%^([0-9a-fA-F]+)$%", $_GET["id"], $matches ) == 0 ) {
-	fail('Invalid `id` in GET parameter');
-}
-$id = $matches[1];
+$id    = filter_get("id", "%^([0-9a-fA-F]+)$%", "");
 
 $filename = $config["rrddir"] . "/" . $id . "-TS.rrd";
 if( ! is_readable($filename) ) {
 	fail("Could not read file `$filename`");
 }
+$name   = filter_get("name",   "%^([a-zA-Z0-9 _-]*)$%", $id);
+$start  = filter_get("start",  "%^([0-9a-zA-Z /:-]+)$%", "-1 day");
+$end    = filter_get("end",    "%^([0-9a-zA-Z /:-]+)$%", "now");
+$width  = filter_get("width",  "%^([0-9]+)$%", "400");
+$height = filter_get("height", "%^([0-9]+)$%", "100");
 
-if( preg_match("%^([a-zA-Z0-9 _-]*)$%", $_GET["name"], $matches) == 0 ) {
-	fail("Invalid `name` in GET parameters");
-}
-$name = $matches[1];
-if( $name == "" ) { $name = $id; }
-
-$start = "-1 day";
-$end = "now";
 
 header('Content-type: image/png');
 passthru("rrdtool graph - --imgformat PNG" .
+	" --width $width --height $height" .
 	" --start '$start' --end '$end'" .
 	" --title 'Temperature sensor $name'" .
 	" --vertical-label '°C'" .
