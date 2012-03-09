@@ -6,6 +6,12 @@
 		"type": "light"
 	},
 	{
+		"id": "02.2",
+		"name": "Office light",
+		"left": 612, "top": 280,
+		"type": "light"
+	},
+	{
 		"id": "01.1",
 		"name": "Master bedroom blind",
 		"left": 706, "top": 477,
