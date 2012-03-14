@@ -56,11 +56,11 @@ passthru("rrdtool graph - --imgformat PNG" .
 	" VDEF:duty=heater_100,AVERAGE" .
 	" 'GPRINT:duty:duty=%4.2lf%%'" .
 	" COMMENT:\\\\n" .
-	" LINE1:empty#a0a00030:'Heat requested total'" .
-	" CDEF:relay_100=relay,100,*" .
-	" VDEF:duty_total=relay_100,AVERAGE" .
-	" 'GPRINT:duty_total:duty=%4.2lf%%'" .
-	" COMMENT:\\\\n" .
+	( $filename_relay ? " LINE1:empty#a0a00030:'Heat requested total'" .
+	  " CDEF:relay_100=relay,100,*" .
+	  " VDEF:duty_total=relay_100,AVERAGE" .
+	  " 'GPRINT:duty_total:duty=%4.2lf%%'" .
+	  " COMMENT:\\\\n" : "" ).
 	"");
 
 ?>

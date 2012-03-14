@@ -23,7 +23,7 @@
    <script type="text/javascript">
 	var icon = {};
 	icon.unknown = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/unknown.png"/></a></div>');
-	icon.light = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/light.png"/></a></div>');
+	icon.light = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/light-on.svg"/></a></div>');
 	icon.blind = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/blind.png"/></a></div>');
 
     var control = {};
