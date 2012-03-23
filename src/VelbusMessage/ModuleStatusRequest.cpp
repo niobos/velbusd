@@ -47,6 +47,7 @@ std::string ModuleStatusRequest::string() throw() {
 	case 0x04: o << "Relay=3"; break;
 	case 0x08: o << "Relay=4"; break;
 	case 0x10: o << "Relay=5"; break;
+	case 0x00: o << "generic"; break;
 	default: o << "Unknown[0x" << hex(m_blind_channel) << "]"; break;
 	}
 
