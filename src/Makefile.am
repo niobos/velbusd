@@ -40,7 +40,7 @@ velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonSt
                    VelbusMessage/Name.cpp VelbusMessage/Name.hpp \
                    VelbusMessage/SwitchBlindOff.cpp VelbusMessage/SwitchBlindOff.hpp \
                    VelbusMessage/SwitchBlindUpDown.cpp VelbusMessage/SwitchBlindUpDown.hpp \
-                   VelbusMessage/BlindRelayStatusRequest.cpp VelbusMessage/BlindRelayStatusRequest.hpp \
+                   VelbusMessage/ModuleStatusRequest.cpp VelbusMessage/ModuleStatusRequest.hpp \
                    VelbusMessage/SwitchRelayOnOff.cpp VelbusMessage/SwitchRelayOnOff.hpp \
                    VelbusMessage/StartRelayTimer.cpp VelbusMessage/StartRelayTimer.hpp \
                    VelbusMessage/WriteAddr.cpp VelbusMessage/WriteAddr.hpp \

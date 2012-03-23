@@ -1,24 +1,24 @@
-#include "BlindRelayStatusRequest.hpp"
+#include "ModuleStatusRequest.hpp"
 #include "Registrar.hpp"
 #include "../utils/output.hpp"
 #include <sstream>
 
 namespace VelbusMessage {
 
-class BlindRelayStatusRequestRegisterer {
+class ModuleStatusRequestRegisterer {
 public:
-	BlindRelayStatusRequestRegisterer() {
+	ModuleStatusRequestRegisterer() {
 		struct factory_methods f;
-		f.factory = &BlindRelayStatusRequest::factory;
+		f.factory = &ModuleStatusRequest::factory;
 		Registrar::get_instance().add(0xfa, f);
 	}
 };
 
 extern "C" { /* To make this auto-load when dlopen()ed */
-	BlindRelayStatusRequestRegisterer BlindRelayStatusRequest; /* Create a static instance: register with the registrar */
+	ModuleStatusRequestRegisterer ModuleStatusRequest; /* Create a static instance: register with the registrar */
 }
 
-BlindRelayStatusRequest::BlindRelayStatusRequest( unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data ) 
+ModuleStatusRequest::ModuleStatusRequest( unsigned char prio, unsigned char addr, unsigned char rtr, std::string const &data ) 
 		throw( FormError ) :
 		VelbusMessage(prio, addr, rtr) {
 	if( prio != 3 ) throw FormError("Wrong prio");
@@ -29,15 +29,15 @@ BlindRelayStatusRequest::BlindRelayStatusRequest( unsigned char prio, unsigned c
 	m_blind_channel = data[1];
 }
 
-std::string BlindRelayStatusRequest::data() throw() {
+std::string ModuleStatusRequest::data() throw() {
 	std::string ret("\xfa", 1);
 	ret.append(1, m_blind_channel);
 	return ret;
 }
 
-std::string BlindRelayStatusRequest::string() throw() {
+std::string ModuleStatusRequest::string() throw() {
 	std::ostringstream o;
-	o << "{Blind,Relay}StatusRequest to 0x" << hex(m_addr) << ": ";
+	o << "ModuleStatusRequest to 0x" << hex(m_addr) << ": ";
 
 	switch(m_blind_channel) {
 	case 0x03: o << "Blind=1"; break;

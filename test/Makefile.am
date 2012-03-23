@@ -46,7 +46,7 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-Name.sh \
                Parser-SwitchBlindOff.sh \
                Parser-SwitchBlindUpDown.sh \
-               Parser-BlindRelayStatusRequest.sh \
+               Parser-ModuleStatusRequest.sh \
                Parser-SwitchRelayOnOff.sh \
                Parser-StartRelayTimer.sh \
                Parser-WriteAddr.sh \
@@ -76,7 +76,7 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/Name.cpp ../src/VelbusMessage/Name.hpp \
                   ../src/VelbusMessage/SwitchBlindOff.cpp ../src/VelbusMessage/SwitchBlindOff.hpp \
                   ../src/VelbusMessage/SwitchBlindUpDown.cpp ../src/VelbusMessage/SwitchBlindUpDown.hpp \
-                  ../src/VelbusMessage/BlindRelayStatusRequest.cpp ../src/VelbusMessage/BlindRelayStatusRequest.hpp \
+                  ../src/VelbusMessage/ModuleStatusRequest.cpp ../src/VelbusMessage/ModuleStatusRequest.hpp \
                   ../src/VelbusMessage/SwitchRelayOnOff.cpp ../src/VelbusMessage/SwitchRelayOnOff.hpp \
                   ../src/VelbusMessage/StartRelayTimer.cpp ../src/VelbusMessage/StartRelayTimer.hpp \
                   ../src/VelbusMessage/WriteAddr.cpp ../src/VelbusMessage/WriteAddr.hpp \
