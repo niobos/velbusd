@@ -19,8 +19,10 @@ if( $id_relay != "" ) {
 }
 
 $name   = filter_get("name",   "%^([a-zA-Z0-9 _-]*)$%", $id);
-$start  = filter_get("start",  "%^([0-9a-zA-Z /:-]+)$%", "-1 day");
-$end    = filter_get("end",    "%^([0-9a-zA-Z /:-]+)$%", "now");
+$start  = strtotime(filter_get("start",  "%^([0-9a-zA-Z /:-]+)$%", "-1 day"));
+if( $start === FALSE ) { fail("Couldn't parse start date"); }
+$end    = strtotime(filter_get("end",    "%^([0-9a-zA-Z /:-]+)$%", "now"));
+if( $end === FALSE ) { fail("Couldn't parse end date"); }
 $width  = filter_get("width",  "%^([0-9]+)$%", "400");
 $height = filter_get("height", "%^([0-9]+)$%", "100");
 
@@ -28,7 +30,7 @@ $height = filter_get("height", "%^([0-9]+)$%", "100");
 header('Content-type: image/png');
 passthru("rrdtool graph - --imgformat PNG" .
 	" --width $width --height $height" .
-	" --start '$start' --end '$end'" .
+	" --start $start --end $end" .
 	" --title 'Temperature sensor $name'" .
 	" --vertical-label '°C'" .
 	" --alt-autoscale" . 
@@ -61,6 +63,10 @@ passthru("rrdtool graph - --imgformat PNG" .
 	  " VDEF:duty_total=relay_100,AVERAGE" .
 	  " 'GPRINT:duty_total:duty=%4.2lf%%'" .
 	  " COMMENT:\\\\n" : "" ).
+	" 'COMMENT: \\\\n'" .
+	" 'COMMENT:Graph showing from " . strftime("%a %Y-%m-%d %H\\:%M\\:%S %z", $start) . "\\\\n'" .
+	" 'COMMENT:                to " . strftime("%a %Y-%m-%d %H\\:%M\\:%S %z", $end) . "\\\\n'" .
+	" 'COMMENT:       rendered on " . strftime("%a %Y-%m-%d %H\\:%M\\:%S %z" /*, now*/) . "\\\\n'" .
 	"");
 
 ?>
