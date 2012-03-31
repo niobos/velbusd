@@ -19,12 +19,12 @@
  <body>
   <h1>Domotica control</h1>
   <div style="position: relative" id="floormap">
-   <img src="data/floorplan.jpg" />
+   <img src="data/floorplan" />
    <script type="text/javascript">
 	var icon = {};
-	icon.unknown = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/unknown.png"/></a></div>');
-	icon.light = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/light-on.svg" width="20" height="20"/></a></div>');
-	icon.blind = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/blind.svg" width="20" height="20"/></a></div>');
+	icon.unknown = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/unknown"/></a></div>');
+	icon.light = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/light-on" width="20" height="20"/></a></div>');
+	icon.blind = $('<div class="icon"><a href="#" onClick="return false;"><img src="images/blind" width="20" height="20"/></a></div>');
 
     var control = {};
 	control.unknown = $('<div class="popover"><div class="name">Name</div><div class="id">id</div></div>');
