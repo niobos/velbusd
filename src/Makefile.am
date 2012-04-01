@@ -47,5 +47,6 @@ velbusd_SOURCES += VelbusMessage/PushButtonStatus.cpp VelbusMessage/PushButtonSt
                    VelbusMessage/SensorTempRequest.cpp VelbusMessage/SensorTempRequest.hpp \
                    VelbusMessage/SensorTemp.cpp VelbusMessage/SensorTemp.hpp \
                    VelbusMessage/RTCstatus.cpp VelbusMessage/RTCstatus.hpp \
-                   VelbusMessage/TempSensorStatus.cpp VelbusMessage/TempSensorStatus.hpp
+                   VelbusMessage/TempSensorStatus.cpp VelbusMessage/TempSensorStatus.hpp \
+                   VelbusMessage/SwitchToMode.cpp VelbusMessage/SwitchToMode.hpp
 endif
