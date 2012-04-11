@@ -71,7 +71,7 @@
 				popover.find('.name').text(el.name);
 				popover.find('.id').text(el.id);
 				popover.find('.type').text(el.type);
-				$('.control.' + el.type).removeClass('template');
+				$('.control.' + el.type).removeClass('template').trigger('update', [el]);
 
 				// Undo selection which has happened while clicking and appending at the same time
 				if (window.getSelection) {
