@@ -30,6 +30,9 @@
 		position: absolute;
 		min-width: 10em;
 	}
+	span.tech {
+		font-size: 0.75em;
+	}
 	div.template {
 		display: none;
 	}
@@ -41,7 +44,7 @@
    <div class="popover template">
     <!-- Header line, common for all -->
     <div style="white-space: nowrap; padding-bottom: .4em;">
-     <span class="name">Name</span> (<span class="type">type</span> @ <span class="id">FF</span>)
+     <span class="name">Name</span> <span class="tech">(<span class="type">type</span> @ <span class="id">FF</span>)</span>
     </div>
 
     <!-- Specific controls for light -->
