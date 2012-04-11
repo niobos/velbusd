@@ -25,11 +25,13 @@ $end    = strtotime(filter_get("end",    "%^([0-9a-zA-Z /:-]+)$%", "now"));
 if( $end === FALSE ) { fail("Couldn't parse end date"); }
 $width  = filter_get("width",  "%^([0-9]+)$%", "400");
 $height = filter_get("height", "%^([0-9]+)$%", "100");
+$graph_only = filter_get("graph_only", "%(1)%", 0);
 
 
 header('Content-type: image/png');
 passthru("rrdtool graph - --imgformat PNG" .
 	" --width $width --height $height" .
+	( $graph_only ? " -g" : "" ) .
 	" --start $start --end $end" .
 	" --title '$title'" .
 	" --vertical-label '°C'" .
