@@ -28,8 +28,8 @@ $height = filter_get("height", "%^([0-9]+)$%", "100");
 $graph_only = filter_get("graph_only", "%(1)%", 0);
 
 
-header('Content-type: image/png');
-passthru("rrdtool graph - --imgformat PNG" .
+header('Content-type: image/svg+xml');
+passthru("rrdtool graph - --imgformat SVG" .
 	" --width $width --height $height" .
 	( $graph_only ? " -g" : "" ) .
 	" --start $start --end $end" .
