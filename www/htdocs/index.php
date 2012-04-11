@@ -19,6 +19,8 @@
 	}
 	div.icon.temp {
 		background-image: url(images/temp);
+	div.icon div {
+		cursor: auto;
 	}
 
 	div.popover {
