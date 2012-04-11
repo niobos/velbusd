@@ -11,14 +11,6 @@
 		background-image: url(images/unknown);
 		background-size: contain;
 	}
-	div.icon.light {
-		background-image: url(images/light-on);
-	}
-	div.icon.blind {
-		background-image: url(images/blind);
-	}
-	div.icon.temp {
-		background-image: url(images/temp);
 	div.icon div {
 		cursor: auto;
 	}
@@ -43,48 +35,13 @@
  <body>
   <h1>Domotica control</h1>
   <div style="position: relative" id="floormap">
-   <div class="popover template">
+   <div id="control" class="popover template">
     <!-- Header line, common for all -->
     <div style="white-space: nowrap; padding-bottom: .4em;">
-     <span class="name">Name</span> <span class="tech">(<span class="type">type</span> @ <span class="id">FF</span>)</span>
+     <span class="name">Name</span>
+     <span class="tech">(<span class="type">type</span> @ <span class="id">FF</span>)</span>
     </div>
-
-    <!-- Specific controls for light -->
-    <div class="control template light">
-     <input type="button" name="on" value="On" /><br/>
-     <input type="button" name="off" value="Off" />
-    </div>
-
-    <!-- Specific controls for blinds -->
-    <div class="control template blind">
-     <input type="button" name="up" value="Up" /><br/>
-     <input type="button" name="stop" value="Stop" /><br/>
-     <input type="button" name="down" value="Down" />
-    </div>
-
    </div>
-   <script type="text/javascript">
-    	$('.control.template.light input').click( function() {
-    		var id = $(this).parent().parent().find(".id").text();
-    		$.ajax({
-    			type: 'POST',
-    			url: 'api/RelayStatus.php/' + id,
-    			data: 'state=' + this.name,
-    			error: function(jqXHR, textStatus, errorThrown) { alert(textStatus); }
-    		});
-    		return false;
-    	});
-
-    	$('.control.template.blind input').click( function() {
-    		var id = $(this).parent().parent().find(".id").text();
-    		$.ajax({
-    			type: 'POST',
-    			url: 'api/BlindStatus.php/' + id,
-    			data: 'state=' + this.name,
-    			error: function(jqXHR, textStatus, errorThrown) { alert(textStatus); }
-    		});
-    	});
-   </script>
 
    <img src="data/floorplan" />
 
@@ -133,6 +90,7 @@
 		$(document).click( function() { $('.popover').addClass('template'); } );
 	});
    </script>
+   <script src="include/all.js"></script>
   </div>
  </body>
 </html>
