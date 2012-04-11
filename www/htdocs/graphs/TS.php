@@ -18,7 +18,7 @@ if( $id_relay != "" ) {
 	$filename_relay = FALSE;
 }
 
-$name   = filter_get("name",   "%^([a-zA-Z0-9 _-]*)$%", $id);
+$title   = filter_get("title",   "%^([a-zA-Z0-9 _-]*)$%", "Temperature sensor $id");
 $start  = strtotime(filter_get("start",  "%^([0-9a-zA-Z /:-]+)$%", "-1 day"));
 if( $start === FALSE ) { fail("Couldn't parse start date"); }
 $end    = strtotime(filter_get("end",    "%^([0-9a-zA-Z /:-]+)$%", "now"));
@@ -31,7 +31,7 @@ header('Content-type: image/png');
 passthru("rrdtool graph - --imgformat PNG" .
 	" --width $width --height $height" .
 	" --start $start --end $end" .
-	" --title 'Temperature sensor $name'" .
+	" --title '$title'" .
 	" --vertical-label '°C'" .
 	" --alt-autoscale" . 
 	" 'DEF:temp=$filename:temperature:AVERAGE'" .
