@@ -20,3 +20,4 @@ test/NBcat
 test/VMB1RS-sim
 configure.scan
 velbusd-0.0.01.tar.*
+www/statepush/node_modules

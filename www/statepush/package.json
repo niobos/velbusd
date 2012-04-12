@@ -1,0 +1,9 @@
+{
+	"name": "statepush",
+	"version": "0.0.1",
+	"description": "A WebSocket daemon to push stateupdates to the browser",
+	"author": "",
+	"dependencies": {
+		"sockjs": "0.3.x"
+	}
+}
