@@ -25,5 +25,5 @@ velbus.on('resync', function(why) {
 	util.log('velbus connection: lost sync: ' + why + ', resyncing');
 });
 velbus.on('message', function(data) {
-	util.log('velbus connection: message: ' + data);
+	util.log('velbus connection: message: ' + util.inspect(data) );
 });

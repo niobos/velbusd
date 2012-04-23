@@ -66,11 +66,12 @@ velbus.prototype.process_message = function() {
 	this.unprocessed_data.copy( this.unprocessed_data, 0, 6+length );
 	this.n_unprocessed_data -= 6+length;
 
-	this.emit('message', "Rx data: Prio=" + priority +
-			" Addr=0x" + address +
-			" RTR=" + rtr +
-			" data[" + length + "]=" + hexdump(data)
-			);
+	this.emit('message', {
+			"prio": priority,
+			"address": address,
+			"rtr": rtr,
+			"data": data
+			});
 }
 
 velbus.prototype.resync = function(where) {
@@ -83,12 +84,4 @@ velbus.prototype.resync = function(where) {
 
 exports.ctor = function(host, port) {
 	return new velbus(host, port);
-}
-
-function hexdump(data) {
-	var h = '';
-	for( var i = 0; i < data.length; i++ ) {
-		h += data[i].toString(16) + ' ';
-	}
-	return h;
 }
