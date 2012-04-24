@@ -10,6 +10,7 @@ process.on('SIGINT', function () {
 	process.exit(0);
 });
 
+
 var velbus = require('./velbus').ctor(config.velbusd.host, config.velbusd.port);
 velbus.on('error', function(e) {
 	util.log("velbus connection error: " + e.syscall + " -> " + e.code);
@@ -25,5 +26,29 @@ velbus.on('resync', function(why) {
 	util.log('velbus connection: lost sync: ' + why + ', resyncing');
 });
 velbus.on('message', function(data) {
-	util.log('velbus connection: message: ' + util.inspect(data) );
+	//util.log('velbus connection: message: ' + util.inspect(data) );
 });
+
+
+var express = require('express');
+var webapp = express.createServer();
+
+webapp.configure(function() {
+	webapp.use( express.logger() );
+	//webapp.use( express.bodyParser() );
+	//webapp.use( express.cookieParser(...) );
+	//webapp.use( express.session(...) );
+	webapp.use( webapp.router );
+	webapp.use( express.static(__dirname + '/public') );
+});
+webapp.configure('development', function() {
+	webapp.use( express.errorHandler({ dumpExceptions: true, showStack: true }) );
+});
+webapp.configure('production', function() {
+	webapp.use(express.errorHandler() );
+});
+
+webapp.listen(config.webapp.port);
+util.log("webserver listening on " +
+		webapp.address().address + ':' + webapp.address().port +
+		" in " + webapp.settings.env + " mode");

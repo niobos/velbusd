@@ -4,5 +4,6 @@
 	"description": "A WebSocket daemon to push stateupdates to the browser",
 	"author": "",
 	"dependencies": {
+		"express": "2.5.x"
 	}
 }
