@@ -2,6 +2,7 @@
 
 var util = require('util');
 var config = require('./config');
+var fs = require('fs');
 
 util.log("velbusweb starting");
 
@@ -50,5 +51,29 @@ webapp.configure('production', function() {
 
 webapp.listen(config.webapp.port);
 util.log("webserver listening on " +
-		webapp.address().address + ':' + webapp.address().port +
-		" in " + webapp.settings.env + " mode");
+	webapp.address().address + ':' + webapp.address().port +
+	" in " + webapp.settings.env + " mode");
+
+webapp.get('/js/controls.js', function(req, res, next) {
+	// Generate the concatenated JS file of the content
+	fs.readdir('public/js/controls', function(err, files) {
+		if( err !== null ) { next(err); }
+		var body = '';
+		for( var f in files ) {
+			var fn = files[f];
+			// Read all files
+			fs.readFile('public/js/controls/' + fn, function(err, data) {
+				if( err !== null ) { next(err); }
+				// Append content to the body
+				body += data + "\n";
+				// Remove us from the todo list
+				files.splice( files.indexOf(fn), 1 );
+
+				if( files.length == 0 ) {
+					// We are the last one to finish, send output
+					res.send(body, {'Content-Type': 'application/javascript'} );
+				}
+			});
+		}
+	});
+});
