@@ -26,8 +26,11 @@ velbus.on('close', function() {
 velbus.on('resync', function(why) {
 	util.log('velbus connection: lost sync: ' + why + ', resyncing');
 });
+
+var vbmp = require('./velbusMessageParser');
 velbus.on('message', function(data) {
 	//util.log('velbus connection: message: ' + util.inspect(data) );
+	vbmp.parse(data);
 });
 
 
@@ -76,4 +79,18 @@ webapp.get('/js/controls.js', function(req, res, next) {
 			});
 		}
 	});
+});
+
+
+webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])/, function(req, res, next) {
+	var id = parseInt( req.params[0], 16 );
+	var relay = parseInt( req.params[1] );
+
+	// Set up listener for the answer
+	console.log('listening for relay status ' + id + '.' + relay);
+	vbmp.once('relay status ' + id + '.' + relay, function(msg) {
+		res.send(msg);
+	});
+	// Now send the request
+	// TODO
 });
