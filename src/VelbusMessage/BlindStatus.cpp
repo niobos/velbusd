@@ -63,13 +63,18 @@ std::string BlindStatus::string() throw() {
 	default: o << "Unknown[0x" << hex(m_timeout) << "]"; break;
 	}
 
-	o << " Status=";
-	switch(m_blind_status) {
+	o << " Status1=";
+	switch(m_blind_status & 0x03) {
 	case 0x00: o << "off"; break;
-	case 0x01: o << "1 up"; break;
-	case 0x02: o << "1 down"; break;
-	case 0x04: o << "2 up"; break;
-	case 0x08: o << "1 down"; break;
+	case 0x01: o << "up"; break;
+	case 0x02: o << "down"; break;
+	default: o << "Unknown[0x" << hex(m_blind_status) << "]"; break;
+	}
+	o << " Status2=";
+	switch(m_blind_status & 0x0c) {
+	case 0x00: o << "off"; break;
+	case 0x04: o << "up"; break;
+	case 0x08: o << "down"; break;
 	default: o << "Unknown[0x" << hex(m_blind_status) << "]"; break;
 	}
 
