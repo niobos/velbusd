@@ -87,11 +87,13 @@ webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])/, function(req, res, next
 	var relay = parseInt( req.params[1] );
 
 	// Set up listener for the answer
+	var timeout;
 	var send_answer = function(msg) {
+		clearTimeout(timeout);
 		res.send(msg);
 	};
 	vbm.once('relay status ' + id + '.' + relay, send_answer);
-	setTimeout(function() {
+	timeout = setTimeout(function() {
 			vbm.removeListener('relay status ' + id + '.' + relay, send_answer);
 			res.send("Timeout", 500);
 		}, config.webapp.timeout);
