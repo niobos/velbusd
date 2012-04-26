@@ -82,15 +82,24 @@ webapp.get('/js/controls.js', function(req, res, next) {
 });
 
 
-webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])/, function(req, res, next) {
+webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
 	var id = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
+	var field = req.params[2];
 
 	// Set up listener for the answer
 	var timeout;
 	var send_answer = function(msg) {
 		clearTimeout(timeout);
-		res.send(msg);
+		if( field != undefined && field != '' ) {
+			if( msg.hasOwnProperty(field) ) {
+				res.send( msg[field].toString(), {'Content-Type': 'text/plain'} );
+			} else {
+				res.send("Unknown property", 500);
+			}
+		} else {
+			res.send(msg);
+		}
 	};
 	vbm.once('relay status ' + id + '.' + relay, send_answer);
 	timeout = setTimeout(function() {
