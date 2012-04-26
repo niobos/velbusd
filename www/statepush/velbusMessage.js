@@ -23,7 +23,7 @@ module.exports.parse = function(msg) {
 			case 3: msg.mode = "disabled"; break;
 			// no default, we listen everything
 		}
-		switch(msg.data[3] & 0x02) {
+		switch(msg.data[3] & 0x03) {
 			case 0: msg.status = "off"; break;
 			case 1: msg.status = "on"; break;
 			case 3: msg.status = "interval"; break;
