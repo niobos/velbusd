@@ -90,10 +90,7 @@ webapp.all(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 	var relaybit = String.fromCharCode( 1 << (relay-1) );
 
 	if( req.method == "POST" ) {
-		if( field == undefined || field == '' ) {
-			res.send("Not (yet) implemented on full object", 501);
-			return;
-		} else if( field == "status" ) {
+		if( field == "status" ) {
 			var command;
 			if( req.body.on == '' ) {
 				command = "\x02";
@@ -104,12 +101,14 @@ webapp.all(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 				return;
 			}
 			velbus.send_message(0, id, 0, command + relaybit);
+			// And fall through to GET
 		} else {
 			res.send("Not implemented", 501);
 			return;
 		}
 	}
 
+	// GET handler
 	// Set up listener for the answer
 	var timeout;
 	var send_answer = function(msg) {
