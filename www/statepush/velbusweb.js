@@ -82,10 +82,12 @@ webapp.get('/js/controls.js', function(req, res, next) {
 });
 
 
-webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
+webapp.all(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
 	var id = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
+
+	var relaybit = String.fromCharCode( 1 << (relay-1) );
 
 	// Set up listener for the answer
 	var timeout;
@@ -108,6 +110,5 @@ webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 		}, config.webapp.timeout);
 
 	// Now send the request
-	var relaybit = 1 << (relay-1);
-	velbus.send_message(3, id, 0, "\xfa" + String.fromCharCode(relaybit) );
+	velbus.send_message(3, id, 0, "\xfa" + relaybit );
 });
