@@ -27,10 +27,10 @@ velbus.on('resync', function(why) {
 	util.log('velbus connection: lost sync: ' + why + ', resyncing');
 });
 
-var vbmp = require('./velbusMessageParser');
+var vbm = require('./velbusMessage');
 velbus.on('message', function(data) {
 	//util.log('velbus connection: message: ' + util.inspect(data) );
-	vbmp.parse(data);
+	vbm.parse(data);
 });
 
 
@@ -88,7 +88,7 @@ webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])/, function(req, res, next
 
 	// Set up listener for the answer
 	console.log('listening for relay status ' + id + '.' + relay);
-	vbmp.once('relay status ' + id + '.' + relay, function(msg) {
+	vbm.once('relay status ' + id + '.' + relay, function(msg) {
 		res.send(msg);
 	});
 	// Now send the request
