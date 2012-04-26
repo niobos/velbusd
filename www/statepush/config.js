@@ -6,4 +6,5 @@ exports.velbusd = {
 
 exports.webapp = {
 	'port': 8080,
+	'timeout': 2000,
 }

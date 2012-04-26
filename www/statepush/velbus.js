@@ -85,3 +85,33 @@ velbus.prototype.resync = function(where) {
 exports.ctor = function(host, port) {
 	return new velbus(host, port);
 }
+
+exports.create_message = function (prio, addr, rtr, data) {
+	var length = data.length;
+	var msg = new Buffer( 4 + length + 2 );
+	msg[0] = 0x0f;
+	msg[1] = 0xf8 | (prio & 0x03);
+	msg[2] = addr & 0xff;
+	msg[3] = ( rtr ? 0x40 : 0x00 ) | (length & 0x0f);
+	if( typeof data == "string" ) { msg.write(data, 4, 'binary'); }
+	else if( data instanceof Buffer ) { data.copy(msg, 4); }
+	else { return null; }
+
+	var sum = 0;
+	for( var i = 0; i < 4+length; i++ ) {
+		sum += msg[i];
+	}
+	sum = (-sum)&0xff;
+
+	msg[ 4+length ] = sum;
+	msg[ 4+length+1 ] = 0x04;
+
+	return msg;
+}
+
+velbus.prototype.send_message = function (prio, addr, rtr, data) {
+	var msg = exports.create_message( prio, addr, rtr, data );
+	if( msg == null ) { return null; }
+
+	this.socket.write( msg );
+}
