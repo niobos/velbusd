@@ -9,9 +9,9 @@ $('<div class="control template light">' +
 	'</div>'
  ).appendTo("#control").bind('update', function(event, element) {
 		$('#lightstate').text('?');
-		$.ajax({ url: 'api/RelayStatus/' + element.id, dataType: 'json' })
+		$.ajax({ url: 'control/relay/' + element.id, dataType: 'json' })
 			.success(function(data) {
-				$('#lightstate').text(data['state']);
+				$('#lightstate').text(data['status']);
 			});
 	});
 
@@ -19,8 +19,8 @@ $('#control div.light input').click( function() {
 	var id = $(this).parent().parent().find(".id").text();
 	$.ajax({
 		type: 'POST',
-		url: 'api/RelayStatus.php/' + id,
-		data: 'state=' + this.name,
+		url: 'control/relay/' + id + "/status",
+		data: this.name,
 		error: function(jqXHR, textStatus, errorThrown) { alert(textStatus); }
 	});
 	return false;
