@@ -39,7 +39,7 @@ var webapp = express.createServer();
 
 webapp.configure(function() {
 	webapp.use( express.logger() );
-	//webapp.use( express.bodyParser() );
+	webapp.use( express.bodyParser() );
 	//webapp.use( express.cookieParser(...) );
 	//webapp.use( express.session(...) );
 	webapp.use( webapp.router );
@@ -88,6 +88,27 @@ webapp.all(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 	var field = req.params[2];
 
 	var relaybit = String.fromCharCode( 1 << (relay-1) );
+
+	if( req.method == "POST" ) {
+		if( field == undefined || field == '' ) {
+			res.send("Not (yet) implemented on full object", 501);
+			return;
+		} else if( field == "status" ) {
+			var command;
+			if( req.body.on == '' ) {
+				command = "\x02";
+			} else if( req.body.off == '' ) {
+				command = "\x01";
+			} else {
+				res.send("Unknown status", 500);
+				return;
+			}
+			velbus.send_message(0, id, 0, command + relaybit);
+		} else {
+			res.send("Not implemented", 501);
+			return;
+		}
+	}
 
 	// Set up listener for the answer
 	var timeout;
