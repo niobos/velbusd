@@ -82,33 +82,38 @@ webapp.get('/js/controls.js', function(req, res, next) {
 });
 
 
-webapp.all(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
+webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
 	var id = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
 
 	var relaybit = String.fromCharCode( 1 << (relay-1) );
 
-	if( req.method == "POST" ) {
-		if( field == "status" ) {
-			var command;
-			if( req.body.on == '' ) {
-				command = "\x02";
-			} else if( req.body.off == '' ) {
-				command = "\x01";
-			} else {
-				res.send("Unknown status", 500);
-				return;
-			}
-			velbus.send_message(0, id, 0, command + relaybit);
-			// And fall through to GET
+	if( field == "status" ) {
+		var command;
+		if( req.body.on == '' ) {
+			command = "\x02";
+		} else if( req.body.off == '' ) {
+			command = "\x01";
 		} else {
-			res.send("Not implemented", 501);
+			res.send("Unknown status", 400);
 			return;
 		}
-	}
+		velbus.send_message(0, id, 0, command + relaybit);
 
-	// GET handler
+		req.method = "GET"; // And fall through to the GET response
+		next();
+	} else {
+		res.send("Not implemented", 501);
+		return;
+	}
+});
+
+webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
+	var id = parseInt( req.params[0], 16 );
+	var relay = parseInt( req.params[1] );
+	var field = req.params[2];
+
 	// Set up listener for the answer
 	var timeout;
 	var send_answer = function(msg) {
@@ -117,7 +122,7 @@ webapp.all(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 			if( msg.hasOwnProperty(field) ) {
 				res.send( msg[field].toString(), {'Content-Type': 'text/plain'} );
 			} else {
-				res.send("Unknown property", 500);
+				res.send("Unknown property", 404);
 			}
 		} else {
 			res.send(msg);
@@ -130,39 +135,45 @@ webapp.all(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 		}, config.webapp.timeout);
 
 	// Now send the request
+	var relaybit = String.fromCharCode( 1 << (relay-1) );
 	velbus.send_message(3, id, 0, "\xfa" + relaybit );
 });
 
 
-webapp.all(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
+webapp.post(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
 	var id = parseInt( req.params[0], 16 );
 	var blind = parseInt( req.params[1] );
 	var field = req.params[2];
 
 	var blindbit = String.fromCharCode( 3 << (blind-1)*2 );
 
-	if( req.method == "POST" ) {
-		if( field == "status" ) {
-			var command;
-			if( req.body.up == '' ) {
-				command = "\x05" + blindbit + "\0\0\0"; // Use dip switch settings
-			} else if( req.body.down == '' ) {
-				command = "\x06" + blindbit + "\0\0\0";
-			} else if( req.body.stop == '' ) {
-				command = "\x04" + blindbit;
-			} else {
-				res.send("Unknown status", 500);
-				return;
-			}
-			velbus.send_message(0, id, 0, command);
-			// And fall through to GET
+	if( field == "status" ) {
+		var command;
+		if( req.body.up == '' ) {
+			command = "\x05" + blindbit + "\0\0\0"; // Use dip switch settings
+		} else if( req.body.down == '' ) {
+			command = "\x06" + blindbit + "\0\0\0";
+		} else if( req.body.stop == '' ) {
+			command = "\x04" + blindbit;
 		} else {
-			res.send("Not implemented", 501);
+			res.send("Unknown status", 400);
 			return;
 		}
-	}
+		velbus.send_message(0, id, 0, command);
 
-	// GET handler
+		req.method = "GET"; // And fall through to the GET response
+		next();
+	} else {
+		res.send("Not implemented", 501);
+		return;
+	}
+});
+
+webapp.get(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
+	var id = parseInt( req.params[0], 16 );
+	var blind = parseInt( req.params[1] );
+	var field = req.params[2];
+
 	// Set up listener for the answer
 	var timeout;
 	var send_answer = function(msg) {
@@ -171,7 +182,7 @@ webapp.all(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 			if( msg.hasOwnProperty(field) ) {
 				res.send( msg[field].toString(), {'Content-Type': 'text/plain'} );
 			} else {
-				res.send("Unknown property", 500);
+				res.send("Unknown property", 404);
 			}
 		} else {
 			res.send(msg);
@@ -184,5 +195,6 @@ webapp.all(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 		}, config.webapp.timeout);
 
 	// Now send the request
+	var blindbit = String.fromCharCode( 3 << (blind-1)*2 );
 	velbus.send_message(3, id, 0, "\xfa" + blindbit );
 });
