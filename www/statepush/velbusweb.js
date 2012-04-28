@@ -82,31 +82,48 @@ webapp.get('/js/controls.js', function(req, res, next) {
 });
 
 
-webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
+webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
 	var id = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
 
 	var relaybit = String.fromCharCode( 1 << (relay-1) );
 
-	if( field == "status" ) {
+	// We expect a single value in the body
+	var value = Object.keys( req.body )
+	if( value.length != 1 ) {
+		res.send("Expecting single value in POST body", 400);
+		return;
+	}
+	value = value[0];
+
+	switch( field ) {
+	case "status":
 		var command;
-		if( req.body.on == '' ) {
-			command = "\x02";
-		} else if( req.body.off == '' ) {
-			command = "\x01";
-		} else {
+		switch( value ) {
+		case "on":
+			command = "\x02" + relaybit;
+			break;
+
+		case "off":
+			command = "\x01" + relaybit;
+			break;
+
+		default:
 			res.send("Unknown status", 400);
 			return;
 		}
-		velbus.send_message(0, id, 0, command + relaybit);
+		velbus.send_message(0, id, 0, command);
+		break;
 
-		req.method = "GET"; // And fall through to the GET response
-		next();
-	} else {
+	default:
 		res.send("Not implemented", 501);
 		return;
 	}
+
+	// And fall through to the GET response
+	req.method = "GET";
+	next();
 });
 
 webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
@@ -140,33 +157,52 @@ webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, fun
 });
 
 
-webapp.post(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
+webapp.post(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
 	var id = parseInt( req.params[0], 16 );
 	var blind = parseInt( req.params[1] );
 	var field = req.params[2];
 
 	var blindbit = String.fromCharCode( 3 << (blind-1)*2 );
 
-	if( field == "status" ) {
+	// We expect a single value in the body
+	var value = Object.keys( req.body )
+	if( value.length != 1 ) {
+		res.send("Expecting single value in POST body", 400);
+		return;
+	}
+	value = value[0];
+
+	switch( field ) {
+	case "status":
 		var command;
-		if( req.body.up == '' ) {
+		switch( value ) {
+		case "up":
 			command = "\x05" + blindbit + "\0\0\0"; // Use dip switch settings
-		} else if( req.body.down == '' ) {
+			break;
+
+		case "down":
 			command = "\x06" + blindbit + "\0\0\0";
-		} else if( req.body.stop == '' ) {
+			break;
+
+		case "stop":
 			command = "\x04" + blindbit;
-		} else {
+			break;
+
+		default:
 			res.send("Unknown status", 400);
 			return;
 		}
 		velbus.send_message(0, id, 0, command);
+		break;
 
-		req.method = "GET"; // And fall through to the GET response
-		next();
-	} else {
+	default:
 		res.send("Not implemented", 501);
 		return;
 	}
+
+	// And fall through to the GET response
+	req.method = "GET";
+	next();
 });
 
 webapp.get(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
