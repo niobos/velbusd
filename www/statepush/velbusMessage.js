@@ -3,6 +3,8 @@ var events = require('events'),
 
 module.exports = new events.EventEmitter;
 
+var blindStatus = {};
+
 module.exports.parse = function(msg) {
 
 	// Relay Status
@@ -84,6 +86,46 @@ module.exports.parse = function(msg) {
 
 		delete msg.data;
 		delete msg.rtr;
+
+		// Calculate augmented info
+		var id = msg.address + '.' + msg.blind;
+		if( blindStatus[id] == undefined ) {
+			blindStatus[id] = { 'public': { 'position': 0.5 } };
+		}
+
+		{
+			var travel = msg.timeout-5; // TODO: get this configurable
+			var now = +new Date();
+
+			// Have we been moving since the last time we checked?
+			if( blindStatus[id].since != undefined ) {
+				var traveled = (now - blindStatus[id].since) / 1000 / travel;
+				blindStatus[id].public.position += traveled *
+					( blindStatus[id].public['last move'] == "up" ? 1 : -1 );
+				// And clamp to [0,1]
+				blindStatus[id].public.position = Math.min(1, Math.max(0,
+					blindStatus[id].public.position ));
+				blindStatus[id].since = now;
+			}
+
+			if( msg.status == "stopped" ) {
+				blindStatus[id].since = undefined;
+			} else {
+				blindStatus[id].since = now;
+			}
+
+		}
+
+		// Augment with calculated info
+		for( var attr in blindStatus[id].public ) {
+			msg[attr] = blindStatus[id].public[attr];
+		}
+
+		// Update last move AFTER it has been copied into msg
+		switch( msg.status ) {
+			case "going up": blindStatus[id].public['last move'] = "up"; break;
+			case "going down": blindStatus[id].public['last move'] = "down"; break;
+		}
 
 		this.emit('blind status', msg);
 		this.emit('blind status ' + msg.address, msg);
