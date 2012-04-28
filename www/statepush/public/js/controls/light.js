@@ -7,9 +7,9 @@ $('<div class="control template light">' +
 	'<input type="button" name="on" value="On" /><br/>' +
 	'<input type="button" name="off" value="Off" />' +
 	'</div>'
- ).appendTo("#control").bind('update', function(event, element) {
+ ).appendTo("#control").bind('update', function(event, id, element, coords) {
 		$('#lightstate').text('?');
-		$.ajax({ url: 'control/relay/' + element.id, dataType: 'json' })
+		$.ajax({ url: 'control/relay/' + id, dataType: 'json' })
 			.success(function(data) {
 				$('#lightstate').text(data['status']);
 			});

@@ -8,9 +8,9 @@ $('<div class="control template blind">' +
      '<input type="button" name="stop" value="Stop" /><br/>' +
      '<input type="button" name="down" value="Down" />' +
 	'</div>'
- ).appendTo("#control").bind('update', function(event, element) {
+ ).appendTo("#control").bind('update', function(event, id, element, coords) {
 		$('#blindposition').text('?');
-		$.ajax({ url: 'control/blind/' + element.id, dataType: 'json' })
+		$.ajax({ url: 'control/blind/' + id, dataType: 'json' })
 			.success(function(data) {
 				$('#blindposition').text(data['status']);
 			});
