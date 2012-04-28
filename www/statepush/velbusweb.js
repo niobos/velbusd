@@ -82,6 +82,11 @@ webapp.get('/js/controls.js', function(req, res, next) {
 });
 
 
+webapp.get('/data/coords.json', function(req, res, next) {
+	res.json(config.controls);
+});
+
+
 webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
 	var id = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
