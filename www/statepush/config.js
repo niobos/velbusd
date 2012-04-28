@@ -9,8 +9,9 @@ exports.webapp = {
 	'timeout': 2000,
 }
 
+// IDs MUST be in lowercase and have two hex digits for the address
 exports.controls = {
-	"02.1": {
+	"0a.1": {
 		"name": "Master bedroom light",
 		"coords": [ {"left": 590, "top": 270} ],
 		"type": "light"
@@ -18,7 +19,8 @@ exports.controls = {
 	"01.1": {
 		"name": "Master bedroom blind",
 		"coords": [ {"left": 730, "top": 270} ],
-		"type": "blind"
+		"type": "blind",
+		"time": 18
 	},
 	"04": {
 		"name": "Master bedroom temp",

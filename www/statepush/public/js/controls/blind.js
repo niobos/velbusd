@@ -12,7 +12,14 @@ $('<div class="control template blind">' +
 		$('#blindposition').text('?');
 		$.ajax({ url: 'control/blind/' + id, dataType: 'json' })
 			.success(function(data) {
-				$('#blindposition').text(data['status']);
+				var pct = data['position']*100;
+				var dir;
+				switch( data['status'] ) {
+				case "going up": dir = "\u2191"; break;
+				case "going down": dir = "\u2193"; break;
+				case "stopped": dir = ""; break;
+				}
+				$('#blindposition').text( pct.toFixed(0) + '% ' + dir );
 			});
 	});
 

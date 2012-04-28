@@ -1,5 +1,6 @@
 var events = require('events'),
-    util = require('util');
+    util = require('util'),
+    config = require('./config');
 
 module.exports = new events.EventEmitter;
 
@@ -88,13 +89,16 @@ module.exports.parse = function(msg) {
 		delete msg.rtr;
 
 		// Calculate augmented info
-		var id = msg.address + '.' + msg.blind;
+		var id = msg.address.toString(16) + '.' + msg.blind;
+		if( id.length == 3 ) { id = '0' + id; }
+
 		if( blindStatus[id] == undefined ) {
 			blindStatus[id] = { 'public': { 'position': 0.5 } };
 		}
 
 		{
-			var travel = msg.timeout-5; // TODO: get this configurable
+			var travel = config.controls[id].time;
+			if( travel == undefined ) { travel = msg.timeout - 5; } // Default
 			var now = +new Date();
 
 			// Have we been moving since the last time we checked?
