@@ -15,9 +15,9 @@ $('<div class="control template temp">' +
 
 	$("#tempcur").text('?');
 	$("#temptarget").text('?');
-	$.ajax({ url: 'api/TempStatus/' + id, dataType: 'json' })
+	$.ajax({ url: 'control/temp/' + id, dataType: 'json' })
 		.success(function(data) {
-				$("#tempcur").text(data['temp']);
-				$("#temptarget").text(data['target temp']);
+				$("#tempcur").text(data['current temperature']);
+				$("#temptarget").text(data['target temperature']);
 			});
 });
