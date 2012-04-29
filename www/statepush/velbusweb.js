@@ -27,10 +27,20 @@ velbus.on('resync', function(why) {
 	util.log('velbus connection: lost sync: ' + why + ', resyncing');
 });
 
-var vbm = require('./velbusMessage');
-velbus.on('message', function(data) {
-	//util.log('velbus connection: message: ' + util.inspect(data) );
-	vbm.parse(data);
+var messageParsers = fs.readdirSync('./velbusMessages');
+for( var i = 0; i < messageParsers.length; i++ ) {
+	messageParsers[i] = require('./velbusMessages/' + messageParsers[i] );
+}
+velbus.on('message', function(msg) {
+	//util.log('velbus connection: message: ' + util.inspect(msg) );
+	for( var i = 0; i < messageParsers.length; i++ ) {
+		messageParsers[i].parse( msg, config, null );
+	}
+	//util.log('velbus connection: message (after processing): ' + util.inspect(msg) );
+
+	if( msg.type != null ) {
+		velbus.emit( msg.type + ' ' + msg.id, msg );
+	}
 });
 
 
@@ -86,5 +96,7 @@ webapp.get('/data/coords.json', function(req, res, next) {
 	res.json(config.controls);
 });
 
-require('./controls/relay.js').add_routes(webapp, velbus, vbm, config);
-require('./controls/blind.js').add_routes(webapp, velbus, vbm, config);
+var controls = fs.readdirSync('./controls');
+for( var i = 0; i < controls.length; i++ ) {
+	require('./controls/' + controls[i]).add_routes(webapp, velbus, config);
+}

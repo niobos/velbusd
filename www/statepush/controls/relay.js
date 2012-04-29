@@ -1,8 +1,8 @@
 
-exports.add_routes = function(webapp, velbus, vbm, config) {
+exports.add_routes = function(webapp, velbus, config) {
 
 function reply_to_get(req, res, next) {
-	var id = parseInt( req.params[0], 16 );
+	var addr = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
 
@@ -20,21 +20,21 @@ function reply_to_get(req, res, next) {
 			res.send(msg);
 		}
 	};
-	vbm.once('relay status ' + id + '.' + relay, send_answer);
+	velbus.once('relay status ' + addr + '.' + relay, send_answer);
 	timeout = setTimeout(function() {
-			vbm.removeListener('relay status ' + id + '.' + relay, send_answer);
+			velbus.removeListener('relay status ' + addr + '.' + relay, send_answer);
 			res.send("Timeout", 500);
 		}, config.webapp.timeout);
 
 	// Now send the request
 	var relaybit = String.fromCharCode( 1 << (relay-1) );
-	velbus.send_message(3, id, 0, "\xfa" + relaybit );
+	velbus.send_message(3, addr, 0, "\xfa" + relaybit );
 }
 
 webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
 
 webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
-	var id = parseInt( req.params[0], 16 );
+	var addr = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
 
@@ -64,7 +64,7 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, functio
 			res.send("Unknown status", 400);
 			return;
 		}
-		velbus.send_message(0, id, 0, command);
+		velbus.send_message(0, addr, 0, command);
 		break;
 
 	default:
