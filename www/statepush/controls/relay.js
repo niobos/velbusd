@@ -10,6 +10,9 @@ function reply_to_get(req, res, next) {
 	var timeout;
 	var send_answer = function(msg) {
 		clearTimeout(timeout);
+
+		delete msg.data;
+
 		if( field != undefined && field != '' ) {
 			if( msg.hasOwnProperty(field) ) {
 				res.send( msg[field].toString(), {'Content-Type': 'text/plain'} );
