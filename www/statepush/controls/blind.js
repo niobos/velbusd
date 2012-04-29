@@ -31,9 +31,9 @@ function reply_to_get(req, res, next) {
 	velbus.send_message(3, id, 0, "\xfa" + blindbit );
 };
 
-webapp.get(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
+webapp.get(/\/control\/blind\/([0-9a-fA-F]{2}).([12])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
 
-webapp.post(/\/control\/blind\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
+webapp.post(/\/control\/blind\/([0-9a-fA-F]{2}).([12])\/([a-zA-Z ]*)$/, function(req, res, next) {
 	var id = parseInt( req.params[0], 16 );
 	var blind = parseInt( req.params[1] );
 	var field = req.params[2];
