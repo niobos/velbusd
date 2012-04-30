@@ -7,7 +7,7 @@ namespace VelbusMessage {
 
 class SwitchToMode : public VelbusMessage {
 public:
-	char m_mode;
+	unsigned char m_mode;
 	unsigned int m_timer;
 
 protected:
