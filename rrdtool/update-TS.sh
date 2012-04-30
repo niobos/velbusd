@@ -16,21 +16,25 @@ if [ ! -w "$FILENAME" ]; then
 	exit 1
 fi
 
-DATA="$( wget --quiet --header="Accept: text/plain" -O- "http://localhost/domotica/api/TempStatus.php/$ADDR" )"
+DATA="$( wget --quiet -O- "http://localhost:8080/control/temp/$ADDR" )"
 if [ $? -ne 0 ]; then
 	echo "Error wget-ing data:"
 	echo "$DATA"
 	exit 1
 fi
 
-TEMP="$(   echo "$DATA" | grep "^temp:"        | sed 's/^[^:]*://' )" 
-TTEMP="$(  echo "$DATA" | grep "^target_temp:" | sed 's/^[^:]*://' )"
-HEATER="$( echo "$DATA" | grep "^heater:"      | sed 's/^[^:]*://' )"
-BOOST="$(  echo "$DATA" | grep "^boost:"       | sed 's/^[^:]*://' )"
-DAY="$(    echo "$DATA" | grep "^day:"         | sed 's/^[^:]*://' )"
-COOLER="$( echo "$DATA" | grep "^cooler:"      | sed 's/^[^:]*://' )"
-LOW="$(    echo "$DATA" | grep "^low_alarm:"   | sed 's/^[^:]*://' )"
-HIGH="$(   echo "$DATA" | grep "^high_alarm:"  | sed 's/^[^:]*://' )"
+DATA="$( echo "$DATA" | ./json-to-lines.js )"
+
+TEMP="$(   echo "$DATA" | grep "current temperature" | sed 's/^[^=]* = //' )"
+TTEMP="$(  echo "$DATA" | grep "target temperature"  | sed 's/^[^=]* = //' )"
+
+OUTPUT="$( echo "$DATA" | grep "output / " )"
+HEATER="$( echo "$OUTPUT" | grep "heater"     | sed 's/^[^=]* = //' | sed 's/off/0/;s/on/1/' )"
+BOOST="$(  echo "$OUTPUT" | grep "boost"      | sed 's/^[^=]* = //' | sed 's/off/0/;s/on/1/' )"
+DAY="$(    echo "$OUTPUT" | grep "day"        | sed 's/^[^=]* = //' | sed 's/off/0/;s/on/1/' )"
+COOLER="$( echo "$OUTPUT" | grep "cooler"     | sed 's/^[^=]* = //' | sed 's/off/0/;s/on/1/' )"
+LOW="$(    echo "$OUTPUT" | grep "low alarm"  | sed 's/^[^=]* = //' | sed 's/off/0/;s/on/1/' )"
+HIGH="$(   echo "$OUTPUT" | grep "high alarm" | sed 's/^[^=]* = //' | sed 's/off/0/;s/on/1/' )"
 
 rrdtool update "$FILENAME" --template \
 	"temperature:set_temperature:heater:boost:day:cooler:low_alarm:high_alarm" \

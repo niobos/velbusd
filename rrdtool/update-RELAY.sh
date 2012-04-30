@@ -16,16 +16,15 @@ if [ ! -w "$FILENAME" ]; then
 	exit 1
 fi
 
-DATA="$( wget --quiet --header="Accept: text/plain" -O- "http://localhost/domotica/api/RelayStatus.php/$ADDR" )"
+DATA="$( wget --quiet -O- "http://localhost:8080/control/relay/$ADDR/status" )"
 if [ $? -ne 0 ]; then
 	echo "Error wget-ing data:"
 	echo "$DATA"
 	exit 1
 fi
 
-STATE="$( echo "$DATA" | grep "^state:" | sed 's/^[^:]*://' )" 
-if [ "$STATE" == "on" ]; then STATE="1"
-elif [ "$STATE" == "off" ]; then STATE="0"
+if [ "$DATA" == "on" ]; then STATE="1"
+elif [ "$DATA" == "off" ]; then STATE="0"
 else STATE=""
 fi
 
