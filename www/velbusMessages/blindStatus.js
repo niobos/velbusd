@@ -13,6 +13,7 @@ module.exports.parse = function(msg, config, next) {
 		case 0x0c: msg.blind = 2; break;
 		default: msg.blind = null; break;
 	}
+	msg.id = msg.address + '.' + msg.blind;
 	switch(msg.data[2]) {
 		case 0x00: msg.timeout = 15; break;
 		case 0x01: msg.timeout = 30; break;
