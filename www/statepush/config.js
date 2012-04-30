@@ -10,6 +10,10 @@ exports.webapp = {
 	'timeout': 2000,
 }
 
+exports.graphs = {
+	'directory': '/mnt/data/rrdtool',
+}
+
 exports.controls = {
 	"0a.1": {
 		"name": "Master bedroom light",

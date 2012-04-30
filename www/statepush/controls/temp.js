@@ -327,6 +327,8 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 	var start = strtotime("-1 day");
 	var end = strtotime("now");
 	var title = name;
+	var filename = config.graphs.directory + '/' + addr_s + '-TS.rrd';
+	var filename_relay = config.graphs.directory + '/' + relay + '-RELAY.rrd';
 
 	var rrdcmd =
 		"rrdtool graph - --imgformat SVG" +
@@ -336,10 +338,10 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 		" --title '" + title + "'" +
 		" --vertical-label '°C'" +
 		" --alt-autoscale" +
-		" 'DEF:temp=$filename:temperature:AVERAGE'" +
-		" 'DEF:tt=$filename:set_temperature:AVERAGE'" +
-		" 'DEF:heater=$filename:heater:AVERAGE'" +
-		" 'DEF:relay=$filename_relay:state:AVERAGE'" +
+		" 'DEF:temp=" + filename + ":temperature:AVERAGE'" +
+		" 'DEF:tt=" + filename + ":set_temperature:AVERAGE'" +
+		" 'DEF:heater=" + filename + ":heater:AVERAGE'" +
+		" 'DEF:relay=" + filename_relay + ":state:AVERAGE'" +
 		" 'TICK:relay#a0a00030:1'" +
 		" TICK:heater#ff000030:1" +
 		" LINE1:temp#ff0000:'Actual temperature'" +
@@ -366,9 +368,9 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 		" 'GPRINT:duty_total:duty=%4.2lf%%'" +
 		" COMMENT:\\\\n" +
 		" 'COMMENT: \\\\n'" +
-		" 'COMMENT:Graph showing from " + dts(new Date(start*1000)) + "\\\\n'" +
-		" 'COMMENT:                to " + dts(new Date(end*1000)) + "\\\\n'" +
-		" 'COMMENT:       rendered on " + dts(new Date()) + "\\\\n'" +
+		" 'COMMENT:Graph showing from " + dts(new Date(start*1000)).replace(/:/g, '\\:') + "\\\\n'" +
+		" 'COMMENT:                to " + dts(new Date(end*1000)).replace(/:/g , '\\:') + "\\\\n'" +
+		" 'COMMENT:       rendered on " + dts(new Date()).replace(/:/g, '\\:') + "\\\\n'" +
 		"";
 
 
