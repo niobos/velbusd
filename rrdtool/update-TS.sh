@@ -1,5 +1,7 @@
 #!/bin/bash
 
+: ${TOOLPATH:=$(cd $(dirname "$0"); echo $PWD)}
+
 ADDR="$1"
 if [ -z "$ADDR" ]; then
 	echo "Usage: $0 address"
@@ -23,7 +25,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-DATA="$( echo "$DATA" | ./json-to-lines.js )"
+DATA="$( echo "$DATA" | "$TOOLPATH/json-to-lines.js" )"
 
 TEMP="$(   echo "$DATA" | grep "current temperature" | sed 's/^[^=]* = //' )"
 TTEMP="$(  echo "$DATA" | grep "target temperature"  | sed 's/^[^=]* = //' )"

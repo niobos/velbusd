@@ -1,2 +1,9 @@
-velbuswebdir = $(prefix)/share/@PACKAGE@
-velbusweb_DATA = config.js controls/ package.json public/ velbus.js velbusMessages/ velbusweb.js
+velbuswebdir = $(prefix)/share/@PACKAGE@/velbusweb
+EXTRA_DIST = velbusweb.js
+EXTRA_DIST += config.js package.json velbus.js velbusweb.js
+EXTRA_DIST += controls/ velbusMessages/ public/
+
+install-data-hook:
+	mkdir "$(velbuswebdir)"
+	cp -av . "$(velbuswebdir)/."
+	cd "$(velbuswebdir)"; npm install

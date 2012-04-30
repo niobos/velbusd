@@ -323,7 +323,7 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 
 	var width = 200;
 	var height = 100;
-	var graph_only = 0;
+	var graph_only = 1;
 	var start = strtotime("-1 day");
 	var end = strtotime("now");
 	var title = name;
