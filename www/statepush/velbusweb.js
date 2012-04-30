@@ -62,9 +62,9 @@ webapp.configure('production', function() {
 	webapp.use(express.errorHandler() );
 });
 
-webapp.listen(config.webapp.port);
-util.log("webserver listening on " +
-	webapp.address().address + ':' + webapp.address().port +
+webapp.listen(config.webapp.port, config.webapp.bind);
+util.log("webserver listening on [" +
+	config.webapp.bind + ']:' + config.webapp.port +
 	" in " + webapp.settings.env + " mode");
 
 webapp.get('/js/controls.js', function(req, res, next) {

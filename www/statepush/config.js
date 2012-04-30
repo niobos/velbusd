@@ -6,10 +6,10 @@ exports.velbusd = {
 
 exports.webapp = {
 	'port': 8080,
+	'bind': '::',
 	'timeout': 2000,
 }
 
-// IDs MUST be in lowercase and have two hex digits for the address
 exports.controls = {
 	"0a.1": {
 		"name": "Master bedroom light",
