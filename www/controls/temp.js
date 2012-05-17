@@ -341,8 +341,8 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 		" 'DEF:temp=" + filename + ":temperature:AVERAGE'" +
 		" 'DEF:tt=" + filename + ":set_temperature:AVERAGE'" +
 		" 'DEF:heater=" + filename + ":heater:AVERAGE'" +
-		" 'DEF:relay=" + filename_relay + ":state:AVERAGE'" +
-		" 'TICK:relay#a0a00030:1'" +
+		( relay != undefined ? " 'DEF:relay=" + filename_relay + ":state:AVERAGE'" : "" ) +
+		( relay != undefined ? " 'TICK:relay#a0a00030:1'" : "" ) +
 		" TICK:heater#ff000030:1" +
 		" LINE1:temp#ff0000:'Actual temperature'" +
 		" VDEF:temp_avg=temp,AVERAGE" +
@@ -362,11 +362,11 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 		" VDEF:duty=heater_100,AVERAGE" +
 		" 'GPRINT:duty:duty=%4.2lf%%'" +
 		" COMMENT:\\\\n" +
-		" LINE1:empty#a0a00030:'Heat requested total'" +
-		" CDEF:relay_100=relay,100,*" +
-		" VDEF:duty_total=relay_100,AVERAGE" +
-		" 'GPRINT:duty_total:duty=%4.2lf%%'" +
-		" COMMENT:\\\\n" +
+		( relay != undefined ? " LINE1:empty#a0a00030:'Heat requested total'" +
+		  " CDEF:relay_100=relay,100,*" +
+		  " VDEF:duty_total=relay_100,AVERAGE" +
+		  " 'GPRINT:duty_total:duty=%4.2lf%%'" +
+		  " COMMENT:\\\\n" : "" ) +
 		" 'COMMENT: \\\\n'" +
 		" 'COMMENT:Graph showing from " + dts(new Date(start*1000)).replace(/:/g, '\\:') + "\\\\n'" +
 		" 'COMMENT:                to " + dts(new Date(end*1000)).replace(/:/g , '\\:') + "\\\\n'" +
