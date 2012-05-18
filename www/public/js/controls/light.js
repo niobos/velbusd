@@ -1,8 +1,11 @@
 $('<style type="text/css">' +
 		'div.icon.light { background-image: url(images/light-on.svg) }' +
 	'</style>').appendTo("head");
+$('<style type="text/css">' +
+		'div.icon.relay { background-image: url(images/light-off.svg) }' +
+	'</style>').appendTo("head");
 
-$('<div class="control template light">' +
+$('<div class="control template light relay">' +
 	'Current state: <span id="lightstate">?</span><br/>' +
 	'<input type="button" name="on" value="On" /><br/>' +
 	'<input type="button" name="onfor" value="On for" />' +
