@@ -321,12 +321,12 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 	var name = config.controls[ addr_s ].name;
 	var relay = config.controls[ addr_s ].relay;
 
-	var width = 200;
-	var height = 100;
-	var graph_only = 1;
-	var start = strtotime("-1 day");
-	var end = strtotime("now");
-	var title = name;
+	var width = req.query.width != undefined ? parseInt(req.query.width) : 200;
+	var height = req.query.height != undefined ? parseInt(req.query.height) : 100;
+	var graph_only = req.query.graph_only != undefined ? parseInt(req.query.graph_only) : 1;
+	var start = strtotime( req.query.start != undefined ? req.query.start : "-1 day" );
+	var end = strtotime( req.query.end != undefined ? req.query.end : "now" );
+	var title = req.query.title ? req.query.title : name;
 	var filename = config.graphs.directory + '/' + addr_s + '-TS.rrd';
 	var filename_relay = config.graphs.directory + '/' + relay + '-RELAY.rrd';
 
