@@ -11,7 +11,11 @@ $('<div class="control template light">' +
 		$('#lightstate').text('?');
 		$.ajax({ url: 'control/relay/' + id, dataType: 'json' })
 			.success(function(data) {
-				$('#lightstate').text(data['status']);
+				var s = data['status'];
+				if( data['timer'] != 0 ) {
+					s += ' for ' + data['timer'] + ' secs';
+				}
+				$('#lightstate').text( s );
 			});
 	});
 

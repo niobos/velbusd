@@ -56,7 +56,13 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, functio
 		var command;
 		switch( value ) {
 		case "on":
-			command = new Buffer([ 0x02, relaybit ] );
+			if( req.body[ value ] == undefined ) {
+				command = new Buffer([ 0x02, relaybit ] );
+			} else {
+				// Start timer for the specified number of seconds
+				var delay = parseInt( req.body[ value ] );
+				command = new Buffer([ 0x03, relaybit, (delay>>16) & 0xff, (delay>>8) & 0xff, (delay) & 0xff ]);
+			}
 			break;
 
 		case "off":
