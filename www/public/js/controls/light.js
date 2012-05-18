@@ -24,7 +24,7 @@ $('<div class="control template light relay">' +
 			});
 	});
 
-$('#control div.light input').click( function() {
+$('#control div.light input[type="button"]').click( function() {
 	var id = $(this).parent().parent().find(".id").text();
 	var data;
 	switch( this.name ) {
