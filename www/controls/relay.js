@@ -41,7 +41,7 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, functio
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
 
-	var relaybit = String.fromCharCode( 1 << (relay-1) );
+	var relaybit = 1 << (relay-1);
 
 	// We expect a single value in the body
 	var value = Object.keys( req.body )
@@ -56,11 +56,11 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, functio
 		var command;
 		switch( value ) {
 		case "on":
-			command = "\x02" + relaybit;
+			command = new Buffer([ 0x02, relaybit ] );
 			break;
 
 		case "off":
-			command = "\x01" + relaybit;
+			command = new Buffer([ 0x01, relaybit ]);
 			break;
 
 		default:
