@@ -23,6 +23,7 @@ $('<div class="control template light relay">' +
 				$('#lightstate').text( s );
 			});
 	});
+$('#onfor').click( function() { return false; } ); // just enter text field, do nothing more
 
 $('#control div.light input[type="button"]').click( function() {
 	var id = $(this).parent().parent().find(".id").text();
