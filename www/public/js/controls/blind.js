@@ -1,5 +1,5 @@
 $('<style type="text/css">' +
-		'div.icon.blind { background-image: url(images/blind.svg) }' +
+		'div.icon.blind { background-image: url(images/blind-down.svg) }' +
 	'</style>').appendTo("head");
 
 $('<div class="control template blind">' +
