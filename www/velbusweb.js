@@ -62,6 +62,12 @@ webapp.configure('production', function() {
 	webapp.use(express.errorHandler() );
 });
 
+var sockjs = require('sockjs');
+var sockjs_stream = sockjs.createServer( {
+	sockjs_url: "http://cdn.sockjs.org/sockjs-0.3.min.js"
+});
+sockjs_stream.installHandlers(webapp, { prefix:'/events' });
+
 webapp.listen(config.webapp.port, config.webapp.bind);
 util.log("webserver listening on [" +
 	config.webapp.bind + ']:' + config.webapp.port +
@@ -100,3 +106,9 @@ var controls = fs.readdirSync('./controls');
 for( var i = 0; i < controls.length; i++ ) {
 	require('./controls/' + controls[i]).add_routes(webapp, velbus, config);
 }
+
+sockjs_stream.on('connection', function(conn) {
+    conn.on('data', function(message) {
+        conn.write("Received: " + message);
+    });
+});
