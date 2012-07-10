@@ -18,9 +18,11 @@ velbus.on('error', function(e) {
 });
 velbus.on('connect', function() {
 	util.log('velbus connection opened');
+	state.set('velbus.state', 'online');
 });
 velbus.on('close', function() {
 	util.log('velbus connection closed');
+	state.set('velbus.state', 'offline');
 });
 
 velbus.on('resync', function(why) {
@@ -62,11 +64,20 @@ webapp.configure('production', function() {
 	webapp.use(express.errorHandler() );
 });
 
+var state = require('./state.js').ctor();
+
 var sockjs = require('sockjs');
 var sockjs_stream = sockjs.createServer( {
-	sockjs_url: "http://cdn.sockjs.org/sockjs-0.3.min.js"
+	sockjs_url: "/js/sockjs.js"
 });
 sockjs_stream.installHandlers(webapp, { prefix:'/events' });
+
+sockjs_stream.on('connection', function(conn) {
+	state.on('update', function(data) {
+		conn.write(data);
+	});
+});
+
 
 webapp.listen(config.webapp.port, config.webapp.bind);
 util.log("webserver listening on [" +
@@ -107,8 +118,3 @@ for( var i = 0; i < controls.length; i++ ) {
 	require('./controls/' + controls[i]).add_routes(webapp, velbus, config);
 }
 
-sockjs_stream.on('connection', function(conn) {
-    conn.on('data', function(message) {
-        conn.write("Received: " + message);
-    });
-});
