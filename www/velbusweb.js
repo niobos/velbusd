@@ -73,8 +73,16 @@ var sockjs_stream = sockjs.createServer( {
 sockjs_stream.installHandlers(webapp, { prefix:'/events' });
 
 sockjs_stream.on('connection', function(conn) {
-	state.on('update', function(data) {
+	// Start by sending the full object
+	conn.write( state.dump() );
+
+	var fonupdate = function(data) { // Assign function to a variable, so we can remove it later
+		// Closure over conn object
 		conn.write(data);
+	};
+	state.on('update', fonupdate);
+	conn.on('close', function() {
+		state.removeListener('update', fonupdate);
 	});
 });
 

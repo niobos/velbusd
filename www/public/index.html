@@ -135,7 +135,7 @@
   </div>
   <script src="js/sockjs.js"></script>
   <script type="text/javascript">
-	sockjs = new SockJS('/events');
+	var sockjs = new SockJS('/events');
 	velbus_state = {};
 	sockjs.onopen = function() {
 		console.log("SockJS open");
@@ -144,10 +144,10 @@
 		console.log("SockJS close");
 	};
 	sockjs.onmessage = function(e) {
-		//console.log("SockJS message:");
-		//console.log(e);
 		var d = JSON.parse(e.data);
-		if( d.changetype == 'update' ) {
+		if( d.changetype == 'new' ) {
+			velbus_state = d.value;
+		} else if( d.changetype == 'update' ) {
 			var p = velbus_state;
 			var k = d.key.split(".");
 			for(var i=0; i<k.length-1; i++ ) {
@@ -159,6 +159,9 @@
 			p[ k[ k.length-1 ] ] = d.value;
 
 			// TODO: Trigger GUI update
+		} else {
+			console.log("Unknown message received");
+			console.log(e);
 		}
 	};
   </script>
