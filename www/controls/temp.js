@@ -388,3 +388,7 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 });
 
 }
+
+exports.add_watchers = function(velbus, state, config) {
+
+}

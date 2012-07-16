@@ -84,3 +84,7 @@ webapp.post(/\/control\/blind\/([0-9a-fA-F]{2})-([12])\/([a-zA-Z ]*)$/, function
 });
 
 }
+
+exports.add_watchers = function(velbus, state, config) {
+
+}

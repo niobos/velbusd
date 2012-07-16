@@ -14,7 +14,9 @@ module.exports.parse = function(msg, config, next) {
 		case 0x10: msg.relay = 5; break;
 		default: msg.relay = null; break;
 	}
-	msg.id = msg.address + '-' + msg.relay;
+	msg.id = msg.address.toString(16) + '-' + msg.relay;
+	if( msg.id.length == 3 ) { msg.id = '0' + msg.id; }
+
 	switch(msg.data[2] & 0x03) {
 		case 0: msg.mode = "normal"; break;
 		case 1: msg.mode = "inhibited"; break;

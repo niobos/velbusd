@@ -41,6 +41,7 @@ velbus.on('message', function(msg) {
 	//util.log('velbus connection: message (after processing): ' + util.inspect(msg) );
 
 	if( msg.type != null ) {
+		velbus.emit( msg.type, msg );
 		velbus.emit( msg.type + ' ' + msg.id, msg );
 	}
 });
@@ -143,6 +144,8 @@ webapp.get('/state.json', function(req, res, next) {
 
 var controls = fs.readdirSync('./controls');
 for( var i = 0; i < controls.length; i++ ) {
-	require('./controls/' + controls[i]).add_routes(webapp, velbus, config);
+	var r = require('./controls/' + controls[i]);
+	r.add_routes(webapp, velbus, config);
+	r.add_watchers(velbus, state, config);
 }
 
