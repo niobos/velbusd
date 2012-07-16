@@ -18,11 +18,11 @@ velbus.on('error', function(e) {
 });
 velbus.on('connect', function() {
 	util.log('velbus connection opened');
-	state.set('velbus.state', 'online');
+	state.set('00.state', 'online');
 });
 velbus.on('close', function() {
 	util.log('velbus connection closed');
-	state.set('velbus.state', 'offline');
+	state.set('00.state', 'offline');
 });
 
 velbus.on('resync', function(why) {
@@ -65,6 +65,26 @@ webapp.configure('production', function() {
 });
 
 var state = require('./state.js').ctor();
+
+// Copy in config.controls
+function traverse(obj, func, stack) {
+	if( stack == null ) { stack = []; }
+	for(var prop in obj) {
+		var newstack = stack.slice();
+		newstack.push(prop);
+		if( Array.isArray( obj[prop] ) ) {
+			func.apply(this, [ newstack, obj[prop] ]);
+		} else if( typeof( obj[prop] ) == "object" ) {
+			traverse( obj[prop], func, newstack );
+		} else {
+			func.apply(this, [ newstack, obj[prop] ]);
+		}
+	}
+}
+traverse( config.controls, function(prop, value) {
+	var propname = prop.join('.');
+	state.set(propname, value);
+});
 
 var sockjs = require('sockjs');
 var sockjs_stream = sockjs.createServer( {
@@ -117,8 +137,8 @@ webapp.get('/js/controls.js', function(req, res, next) {
 });
 
 
-webapp.get('/data/coords.json', function(req, res, next) {
-	res.json(config.controls);
+webapp.get('/state.json', function(req, res, next) {
+	res.json(state.properities);
 });
 
 var controls = fs.readdirSync('./controls');

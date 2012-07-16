@@ -23,9 +23,9 @@ function reply_to_get(req, res, next) {
 			res.send(msg);
 		}
 	};
-	velbus.once('relay status ' + addr + '.' + relay, send_answer);
+	velbus.once('relay status ' + addr + '-' + relay, send_answer);
 	timeout = setTimeout(function() {
-			velbus.removeListener('relay status ' + addr + '.' + relay, send_answer);
+			velbus.removeListener('relay status ' + addr + '-' + relay, send_answer);
 			res.send("Timeout", 500);
 		}, config.webapp.timeout);
 
@@ -34,9 +34,9 @@ function reply_to_get(req, res, next) {
 	velbus.send_message(3, addr, 0, "\xfa" + relaybit );
 }
 
-webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
+webapp.get(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
 
-webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
+webapp.post(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
 	var addr = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
