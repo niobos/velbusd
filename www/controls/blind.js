@@ -86,5 +86,24 @@ webapp.post(/\/control\/blind\/([0-9a-fA-F]{2})-([12])\/([a-zA-Z ]*)$/, function
 }
 
 exports.add_watchers = function(velbus, state, config) {
+	velbus.on('blind status', function(msg) {
+		state.set( msg.id + '.status', msg.status );
+		state.set( msg.id + '.position', msg.position );
+	});
 
+	// And initialize the current status of all relays in config
+	for(var control in config.controls) {
+		if( config.controls[control].type != "blind" ) continue;
+
+		velbus.once('connect', function(id, control) { return function() {
+			// Closure with id and control
+
+			var addr = id.split('-');
+			var blindbit = String.fromCharCode( 3 << (addr[1]-1)*2 );
+
+			// Spread queries in time in order not to overload the bus when starting up
+			var starttime = Math.random() * Object.keys(config.controls).length * 100;
+			setTimeout(function() { velbus.send_message(3, addr[0], 0, "\xfa" + blindbit ); }, starttime);
+		}}(control, config.controls[control]));
+	}
 }

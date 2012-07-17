@@ -47,7 +47,7 @@
          type="translate"
          from="0 0"
          to="0 -100"
-         dur="5s"
+         dur="3s"
          repeatCount="indefinite" />
       <rect
          x="0"

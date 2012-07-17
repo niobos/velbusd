@@ -91,4 +91,21 @@ exports.add_watchers = function(velbus, state, config) {
 	velbus.on('relay status', function(msg) {
 		state.set( msg.id + '.status', msg.status );
 	});
+
+	// And initialize the current status of all relays in config
+	for(var control in config.controls) {
+		if( config.controls[control].type != "light"
+		 && config.controls[control].type != "relay" ) continue;
+
+		velbus.once('connect', function(id, control) { return function() {
+			// Closure with id and control
+
+			var addr = id.split('-');
+			var relaybit = String.fromCharCode( 1 << (addr[1]-1) );
+
+			// Spread queries in time in order not to overload the bus when starting up
+			var starttime = Math.random() * Object.keys(config.controls).length * 100;
+			setTimeout(function() { velbus.send_message(3, addr[0], 0, "\xfa" + relaybit ); }, starttime);
+		}}(control, config.controls[control]));
+	}
 }

@@ -65,9 +65,9 @@
 	Unknown.prototype.update = function(attr) {
 		if( this.div.find(".popover").css('display') == 'none' ) {
 			// We're not visible, don't bother...
-			return "not displaye";
+			return "not displayed";
 		}
-		console.log("Updating Unknown for real");
+
 		this.div.find("span.name").text(this.state.name);
 		this.div.find("span.tech").text('(' + this.state.type + " @ " + this.addr + ')');
 	}
