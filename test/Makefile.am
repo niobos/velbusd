@@ -53,7 +53,8 @@ testscripts += Parser-PushButtonStatus.sh \
                Parser-SensorTempRequest.sh \
                Parser-SensorTemp.sh \
                Parser-TempSensorStatus.sh \
-               Parser-SwitchToMode.sh
+               Parser-SwitchToMode.sh \
+               Parser-ModuleStatus.sh
 
 Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage/PushButtonStatus.hpp \
                   ../src/VelbusMessage/SetLeds.cpp ../src/VelbusMessage/SetLeds.hpp \
