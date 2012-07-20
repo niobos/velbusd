@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class FastBlinkLedsRegisterer {
 public:
 	FastBlinkLedsRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 2;
+		k.command  = 0xf8;
 		struct factory_methods f;
 		f.factory = &FastBlinkLeds::factory;
-		Registrar::get_instance().add(0xf8, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

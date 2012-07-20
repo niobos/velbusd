@@ -8,10 +8,16 @@ namespace VelbusMessage {
 class SwitchBlindUpDownRegisterer {
 public:
 	SwitchBlindUpDownRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 0;
+		k.length   = 5;
+		k.command  = 0x05;
 		struct factory_methods f;
 		f.factory = &SwitchBlindUpDown::factory;
-		Registrar::get_instance().add(0x05, f);
-		Registrar::get_instance().add(0x06, f);
+		Registrar::get_instance().add(k, f);
+		k.command  = 0x06;
+		Registrar::get_instance().add(k, f);
 	}
 };
 

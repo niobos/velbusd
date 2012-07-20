@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class MemoryDumpRequestRegisterer {
 public:
 	MemoryDumpRequestRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 1;
+		k.command  = 0xcb;
 		struct factory_methods f;
 		f.factory = &MemoryDumpRequest::factory;
-		Registrar::get_instance().add(0xcb, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

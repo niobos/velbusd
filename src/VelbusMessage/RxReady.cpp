@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class RxReadyRegisterer {
 public:
 	RxReadyRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 0;
+		k.length   = 1;
+		k.command  = 0x0C;
 		struct factory_methods f;
 		f.factory = &RxReady::factory;
-		Registrar::get_instance().add(0x0C, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

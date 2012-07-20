@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class ModuleStatus5Registerer {
 public:
 	ModuleStatus5Registerer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 5;
+		k.command  = 0xed;
 		struct factory_methods f;
 		f.factory = &ModuleStatus5::factory;
-		Registrar::get_instance().add(0xed, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

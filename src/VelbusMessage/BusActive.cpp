@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class BusActiveRegisterer {
 public:
 	BusActiveRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 0;
+		k.length   = 1;
+		k.command  = 0x0a;
 		struct factory_methods f;
 		f.factory = &BusActive::factory;
-		Registrar::get_instance().add(0x0A, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

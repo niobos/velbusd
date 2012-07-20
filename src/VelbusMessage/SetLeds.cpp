@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class SetLedsRegisterer {
 public:
 	SetLedsRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 2;
+		k.command  = 0xf6;
 		struct factory_methods f;
 		f.factory = &SetLeds::factory;
-		Registrar::get_instance().add(0xf6, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

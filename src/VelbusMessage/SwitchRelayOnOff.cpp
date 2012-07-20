@@ -8,10 +8,16 @@ namespace VelbusMessage {
 class SwitchRelayOnOffRegisterer {
 public:
 	SwitchRelayOnOffRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 0;
+		k.length   = 2;
+		k.command  = 0x01;
 		struct factory_methods f;
 		f.factory = &SwitchRelayOnOff::factory;
-		Registrar::get_instance().add(0x01, f);
-		Registrar::get_instance().add(0x02, f);
+		Registrar::get_instance().add(k, f);
+		k.command  = 0x02;
+		Registrar::get_instance().add(k, f);
 	}
 };
 

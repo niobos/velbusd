@@ -51,7 +51,7 @@ public:
 	T_data get( const T_id& id ) const throw(NotFound) {
 	/* Lookup the data for ID */
 		typeof(m_register.begin()) i = m_register.find( id );
-		if( i == m_register.end() ) throw NotFound("Registrar: couldn't find " + id);
+		if( i == m_register.end() ) throw NotFound("Registrar: couldn't find " + static_cast<std::string>(id));
 		return i->second;
 	}
 

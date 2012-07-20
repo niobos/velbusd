@@ -8,12 +8,20 @@ namespace VelbusMessage {
 class SwitchToModeRegisterer {
 public:
 	SwitchToModeRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 3;
+		k.command  = 0xdb;
 		struct factory_methods f;
 		f.factory = &SwitchToMode::factory;
-		Registrar::get_instance().add(0xdb, f);
-		Registrar::get_instance().add(0xdc, f);
-		Registrar::get_instance().add(0xdd, f);
-		Registrar::get_instance().add(0xde, f);
+		Registrar::get_instance().add(k, f);
+		k.command  = 0xdc;
+		Registrar::get_instance().add(k, f);
+		k.command  = 0xdd;
+		Registrar::get_instance().add(k, f);
+		k.command  = 0xde;
+		Registrar::get_instance().add(k, f);
 	}
 };
 

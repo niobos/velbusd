@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class MemoryBlockWriteRegisterer {
 public:
 	MemoryBlockWriteRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 7;
+		k.command  = 0xca;
 		struct factory_methods f;
 		f.factory = &MemoryBlockWrite::factory;
-		Registrar::get_instance().add(0xca, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

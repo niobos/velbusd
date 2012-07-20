@@ -5,13 +5,22 @@
 #include "VelbusMessage.hpp"
 
 namespace VelbusMessage {
-	typedef VelbusMessage* (*VBM_factory)(unsigned char, unsigned char, unsigned char, std::string const &);
+	struct registrar_key {
+		bool rtr;
+		unsigned char priority;
+		unsigned char length;
+		unsigned char command;
+
+		operator std::string() const throw();
+		bool operator < (struct registrar_key b) const throw();
+	};
+
 	struct factory_methods {
 		VelbusMessage* (*factory)(unsigned char, unsigned char, unsigned char, std::string const &);
 	};
 
 	typedef ::Registrar<
-		char,
+		struct registrar_key,
 		struct factory_methods
 	  > Registrar;
 }

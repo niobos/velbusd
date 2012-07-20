@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class RxBuffFullRegisterer {
 public:
 	RxBuffFullRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 0;
+		k.length   = 1;
+		k.command  = 0x0B;
 		struct factory_methods f;
 		f.factory = &RxBuffFull::factory;
-		Registrar::get_instance().add(0x0B, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 
