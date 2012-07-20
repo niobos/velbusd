@@ -8,11 +8,21 @@ namespace VelbusMessage {
 class NameRegisterer {
 public:
 	NameRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 8;
+		k.command  = 0xf0;
 		struct factory_methods f;
 		f.factory = &Name::factory;
-		Registrar::get_instance().add(0xf0, f);
-		Registrar::get_instance().add(0xf1, f);
-		Registrar::get_instance().add(0xf2, f);
+		Registrar::get_instance().add(k, f);
+
+		k.command  = 0xf1;
+		Registrar::get_instance().add(k, f);
+
+		k.command  = 0xf2;
+		k.length   = 6;
+		Registrar::get_instance().add(k, f);
 	}
 };
 

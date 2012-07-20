@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class MemoryDataRegisterer {
 public:
 	MemoryDataRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 4;
+		k.command  = 0xfe;
 		struct factory_methods f;
 		f.factory = &MemoryData::factory;
-		Registrar::get_instance().add(0xfe, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

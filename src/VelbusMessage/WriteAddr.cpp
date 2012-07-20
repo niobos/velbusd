@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class WriteAddrRegisterer {
 public:
 	WriteAddrRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 7;
+		k.command  = 0x6a;
 		struct factory_methods f;
 		f.factory = &WriteAddr::factory;
-		Registrar::get_instance().add(0x6a, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

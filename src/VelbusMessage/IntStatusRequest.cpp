@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class IntStatusRequestRegisterer {
 public:
 	IntStatusRequestRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 0;
+		k.length   = 1;
+		k.command  = 0x0e;
 		struct factory_methods f;
 		f.factory = &IntStatusRequest::factory;
-		Registrar::get_instance().add(0x0E, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

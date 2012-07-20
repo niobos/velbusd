@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class NameRequestRegisterer {
 public:
 	NameRequestRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 2;
+		k.command  = 0xef;
 		struct factory_methods f;
 		f.factory = &NameRequest::factory;
-		Registrar::get_instance().add(0xef, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

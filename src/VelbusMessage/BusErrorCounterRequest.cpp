@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class BusErrorCounterRequestRegisterer {
 public:
 	BusErrorCounterRequestRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 1;
+		k.command  = 0xd9;
 		struct factory_methods f;
 		f.factory = &BusErrorCounterRequest::factory;
-		Registrar::get_instance().add(0xd9, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

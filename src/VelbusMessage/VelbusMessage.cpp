@@ -58,7 +58,12 @@ VelbusMessage* parse_and_consume(std::string &msges, std::string *msg)
 			return ModuleTypeRequest::factory(prio, addr, rtr, data);
 		}
 
-		struct factory_methods f = Registrar::get_instance().get( data[0] );
+		struct registrar_key k;
+		k.rtr = rtr;
+		k.priority = prio;
+		k.length = length;
+		k.command = data[0];
+		struct factory_methods f = Registrar::get_instance().get( k );
 		return f.factory(prio, addr, rtr, data);
 
 	} catch( NotFound &e ) {

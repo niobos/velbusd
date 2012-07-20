@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class BlindStatusRegisterer {
 public:
 	BlindStatusRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 8;
+		k.command  = 0xec;
 		struct factory_methods f;
 		f.factory = &BlindStatus::factory;
-		Registrar::get_instance().add(0xec, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

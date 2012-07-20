@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class TempSensorStatusRegisterer {
 public:
 	TempSensorStatusRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 8;
+		k.command  = 0xea;
 		struct factory_methods f;
 		f.factory = &TempSensorStatus::factory;
-		Registrar::get_instance().add(0xea, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

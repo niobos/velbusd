@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class SlowBlinkLedsRegisterer {
 public:
 	SlowBlinkLedsRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 2;
+		k.command  = 0xf7;
 		struct factory_methods f;
 		f.factory = &SlowBlinkLeds::factory;
-		Registrar::get_instance().add(0xf7, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class RelayStatusRegisterer {
 public:
 	RelayStatusRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 3;
+		k.length   = 8;
+		k.command  = 0xfb;
 		struct factory_methods f;
 		f.factory = &RelayStatus::factory;
-		Registrar::get_instance().add(0xfb, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 

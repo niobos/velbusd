@@ -8,9 +8,14 @@ namespace VelbusMessage {
 class SwitchBlindOffRegisterer {
 public:
 	SwitchBlindOffRegisterer() {
+		struct registrar_key k;
+		k.rtr      = 0;
+		k.priority = 0;
+		k.length   = 2;
+		k.command  = 0x04;
 		struct factory_methods f;
 		f.factory = &SwitchBlindOff::factory;
-		Registrar::get_instance().add(0x04, f);
+		Registrar::get_instance().add(k, f);
 	}
 };
 
