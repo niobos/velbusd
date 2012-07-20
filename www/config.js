@@ -31,5 +31,10 @@ exports.controls = {
 		"coords": [ {"left": 450, "top": 365} ],
 		"type": "temp",
 		"relay": "06-4"
+	},
+	"0b-1": {
+		"name": "Garage gate",
+		"coords": [ {"left": 500, "top": 100} ],
+		"type": "gate",
 	}
 };

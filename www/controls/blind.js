@@ -103,7 +103,9 @@ exports.add_watchers = function(velbus, state, config) {
 
 			// Spread queries in time in order not to overload the bus when starting up
 			var starttime = Math.random() * Object.keys(config.controls).length * 100;
-			setTimeout(function() { velbus.send_message(3, addr[0], 0, "\xfa" + blindbit ); }, starttime);
+			setTimeout(function() {
+				velbus.send_message(3, parseInt(addr[0],16), 0, "\xfa" + blindbit );
+				}, starttime);
 		}}(control, config.controls[control]));
 	}
 }
