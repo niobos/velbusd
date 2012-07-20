@@ -48,8 +48,8 @@ std::string ModuleStatus5::data() throw() {
 
 std::string ModuleStatus5::string() throw() {
 	std::ostringstream o;
-	o << "ModuleStatus5 from 0x" << hex(m_addr) << ":"
-	  << " Inputs=0b" << bin(m_input_status)
+	o << "ModuleStatus from 0x" << hex(m_addr) << ":"
+	  << " inputs=0b" << bin(m_input_status)
 	  << " LEDs: cont=0b" << bin(m_leds_continuous)
 	  << " slow=0b" << bin(m_leds_slow_blink)
 	  << " fast=0b" << bin(m_leds_fast_blink);
