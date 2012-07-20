@@ -87,5 +87,6 @@ Parser_SOURCES += ../src/VelbusMessage/PushButtonStatus.cpp ../src/VelbusMessage
                   ../src/VelbusMessage/SensorTemp.cpp ../src/VelbusMessage/SensorTemp.hpp \
                   ../src/VelbusMessage/RTCstatus.cpp ../src/VelbusMessage/RTCstatus.hpp \
                   ../src/VelbusMessage/TempSensorStatus.cpp ../src/VelbusMessage/TempSensorStatus.hpp \
-                  ../src/VelbusMessage/SwitchToMode.cpp ../src/VelbusMessage/SwitchToMode.hpp
+                  ../src/VelbusMessage/SwitchToMode.cpp ../src/VelbusMessage/SwitchToMode.hpp \
+                  ../src/VelbusMessage/ModuleStatus5.cpp ../src/VelbusMessage/ModuleStatus5.hpp
 endif
