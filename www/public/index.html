@@ -27,13 +27,24 @@
 		position: relative;
 		left: 1em;
 		width: .8em;
+		opacity:0.9;
+		filter:alpha(opacity=90); /* For IE8 and earlier */
 	}
 	div.popover div.bubble {
-		background-color: #d0d0d0;
+		background-color: rgba(210,210,210,.9);
 		color: #000000;
 		padding: 1em;
 		min-width: 10em;
 		border-radius: .7em;
+
+		/* Drop shadow */
+		box-shadow: 3px 3px 4px rgba(0,0,0,0.7);
+		-moz-box-shadow: 3px 3px 4px rgba(0,0,0,0.7);
+		-webkit-box-shadow: 3px 3px 4px rgba(0,0,0,0.7);
+		/* For IE 8 */
+		-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+		/* For IE 5.5 - 7 */
+		filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000');
 	}
 
 	span.tech {
