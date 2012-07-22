@@ -18,13 +18,22 @@
 	}
 
 	div.popover {
-		top: 1.3em; /* Place them below the icon */
-		background-color: #000000;
-		color: #dddddd;
-		padding: 10px;
-		z-index: 1000;
 		position: absolute;
+		top: 1.4em; /* Place them below the icon */
+		left: -.8em;
+		z-index: 1000;
+	}
+	div.popover img.arrow {
+		position: relative;
+		left: 1em;
+		width: .8em;
+	}
+	div.popover div.bubble {
+		background-color: #d0d0d0;
+		color: #000000;
+		padding: 1em;
 		min-width: 10em;
+		border-radius: .7em;
 	}
 
 	span.tech {
@@ -71,9 +80,14 @@
 		$("#floormap").append(this.div);
 	};
 	Unknown.prototype.show = function() {
-		var popover = $('<div class="popover"><div class="generic" style="white-space: nowrap; padding-bottom: .4em;"><span class="name"/> <span class="tech"/></div></div>');
-		this.div.append(popover);
-		return popover;
+		var popover = $('<div class="popover"><img class="arrow" src="images/arrow.svg"/><div class="bubble"/></div>');
+
+		var bubble = popover.find('.bubble');
+		bubble.append( $('<div class="generic" style="white-space: nowrap; padding-bottom: .4em;"><span class="name"/> <span class="tech"/></div>') );
+
+		this.div.append( popover );
+
+		return bubble;
 	}
 	Unknown.prototype.update = function(attr) {
 		if( this.div.find(".popover").length == 0 ) {
