@@ -390,5 +390,25 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 }
 
 exports.add_watchers = function(velbus, state, config) {
+	velbus.on('temp sensor status', function(msg) {
+		state.set( msg.id + '.heater', msg.output.heater);
+	});
 
+	// And initialize the current status of all temp sensors in the config
+	for(var control in config.controls) {
+		if( config.controls[control].type != "temp" ) continue;
+
+		velbus.once('connect', function(id, control) { return function() {
+			// Closure with id and control
+
+			var addr = id;
+
+			// Spread queries in time in order not to overload the bus when starting up
+			var starttime = Math.random() * Object.keys(config.controls).length * 100;
+			setTimeout(function() {
+				velbus.send_message(3, parseInt(addr, 16), 0, "\xfa\x00" );
+				}, starttime);
+
+		}}(control, config.controls[control]));
+	}
 }

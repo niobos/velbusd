@@ -14,7 +14,8 @@ module.exports.parse = function(msg, config, next) {
 	}
 
 	msg.type = "temp sensor status";
-	msg.id = msg.address;
+	msg.id = msg.address.toString(16);
+	if( msg.id.length == 1 ) { msg.id = '0' + msg.id; }
 
 	msg['operating mode'] = {};
 	msg['operating mode']['mode push button'] =
