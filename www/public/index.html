@@ -25,7 +25,6 @@
 		z-index: 1000;
 		position: absolute;
 		min-width: 10em;
-		display: none;
 	}
 
 	span.tech {
@@ -53,17 +52,31 @@
 		        .addClass(state.type)
 		        .css('left', state.coords[coord].left)
 		        .css('top', state.coords[coord].top)
-		        .append($('<div class="popover"><div class="generic" style="white-space: nowrap; padding-bottom: .4em;"><span class="name"/> <span class="tech"/></div></div>'))
-		        .click(function() { that.show() } );
+		        .click(function() {
+		        	that.show();
+		        	that.update();
+
+		        	// Undo selection which has happened while clicking and appending at the same time
+		        	if (window.getSelection) {
+		        		if (window.getSelection().empty) {  // Chrome
+		        			window.getSelection().empty();
+		        		} else if (window.getSelection().removeAllRanges) {  // Firefox
+		        			window.getSelection().removeAllRanges();
+		        		}
+		        	} else if (document.selection) {  // IE?
+		        		document.selection.empty();
+		        	}
+		        } );
 		$("body").click(function(e) { if( $(e.target).attr('id') != that.id ) { that.hide(); } } );
 		$("#floormap").append(this.div);
 	};
 	Unknown.prototype.show = function() {
-		this.div.find(".popover").css('display', 'block');
-		this.update();
+		var popover = $('<div class="popover"><div class="generic" style="white-space: nowrap; padding-bottom: .4em;"><span class="name"/> <span class="tech"/></div></div>');
+		this.div.append(popover);
+		return popover;
 	}
 	Unknown.prototype.update = function(attr) {
-		if( this.div.find(".popover").css('display') == 'none' ) {
+		if( this.div.find(".popover").length == 0 ) {
 			// We're not visible, don't bother...
 			return "not displayed";
 		}
@@ -72,7 +85,7 @@
 		this.div.find("span.tech").text('(' + this.state.type + " @ " + this.addr + ')');
 	}
 	Unknown.prototype.hide = function() {
-		this.div.find(".popover").css('display', 'none');
+		this.div.find(".popover").remove();
 	}
 
 	function onSockJSmessage(e) {

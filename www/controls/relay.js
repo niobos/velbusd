@@ -5,6 +5,8 @@ function reply_to_get(req, res, next) {
 	var addr = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
 
 	// Set up listener for the answer
 	var timeout;
@@ -23,9 +25,9 @@ function reply_to_get(req, res, next) {
 			res.send(msg);
 		}
 	};
-	velbus.once('relay status ' + addr + '-' + relay, send_answer);
+	velbus.once('relay status ' + addr_h + '-' + relay, send_answer);
 	timeout = setTimeout(function() {
-			velbus.removeListener('relay status ' + addr + '-' + relay, send_answer);
+			velbus.removeListener('relay status ' + addr_h + '-' + relay, send_answer);
 			res.send("Timeout", 500);
 		}, config.webapp.timeout);
 
