@@ -187,6 +187,13 @@
 	}
 	newSockJSconn();
 
+	my_server_time_delta = 0;
+	$.ajax({url: '/now', dataType: 'json' })
+		.success(function(data) {
+			my_server_time_delta = +new Date();
+			my_server_time_delta -= parseInt(data);
+		});
+
    </script>
    <script src="js/controls.js"></script>
   </div>

@@ -92,6 +92,7 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])\/([a-zA-Z ]*)$/, functio
 exports.add_watchers = function(velbus, state, config) {
 	velbus.on('relay status', function(msg) {
 		state.set( msg.id + '.status', msg.status );
+		state.set( msg.id + '.timer', { 'value': msg.timer, 'ref': +new Date() });
 	});
 
 	// And initialize the current status of all relays in config
