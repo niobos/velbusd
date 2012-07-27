@@ -12,10 +12,35 @@ $.extend(Relay.prototype, Unknown.prototype);
 Relay.prototype.show = function() {
 	var p = Unknown.prototype.show.call(this);
 
-	p.append('<div class="relay">Current state: <span class="state"><img src="images/loading.gif"/></span></div>');
+	p.append('<div class="relay">' +
+			'<div style="padding-bottom: 0.2em;">Current state: ' +
+				'<span class="state"><img src="images/loading.gif"/></span></div>' +
+			'<div style="display: table;">' +
+				'<div class="switchbutton" ' +
+					'style="display: table-cell; vertical-align: middle;' +
+						'padding: 0.4em; background-color: #a0a0a0;' +
+						'border-radius: 0.3em; cursor: pointer;">ON</div>' +
+				'<div style="margin-left: 0.5em;">' +
+					//'<div>for NNN</div>' +
+					//'<div>until XXX</div>' +
+				'</div>' +
+				'<div style="clear: both;"></div>' +
+			'</div>' +
+		'</div>');
 
 	$.ajax({ url: 'control/relay/' + this.addr, dataType: 'json' })
 		.success(function(data) {} );
+
+	var that = this;
+	p.find('div.relay div.switchbutton').click(function() {
+			var data = {};
+			if( that.state.status ) {
+				data['off'] = '';
+			} else {
+				data['on'] = '';
+			}
+			$.post('control/relay/' + that.addr + '/status', data );
+		});
 }
 
 Relay.prototype.update = function(attr) {
@@ -23,14 +48,14 @@ Relay.prototype.update = function(attr) {
 	var now = +new Date();
 
 	switch( this.state.status ) {
-	case "on":	this.div.removeClass('off'); break;
-	case "off":	this.div.addClass('off'); break;
+	case true:	this.div.removeClass('off'); break;
+	case false:	this.div.addClass('off'); break;
 	}
 
 	if( d == "not displayed" ) return d;
 
 	var current_state = this.div.find('div.relay span.state');
-	var s = this.state.status;
+	var s = ( this.state.status ? "on" : "off" );
 	if( this.state.timer.value != 0 ) {
 		var t = this.state.timer.value;
 		t -= ( now - this.state.timer.ref + my_server_time_delta ) / 1000;
@@ -38,42 +63,11 @@ Relay.prototype.update = function(attr) {
 	}
 	current_state.text( s );
 
+	this.div.find('div.relay div.switchbutton').text(
+			(this.state.status ? "OFF" : "ON" )
+		);
+
 }
 
 constructors["light"] = Relay;
 constructors["relay"] = Relay;
-
-function sec_to_pretty(sec) {
-	var end = new Date();
-	end.setSeconds( end.getSeconds() + sec );
-
-	var r = '';
-	if( sec >= 24*60*60 ) {
-		r = end.getFullYear() + '-' + pad(end.getMonth(),2) + '-' + pad(end.getDate(),2) + ' ';
-	}
-	r = r + end.getHours() + ':' + pad(end.getMinutes(),2) + ':' + pad(end.getSeconds(),2);
-
-	var h = Math.floor(sec / (60*60));
-	sec -= h*60*60;
-	var m = Math.floor(sec / 60 );
-	sec -= m*60;
-
-	var r = Math.round(sec) + 's (until ' + r + ')';
-	if( m > 0 || h > 0 ) {
-		r = m + 'm' + r;
-	}
-	if( h > 0 ) {
-		r = h + 'h' + r;
-	}
-
-	return r;
-}
-
-function pad(number, digits, pad) {
-	if( pad == undefined ) { pad = '0'; }
-	var s = '' + number;
-	while( s.length < digits ) {
-		s = pad + s;
-	}
-	return s;
-}
