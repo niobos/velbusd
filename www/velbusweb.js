@@ -120,19 +120,26 @@ webapp.get('/js/controls.js', function(req, res, next) {
 		var body = '';
 		for( var f in files ) {
 			var fn = files[f];
-			// Read all files
-			fs.readFile('public/js/controls/' + fn, function(err, data) {
-				if( err !== null ) { next(err); }
-				// Append content to the body
-				body += data + "\n";
-				// Remove us from the todo list
-				files.splice( files.indexOf(fn), 1 );
+			if( fn.substr( fn.length-3 ) == ".js" ) {
+				// Read all files
+				fs.readFile('public/js/controls/' + fn, function(err, data) {
+					if( err !== null ) { next(err); }
+					// Append content to the body
+					body += data + "\n";
+					// Remove us from the todo list
+					files.splice( files.indexOf(fn), 1 );
 
-				if( files.length == 0 ) {
-					// We are the last one to finish, send output
-					res.send(body, {'Content-Type': 'application/javascript'} );
-				}
-			});
+					if( files.length == 0 ) {
+						// We are the last one to finish, send output
+						res.send(body, {'Content-Type': 'application/javascript'} );
+					}
+				});
+			} else {
+				process.nextTick(function() {
+					// Remove us from the todo list right away
+					files.splice( files.indexOf(fn), 1 );
+				});
+			}
 		}
 	});
 });
