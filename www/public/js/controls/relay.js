@@ -11,15 +11,15 @@ $.extend(Relay.prototype, Unknown.prototype);
 
 Relay.prototype.show = function() {
 	var p = Unknown.prototype.show.call(this);
+	if( p == undefined ) return;
 
 	p.append('<div class="relay">' +
 			'<div style="padding-bottom: 0.2em;">Current state: ' +
 				'<span class="state"><img src="images/loading.gif"/></span></div>' +
 			'<div style="display: table;">' +
-				'<div class="switchbutton" ' +
-					'style="display: table-cell; vertical-align: middle;' +
-						'padding: 0.4em; background-color: #a0a0a0;' +
-						'border-radius: 0.3em; cursor: pointer;">ON</div>' +
+				'<div class="button" ' +
+					'style="display: table-cell; vertical-align: middle;">' +
+						'<img src="images/loading.gif"/></div>' +
 				'<div style="margin-left: 0.5em;">' +
 					//'<div>for NNN</div>' +
 					//'<div>until XXX</div>' +
@@ -32,7 +32,7 @@ Relay.prototype.show = function() {
 		.success(function(data) {} );
 
 	var that = this;
-	p.find('div.relay div.switchbutton').click(function() {
+	p.find('div.relay div.button').click(function() {
 			var data = {};
 			if( that.state.status ) {
 				data['off'] = '';
@@ -63,7 +63,7 @@ Relay.prototype.update = function(attr) {
 	}
 	current_state.text( s );
 
-	this.div.find('div.relay div.switchbutton').text(
+	this.div.find('div.relay div.button').text(
 			(this.state.status ? "OFF" : "ON" )
 		);
 

@@ -12,6 +12,24 @@ var Blind = function(addr, state, coord) {
 }
 $.extend(Blind.prototype, Unknown.prototype);
 
+Blind.prototype.show = function() {
+	var p = Unknown.prototype.show.call(this);
+	if( p == undefined ) return;
+
+	p.append('<div class="blind">' +
+			'<div style="padding-bottom: 0.2em;">Current state: ' +
+				'<span class="state"><img src="images/loading.gif"/></span></div>' +
+			'<div style="display: table;">' +
+				'<div class="button up">UP</div>' +
+				'<div class="button stop" style="display: none;">STOP</div>' +
+				'<div class="button down">DOWN</div>' +
+			'</div>' +
+			'</div>');
+
+	$.ajax({ url: 'control/blind/' + this.addr, dataType: 'json' })
+		.success(function(data) {} );
+}
+
 Blind.prototype.update = function(attr) {
 	var d = Unknown.prototype.update.call(this, attr);
 
@@ -29,6 +47,24 @@ Blind.prototype.update = function(attr) {
 	}
 
 	if( d == "not displayed" ) return d;
+
+	this.div.find('div.blind span.state').text( this.state.status );
+
+	switch( this.state.status ) {
+	case "going down":
+	case "going up":
+		this.div.find('div.blind div.button.up').css('display', 'none');
+		this.div.find('div.blind div.button.stop').css('display', 'block');
+		this.div.find('div.blind div.button.down').css('display', 'none');
+		break;
+
+	case "stopped":
+		this.div.find('div.blind div.button.up').css('display', 'block');
+		this.div.find('div.blind div.button.stop').css('display', 'none');
+		this.div.find('div.blind div.button.down').css('display', 'block');
+		break;
+	}
+
 }
 
 

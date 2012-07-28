@@ -1,3 +1,13 @@
+$('<style type="text/css">' +
+		'div.button {' +
+			'padding: 0.4em;' +
+			'background-color: #a0a0a0;' +
+			'border-radius: 0.3em;' +
+			'cursor: pointer;' +
+		'}' +
+	'</style>'
+ ).appendTo("head");
+
 function sec_to_pretty(sec) {
 	var end = new Date();
 	end.setSeconds( end.getSeconds() + sec );
