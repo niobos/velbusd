@@ -69,51 +69,49 @@
 		this.id = addr + "-" + coord;
 		this.state = state;
 		this.div = $('<div class="icon"/>').attr('id', this.id)
-		        .addClass(state.type)
-		        .css('left', state.coords[coord].left)
-		        .css('top', state.coords[coord].top)
-		        .click(function() {
-		        	// Hide all
-		        	for(var g in gui_state) {
-		        		for(var i in gui_state[g]) {
-		        			gui_state[g][i].hide();
-		        		}
-		        	}
+				.addClass(state.type)
+				.css('left', state.coords[coord].left)
+				.css('top', state.coords[coord].top)
+				.click(function(e) {
+					that.show();
+					var hideme = function(e) {
+						// Did we click on ourselves?
+						var t = $(e.target);
+						while( t.length > 0 ) {
+							if( t[0] == that.div[0] ) return;
+							t = t.parent();
+						}
+						that.hide();
+						$("body").unbind('click', hideme);
+					};
+					$("body").bind('click', hideme);
 
-		        	that.show();
-		        	that.update();
-
-		        	// Undo selection which has happened while clicking and appending at the same time
-		        	if (window.getSelection) {
-		        		if (window.getSelection().empty) {  // Chrome
-		        			window.getSelection().empty();
-		        		} else if (window.getSelection().removeAllRanges) {  // Firefox
-		        			window.getSelection().removeAllRanges();
-		        		}
-		        	} else if (document.selection) {  // IE?
-		        		document.selection.empty();
-		        	}
-
-		        	return false; // Don't bubble
-		        } );
-		$("body").click(function() {
-			// Hide all
-			for(var g in gui_state) {
-				for(var i in gui_state[g]) {
-					gui_state[g][i].hide();
-				}
-			}
-		});
+					// Undo selection which has happened while clicking and appending at the same time
+					if (window.getSelection) {
+						if (window.getSelection().empty) {  // Chrome
+							window.getSelection().empty();
+						} else if (window.getSelection().removeAllRanges) {  // Firefox
+							window.getSelection().removeAllRanges();
+						}
+					} else if (document.selection) {  // IE?
+						document.selection.empty();
+					}
+				} );
 		$("#floormap").append(this.div);
 	};
 	Unknown.prototype.show = function() {
+		if( this.div.find('div.popover').length > 0 ) {
+			this.update();
+			return;
+		}
+
 		var popover = $('<div class="popover"><img class="arrow" src="images/arrow.svg"/><div class="bubble"/></div>');
 
 		var bubble = popover.find('.bubble');
 		bubble.append( $('<div class="generic" style="white-space: nowrap; padding-bottom: .4em;"><span class="name"/> <span class="tech"/></div>') );
 
 		this.div.append( popover );
-
+		this.update();
 		return bubble;
 	}
 	Unknown.prototype.update = function(attr) {
