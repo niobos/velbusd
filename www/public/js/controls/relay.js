@@ -11,6 +11,10 @@ $.extend(Relay.prototype, Unknown.prototype);
 
 Relay.prototype.show = function() {
 	var p = Unknown.prototype.show.call(this);
+
+	$.ajax({ url: 'control/relay/' + this.addr, dataType: 'json' })
+		.success(function(data) {} );
+
 	if( p == undefined ) return;
 
 	p.append('<div class="relay">' +
@@ -27,9 +31,6 @@ Relay.prototype.show = function() {
 				'<div style="clear: both;"></div>' +
 			'</div>' +
 		'</div>');
-
-	$.ajax({ url: 'control/relay/' + this.addr, dataType: 'json' })
-		.success(function(data) {} );
 
 	var that = this;
 	p.find('div.relay div.button').click(function() {

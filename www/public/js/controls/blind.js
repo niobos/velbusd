@@ -8,16 +8,21 @@ $('<style type="text/css">' +
 
 var Blind = function(addr, state, coord) {
 	Unknown.call(this, addr, state, coord);
+	this.interval = {state: undefined};
 	this.update();
 }
 $.extend(Blind.prototype, Unknown.prototype);
 
 Blind.prototype.show = function() {
 	var p = Unknown.prototype.show.call(this);
+
+	$.ajax({ url: 'control/blind/' + this.addr, dataType: 'json' })
+		.success(function(data) {} );
+
 	if( p == undefined ) return;
 
 	p.append('<div class="blind">' +
-			'<div style="padding-bottom: 0.2em;">Current state: ' +
+			'<div style="padding-bottom: 0.2em; white-space: nowrap;">Current state: ' +
 				'<span class="state"><img src="images/loading.gif"/></span></div>' +
 			'<div style="display: table;">' +
 				'<div class="button up">UP</div>' +
@@ -26,8 +31,15 @@ Blind.prototype.show = function() {
 			'</div>' +
 			'</div>');
 
-	$.ajax({ url: 'control/blind/' + this.addr, dataType: 'json' })
-		.success(function(data) {} );
+	that = this;
+	p.find('div.blind div.button').click(function() {
+		var el = $(this);
+		var data = {};
+		if( el.hasClass('up') )   data['up'] = '';
+		if( el.hasClass('down') ) data['down'] = '';
+		if( el.hasClass('stop') ) data['stop'] = '';
+		$.post('control/blind/' + that.addr + '/status', data );
+	});
 }
 
 Blind.prototype.update = function(attr) {
@@ -41,14 +53,45 @@ Blind.prototype.update = function(attr) {
 	case "going down":	this.div.addClass('goingdown'); break;
 	case "going up":  	this.div.addClass('goingup'); break;
 	case "stopped":
-		if( this.state.position == 1 ) this.div.addClass('up');
-		else if( this.state.position == 0 ) this.div.addClass('down');
+		if( this.state.position.value == 1 ) this.div.addClass('up');
+		else if( this.state.position.value == 0 ) this.div.addClass('down');
 		break;
 	}
 
 	if( d == "not displayed" ) return d;
 
-	this.div.find('div.blind span.state').text( this.state.status );
+	var that = this;
+	var update_state = function() {
+		var pos = that.state.position.value;
+
+		var time_since_pos = +new Date();
+		time_since_pos -= my_server_time_delta;
+		time_since_pos -= that.state.position.ref;
+
+		var moved_since = time_since_pos/1000 * 1/that.state.time;
+
+		if( that.state.status == "going up" ) {
+			pos += moved_since;
+			pos = Math.min(1,pos);
+		}
+		if( that.state.status == "going down" ) {
+			pos -= moved_since;
+			pos = Math.max(0,pos);
+		}
+
+		var state = (pos * 100).toFixed(0) + '% ';
+		switch( that.state.status ) {
+		case "going up": state += "\u2191"; break;
+		case "going down": state += "\u2193"; break;
+		case "stopped": state += ""; break;
+		}
+		that.div.find('div.blind span.state').text(state);
+	};
+	clearInterval( this.interval.state ); this.interval.state = undefined;
+	if( this.state.status != "stopped" ) {
+		this.interval.state = setInterval(update_state, 500);
+	}
+	update_state();
 
 	switch( this.state.status ) {
 	case "going down":

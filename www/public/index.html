@@ -74,6 +74,7 @@
 				.css('top', state.coords[coord].top)
 				.click(function(e) {
 					that.show();
+
 					var hideme = function(e) {
 						// Did we click on ourselves?
 						var t = $(e.target);
@@ -100,10 +101,7 @@
 		$("#floormap").append(this.div);
 	};
 	Unknown.prototype.show = function() {
-		if( this.div.find('div.popover').length > 0 ) {
-			this.update();
-			return;
-		}
+		if( this.div.find('div.popover').length > 0 ) return;
 
 		var popover = $('<div class="popover"><img class="arrow" src="images/arrow.svg"/><div class="bubble"/></div>');
 

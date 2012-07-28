@@ -90,7 +90,7 @@ webapp.post(/\/control\/blind\/([0-9a-fA-F]{2})-([12])\/([a-zA-Z ]*)$/, function
 exports.add_watchers = function(velbus, state, config) {
 	velbus.on('blind status', function(msg) {
 		state.set( msg.id + '.status', msg.status );
-		state.set( msg.id + '.position', msg.position );
+		state.set( msg.id + '.position', { 'value': msg.position, 'ref': +new Date() });
 	});
 
 	// And initialize the current status of all relays in config
