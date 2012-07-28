@@ -22,12 +22,12 @@ Blind.prototype.show = function() {
 	if( p == undefined ) return;
 
 	p.append('<div class="blind">' +
-			'<div style="padding-bottom: 0.2em; white-space: nowrap;">Current state: ' +
-				'<span class="state"><img src="images/loading.gif"/></span></div>' +
+			'<div style="padding-bottom: 0.2em; white-space: nowrap;">Currently ' +
+				'<span class="state"><img src="images/loading.gif"/></span> open</div>' +
 			'<div style="display: table;">' +
-				'<div class="button up">UP</div>' +
-				'<div class="button stop" style="display: none;">STOP</div>' +
-				'<div class="button down">DOWN</div>' +
+				'<div class="button up">&#x2b06;</div>' +
+				'<div class="button stop" style="display: none;">&#x275A;&#x275A;</div>' +
+				'<div class="button down">&#x2b07;</div>' +
 			'</div>' +
 			'</div>');
 

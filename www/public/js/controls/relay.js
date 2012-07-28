@@ -25,8 +25,8 @@ Relay.prototype.show = function() {
 					'style="display: table-cell; vertical-align: middle;">' +
 						'<img src="images/loading.gif"/></div>' +
 				'<div style="margin-left: 0.5em;">' +
-					//'<div>for NNN</div>' +
-					//'<div>until XXX</div>' +
+					'<div>for NNN</div>' +
+					'<div>until XXX</div>' +
 				'</div>' +
 				'<div style="clear: both;"></div>' +
 			'</div>' +
