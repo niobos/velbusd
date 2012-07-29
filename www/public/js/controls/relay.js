@@ -29,8 +29,8 @@ Relay.prototype.show = function() {
 					'style="display: table-cell; vertical-align: middle;">' +
 						'<img src="images/loading.gif"/></div>' +
 				'<div class="duration" style="margin-left: 0.5em;">' +
-					'<div>for <input type="text" name="for" size="23" placeholder="permanent"/></div>' +
-					'<div>until <input type="text" name="until" size="23" placeholder="permanent"/></div>' +
+					'<div style="white-space: nowrap;">for <input type="text" name="for" size="23" placeholder="permanent"/></div>' +
+					'<div style="white-space: nowrap;">until <input type="text" name="until" size="23" placeholder="permanent"/></div>' +
 				'</div>' +
 				'<div style="clear: both;"></div>' +
 			'</div>' +

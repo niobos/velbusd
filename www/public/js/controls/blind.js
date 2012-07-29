@@ -22,12 +22,12 @@ Blind.prototype.show = function() {
 	if( p == undefined ) return;
 
 	p.append('<div class="blind">' +
-			'<div style="padding-bottom: 0.2em; white-space: nowrap;">Currently ' +
+			'<div style="padding-bottom: 0.4em; white-space: nowrap;">Currently ' +
 				'<span class="state"><img src="images/loading.gif"/></span> open</div>' +
-			'<div style="display: table;">' +
-				'<div class="button up">&#x2b06;</div>' +
+			'<div style="">' +
+				'<div class="button up" style="display: inline;">&#x2191;</div>' +
 				'<div class="button stop" style="display: none;">&#x275A;&#x275A;</div>' +
-				'<div class="button down">&#x2b07;</div>' +
+				'<div class="button down" style="display: inline;">&#x2193;</div>' +
 			'</div>' +
 			'</div>');
 
@@ -97,14 +97,14 @@ Blind.prototype.update = function(attr) {
 	case "going down":
 	case "going up":
 		this.div.find('div.blind div.button.up').css('display', 'none');
-		this.div.find('div.blind div.button.stop').css('display', 'block');
+		this.div.find('div.blind div.button.stop').css('display', 'inline');
 		this.div.find('div.blind div.button.down').css('display', 'none');
 		break;
 
 	case "stopped":
-		this.div.find('div.blind div.button.up').css('display', 'block');
+		this.div.find('div.blind div.button.up').css('display', 'inline');
 		this.div.find('div.blind div.button.stop').css('display', 'none');
-		this.div.find('div.blind div.button.down').css('display', 'block');
+		this.div.find('div.blind div.button.down').css('display', 'inline');
 		break;
 	}
 
