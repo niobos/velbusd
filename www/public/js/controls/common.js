@@ -20,6 +20,12 @@ $('<style type="text/css">' +
 			'background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(238, 238, 238)), to(rgb(204, 204, 204)));' +
 			'background-image:-moz-linear-gradient(-90deg, rgb(238, 238, 238), rgb(204, 204, 204));' +
 		'}' +
+		'input.valid {' +
+			'background-color: #a4ffb8;' +
+		'}' +
+		'input.invalid {' +
+			'background-color: #ffaeb0;' +
+		'}' +
 	'</style>'
  ).appendTo("head");
 
@@ -29,7 +35,7 @@ function sec_to_pretty(sec) {
 
 	var r = '';
 	if( sec >= 24*60*60 ) {
-		r = end.getFullYear() + '-' + pad(end.getMonth(),2) + '-' + pad(end.getDate(),2) + ' ';
+		r = end.getFullYear() + '-' + pad(end.getMonth()+1,2) + '-' + pad(end.getDate(),2) + ' ';
 	}
 	r = r + end.getHours() + ':' + pad(end.getMinutes(),2) + ':' + pad(end.getSeconds(),2);
 
@@ -40,10 +46,10 @@ function sec_to_pretty(sec) {
 
 	var r = Math.round(sec) + 's (until ' + r + ')';
 	if( m > 0 || h > 0 ) {
-		r = m + 'm' + r;
+		r = m + 'm ' + r;
 	}
 	if( h > 0 ) {
-		r = h + 'h' + r;
+		r = h + 'h ' + r;
 	}
 
 	return r;
@@ -55,5 +61,111 @@ function pad(number, digits, pad) {
 	while( s.length < digits ) {
 		s = pad + s;
 	}
+	return s;
+}
+
+function parse_duration(d) {
+	/* Parse the string d into a duration in milliseconds
+	 * recognized tokens:
+	 *   " s sec[s] second[s]
+	 *   ' m mi min[s] minute[s]
+	 *   h hour[s]
+	 *   d day[s]
+	 *   w week[s]
+	 *   mo month[s]    (30 days)
+	 *   y year[s]      (365 days)
+	 */
+	
+	var m = d.match(/\d+ ?(?:"|seconds?|secs?|s|'|minutes?|mins?|mi|m|hours?|h|days?|d|weeks?|w|months?|mo|years?|y)(?!['"a-zA-Z])/g);
+	if( m == undefined ) return undefined;
+
+	var d = 0;
+	for( var e in m ) {
+		var t = m[e].match(/(\d+) ?(.*)/);
+		var multiply = 0;
+		switch(t[2] /* units */) {
+		case '"': case 's':
+		case 'seconds': case 'second':
+		case 'secs': case 'sec':
+			multiply = 1000; break;
+
+		case "'": case 'm': case 'mi':
+		case 'mins': case 'min':
+		case 'minutes': case 'minute':
+			multiply = 1000 * 60; break;
+
+		case 'h': case 'hours': case 'hour':
+			multiply = 1000 * 60 * 60; break;
+		case 'd': case 'days': case 'day':
+			multiply = 1000 * 60 * 60 * 24; break;
+		case 'w': case 'weeks': case 'week':
+			multiply = 1000 * 60 * 60 * 24 * 7; break;
+		case 'mo': case 'months': case 'month':
+			multiply = 1000 * 60 * 60 * 24 * 30; break;
+		case 'y': case 'years': case 'year':
+			multiply = 1000 * 60 * 60 * 24 * 365; break;
+		}
+		var res = parseInt(t[1] * multiply);
+		d += res;
+	}
+
+	return d;
+}
+
+function pretty_print_duration(ms) {
+	/* print the given duration (in milliseconds) */
+	if( ms < 0 ) return "<0";
+
+	var sec = Math.round(ms/1000);
+
+	var h = Math.floor(sec / (60*60));
+	sec -= h*60*60;
+	var mi = Math.floor(sec / 60 );
+	sec -= mi*60;
+
+	var s = Math.round(sec) + '"';
+	if( mi > 0 || h > 0 ) {
+		s = mi + "' " + s;
+	}
+	if( h > 0 ) {
+		 s= h + 'h ' + s;
+	}
+
+	return s;
+}
+
+function parse_datetime(dt) {
+	/* Parse the string dt into a Date() object
+	 * recognized formats:
+	 *  YYYY-MM-DD HH:MM:SS
+	 *  HH:MM:SS    (assumed to be within the next 24 hours)
+	 */
+
+	var now = new Date();
+	if( dt.match(/^\d\d\d\d-\d\d-\d\d[ T-]\d\d(?:[:-]\d\d)?(?:[:-]\d\d)?$/) ) {
+		return new Date(dt);
+	} else if( dt.match(/^\d\d:\d\d(?::\d\d)?$/) ) {
+		var today_date = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
+		var time_today = new Date( today_date + ' ' + dt );
+		if( time_today > now ) return time_today;
+
+		// This time today is already gone, user means tomorrow
+		var tomorrow = now; tomorrow.setDate( tomorrow.getDate() + 1 );
+		var tomorrow_date = tomorrow.getFullYear() + '-' + (tomorrow.getMonth()+1) + '-' + tomorrow.getDate();
+		return new Date( tomorrow_date + ' ' + dt );
+	}
+
+	return undefined;
+}
+
+function pretty_print_datetime(dt) {
+	/* Print the given datetime (either milliseconds or Date object) */
+	if( dt.constructor == Number ) {
+		dt = new Date( dt );
+	}
+
+	var s = dt.getFullYear() + '-' + pad(dt.getMonth()+1,2) + '-' + pad(dt.getDate(),2) + ' ' +
+		dt.getHours() + ':' + pad(dt.getMinutes(),2) + ':' + pad(dt.getSeconds(),2);
+
 	return s;
 }
