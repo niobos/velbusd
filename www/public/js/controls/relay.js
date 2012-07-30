@@ -54,6 +54,9 @@ Relay.prototype.show = function() {
 		e.stopPropagation(); // because that would undo the selection
 	});
 
+	p.find('div.relay input').focus(function(e) {
+		return $(this).trigger('keyup');
+	});
 	p.find('div.relay input[name="for"]').keyup(function(e) {
 			if( e.keyCode == 13 ) { // Enter
 				return p.find('div.relay div.button').trigger('click');
