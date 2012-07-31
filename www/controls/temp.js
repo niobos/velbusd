@@ -4,6 +4,8 @@ exports.add_routes = function(webapp, velbus, config) {
 
 function reply_to_get(req, res, next) {
 	var addr = parseInt( req.params[0], 16 );
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
 	var field = req.params[1];
 	if( field != undefined ) {
 		field = field.split('/');
@@ -79,15 +81,15 @@ function reply_to_get(req, res, next) {
 	};
 
 	if( need_cmd['temperature sensor status'] ) {
-		velbus.once('temp sensor status ' + addr, save_tss);
+		velbus.once('temp sensor status ' + addr_h, save_tss);
 	}
 	if( need_cmd['sensor temperature'] ) {
-		velbus.once('sensor temperature ' + addr, save_st);
+		velbus.once('sensor temperature ' + addr_h, save_st);
 	}
 
 	timeout = setTimeout(function() {
-			velbus.removeListener('temp sensor status ' + addr, save_tss);
-			velbus.removeListener('sensor temperature ' + addr, save_st);
+			velbus.removeListener('temp sensor status ' + addr_h, save_tss);
+			velbus.removeListener('sensor temperature ' + addr_h, save_st);
 			res.send("Timeout", 500);
 		}, config.webapp.timeout);
 
@@ -391,7 +393,10 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 
 exports.add_watchers = function(velbus, state, config) {
 	velbus.on('temp sensor status', function(msg) {
-		state.set( msg.id + '.heater', msg.output.heater);
+		state.set( msg.id + '.output.heater', msg.output.heater);
+	});
+	velbus.on('sensor temperature', function(msg) {
+		state.set( msg.id + '.temperature', msg['current temperature']);
 	});
 
 	// And initialize the current status of all temp sensors in the config
