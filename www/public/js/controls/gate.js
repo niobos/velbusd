@@ -15,7 +15,7 @@ Gate.prototype.update = function(attr) {
 
 	this.div.removeClass('open')
 	        .removeClass('closed')
-	switch( this.state.status ) {
+	switch( this.state.input_status ) {
 	case true:  this.div.addClass('closed'); break;
 	case false: this.div.addClass('open'); break;
 	}

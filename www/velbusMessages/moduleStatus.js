@@ -11,5 +11,6 @@ module.exports.parse = function(msg, config, next) {
 	msg.id = msg.address.toString(16);
 	if( msg.id.length == 1 ) { msg.id = '0' + msg.id; }
 
-	msg.status = msg.data[1];
+	msg.input = msg.data[1];
+	// Other fields differ between 5B en 7B version
 }

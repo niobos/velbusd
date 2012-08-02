@@ -14,7 +14,8 @@ function reply_to_get(req, res, next) {
 		clearTimeout(timeout);
 
 		delete msg.data;
-		var mybit = msg.status & (1 << (input-1));
+		var mybit = msg.input & (1 << (input-1));
+		delete msg.input;
 		msg.status = (mybit != 0);
 
 		if( field != undefined && field != '' ) {
@@ -44,16 +45,16 @@ webapp.get(/\/control\/input\/([0-9a-fA-F]{2})-([1-6])(?:\/([a-zA-Z ]*))?$/, rep
 exports.add_watchers = function(velbus, state, config) {
 	velbus.on('module status', function(msg) {
 		for( var i=0; i<8; i++) {
-			state.set( msg.id + '-' + (i+1) + '.status', (msg.status & (1<<i)) != 0);
+			state.set( msg.id + '-' + (i+1) + '.input_status', (msg.input & (1<<i)) != 0);
 		}
 	});
 	velbus.on('push button status', function(msg) {
 		for( var i=0; i<8; i++) {
 			if( msg.just_pressed & (1<<i) ) {
-				state.set( msg.id + '-' + (i+1) + '.status', true);
+				state.set( msg.id + '-' + (i+1) + '.input_status', true);
 			}
 			if( msg.just_released & (1<<i) ) {
-				state.set( msg.id + '-' + (i+1) + '.status', false);
+				state.set( msg.id + '-' + (i+1) + '.input_status', false);
 			}
 		}
 	});

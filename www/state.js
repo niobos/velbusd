@@ -30,7 +30,7 @@ state.prototype.get = function(key) {
 }
 
 state.prototype.set = function(key, value) {
-	console.log("state: " + key + " <= " + value);
+	//console.log("state: " + key + " <= " + util.inspect(value));
 	var p = this.properities;
 
 	var k = key.split(".");

@@ -22,7 +22,8 @@ Temp.prototype.show = function() {
 	p.append('<div class="temp">' +
 			'<div style="padding-bottom: 0.2em; white-space: nowrap;">' +
 				'Current state: <span class="state">' +
-					'<img src="images/loading.gif"/></span></div>' +
+					'<img src="images/loading.gif"/></span>' +
+				' (<a href="graph/temp.html">history</a>)</div>' +
 		'</div>');
 };
 
