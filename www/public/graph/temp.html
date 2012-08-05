@@ -5,21 +5,72 @@
  <body>
   <h1>Temperature history</h1>
   <script src="/js/jquery.js"></script>
+  <div>Time range: <select id="timerange"></select> :
+   <input type="text" name="from"/> - <input type="text" name="to"/>
+   <input type="button" value="go"/>
+  </div>
+  <p></p>
+  <script type="text/javascript">
+	function make_preset(options, select_element) {
+		$(select_element).append( $('<option value="">&lt;custom&gt;</option>') );
+		var target_element = {};
+		for( var name in options ) {
+			$(select_element).append( $('<option>' + name + '</option>') );
+			for( var t in options[ name ] ) {
+				target_element[ t ] = 1;
+			}
+		}
+		for( var t in target_element ) {
+			$('input[name=' + t + ']').change(function () {
+					// Are we set by the preset?
+					if( options[ $(select_element).val() ][t] != undefined ) {
+						$(select_element).val('');
+					}
+				});
+		}
+		$(select_element).change(function () {
+				var values = options[ $(select_element).val() ];
+				for( var k in values ) {
+					$('input[name=' + k + ']').val( values[k] );
+				}
+			});
+	}
+
+	make_preset({
+			"last hour" : { from: "-1 hour", to: "now" },
+			"last 12 hours" : { from: "-12 hour", to: "now" },
+			"last day" : { from: "-1 day", to: "now" },
+		}, $("#timerange"));
+  </script>
   <img id="graph" src="/images/loading.gif"/>
   <script type="text/javascript">
+	function URLencode(url) {
+		return escape(url).replace('%20', '+');
+	}
 	function URLdecode(url) {
-		return unescape(url).replace("+", " ");
+		return unescape(url.replace("+", " "));
 	}
 
 	var params = window.location.search.substr(1).split(/&/);
-	var param = {};
+	/* no var, global */ param = {};
 	for( var i in params ) {
 		var k = params[i].substr(0, params[i].indexOf('='));
 		var v = params[i].substr(params[i].indexOf('=')+1);
 		param[ URLdecode(k) ] = URLdecode(v);
 	}
 
-	$('#graph').attr('src', 'temp/' + param['id']);
+	var id = param['id'];
+	delete param['id'];
+
+	function reload_graph() {
+		var src = 'temp/' + id + '?';
+		for( var k in param ) {
+			src += URLencode(k) + '=' + URLencode(param[k]);
+		}
+
+		$('#graph').attr('src', src);
+	}
+	reload_graph();
   </script>
  </body>
 </html>
