@@ -142,17 +142,25 @@ function parse_datetime(dt) {
 	 */
 
 	var now = new Date();
-	if( dt.match(/^\d\d\d\d-\d\d-\d\d[ T-]\d\d(?:[:-]\d\d)?(?:[:-]\d\d)?$/) ) {
-		return new Date(dt);
-	} else if( dt.match(/^\d\d:\d\d(?::\d\d)?$/) ) {
-		var today_date = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
-		var time_today = new Date( today_date + ' ' + dt );
+	var m;
+	if( m = dt.match(/^(\d\d\d\d)-(\d\d)-(\d\d)[ T-](\d\d)(?:[:-](\d\d))?(?:[:-](\d\d))?$/) ) {
+		var y = parseInt(m[1]);
+		var mo = parseInt(m[2],10);
+		var d = parseInt(m[3],10);
+		var h = parseInt(m[4],10);
+		var mi = parseInt(m[5],10); if( isNaN(mi) ) { mi = 0; }
+		var s = parseInt(m[6],10); if( isNaN(s) ) { s = 0; }
+		return new Date(y, mo-1, d, h, mi, s);
+	} else if( m = dt.match(/^(\d\d):(\d\d)(?::(\d\d))?$/) ) {
+		var h = parseInt(m[1],10);
+		var mi = parseInt(m[2],10);
+		var s = parseInt(m[3],10); if( isNaN(s) ) { s = 0; }
+		var time_today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, mi, s );
 		if( time_today > now ) return time_today;
 
 		// This time today is already gone, user means tomorrow
 		var tomorrow = now; tomorrow.setDate( tomorrow.getDate() + 1 );
-		var tomorrow_date = tomorrow.getFullYear() + '-' + (tomorrow.getMonth()+1) + '-' + tomorrow.getDate();
-		return new Date( tomorrow_date + ' ' + dt );
+		return new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), h, mi, s );
 	}
 
 	return undefined;
