@@ -23,7 +23,8 @@ Temp.prototype.show = function() {
 			'<div style="padding-bottom: 0.2em; white-space: nowrap;">' +
 				'Current state: <span class="state">' +
 					'<img src="images/loading.gif"/></span>' +
-				' (<a href="graph/temp.html">history</a>)</div>' +
+				' (<a href="graph/temp.html?id=' + this.addr + '">' +
+					'history</a>)</div>' +
 		'</div>');
 };
 

@@ -1,0 +1,25 @@
+<html>
+ <head>
+  <title>Temperature history - Domotica control</title>
+ </head>
+ <body>
+  <h1>Temperature history</h1>
+  <script src="/js/jquery.js"></script>
+  <img id="graph" src="/images/loading.gif"/>
+  <script type="text/javascript">
+	function URLdecode(url) {
+		return unescape(url).replace("+", " ");
+	}
+
+	var params = window.location.search.substr(1).split(/&/);
+	var param = {};
+	for( var i in params ) {
+		var k = params[i].substr(0, params[i].indexOf('='));
+		var v = params[i].substr(params[i].indexOf('=')+1);
+		param[ URLdecode(k) ] = URLdecode(v);
+	}
+
+	$('#graph').attr('src', 'temp/' + param['id']);
+  </script>
+ </body>
+</html>
