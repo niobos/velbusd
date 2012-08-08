@@ -14,7 +14,8 @@ module.exports.parse = function(msg, config, next) {
 	}
 
 	msg.type = "sensor temperature";
-	msg.id = msg.address;
+	msg.id = msg.address.toString(16);
+	if( msg.id.length == 1 ) msg.id = '0' + msg.id;
 
 	msg['current temperature'] = twosComplement( (msg.data[1]<<8) + msg.data[2], 2 ) / 512;
 	msg['minimum temperature'] = twosComplement( (msg.data[3]<<8) + msg.data[4], 2 ) / 512;

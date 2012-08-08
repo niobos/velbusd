@@ -13,7 +13,8 @@ module.exports.parse = function(msg, config, next) {
 		case 0x0c: msg.blind = 2; break;
 		default: msg.blind = null; break;
 	}
-	msg.id = msg.address + '.' + msg.blind;
+	msg.id = msg.address.toString(16) + '-' + msg.blind;
+	if( msg.id.length == 3 ) { msg.id = '0' + msg.id; }
 	switch(msg.data[2]) {
 		case 0x00: msg.timeout = 15; break;
 		case 0x01: msg.timeout = 30; break;
@@ -42,9 +43,7 @@ module.exports.parse = function(msg, config, next) {
 	msg.timer = (msg.data[5] << 16) + (msg.data[6] << 8) + msg.data[7];
 
 	// Calculate augmented info
-	var id = msg.address.toString(16) + '.' + msg.blind;
-	if( id.length == 3 ) { id = '0' + id; }
-
+	var id = msg.id;
 	if( blindStatus[id] == undefined ) {
 		blindStatus[id] = { 'public': { 'position': 0.5 } };
 	}
@@ -62,7 +61,6 @@ module.exports.parse = function(msg, config, next) {
 			// And clamp to [0,1]
 			blindStatus[id].public.position = Math.min(1, Math.max(0,
 				blindStatus[id].public.position ));
-			blindStatus[id].since = now;
 		}
 
 		if( msg.status == "stopped" ) {

@@ -5,6 +5,8 @@ function reply_to_get(req, res, next) {
 	var addr = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
 
 	// Set up listener for the answer
 	var timeout;
@@ -23,9 +25,9 @@ function reply_to_get(req, res, next) {
 			res.send(msg);
 		}
 	};
-	velbus.once('relay status ' + addr + '.' + relay, send_answer);
+	velbus.once('relay status ' + addr_h + '-' + relay, send_answer);
 	timeout = setTimeout(function() {
-			velbus.removeListener('relay status ' + addr + '.' + relay, send_answer);
+			velbus.removeListener('relay status ' + addr_h + '-' + relay, send_answer);
 			res.send("Timeout", 500);
 		}, config.webapp.timeout);
 
@@ -34,9 +36,9 @@ function reply_to_get(req, res, next) {
 	velbus.send_message(3, addr, 0, "\xfa" + relaybit );
 }
 
-webapp.get(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
+webapp.get(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
 
-webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
+webapp.post(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])\/([a-zA-Z ]*)$/, function(req, res, next) {
 	var addr = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
@@ -85,4 +87,30 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2}).([1-4])\/([a-zA-Z ]*)$/, functio
 	reply_to_get(req, res, next);
 });
 
+}
+
+exports.add_watchers = function(velbus, state, config) {
+	velbus.on('relay status', function(msg) {
+		state.set( msg.id + '.status', msg.status );
+		state.set( msg.id + '.timer', { 'value': msg.timer, 'ref': +new Date() });
+	});
+
+	// And initialize the current status of all relays in config
+	for(var control in config.controls) {
+		if( config.controls[control].type != "light"
+		 && config.controls[control].type != "relay" ) continue;
+
+		velbus.once('connect', function(id, control) { return function() {
+			// Closure with id and control
+
+			var addr = id.split('-');
+			var relaybit = String.fromCharCode( 1 << (addr[1]-1) );
+
+			// Spread queries in time in order not to overload the bus when starting up
+			var starttime = Math.random() * Object.keys(config.controls).length * 100;
+			setTimeout(function() {
+				velbus.send_message(3, parseInt(addr[0],16), 0, "\xfa" + relaybit );
+				}, starttime);
+		}}(control, config.controls[control]));
+	}
 }

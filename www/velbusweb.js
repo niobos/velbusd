@@ -18,9 +18,11 @@ velbus.on('error', function(e) {
 });
 velbus.on('connect', function() {
 	util.log('velbus connection opened');
+	state.set('00.state', 'online');
 });
 velbus.on('close', function() {
 	util.log('velbus connection closed');
+	state.set('00.state', 'offline');
 });
 
 velbus.on('resync', function(why) {
@@ -39,6 +41,7 @@ velbus.on('message', function(msg) {
 	//util.log('velbus connection: message (after processing): ' + util.inspect(msg) );
 
 	if( msg.type != null ) {
+		velbus.emit( msg.type, msg );
 		velbus.emit( msg.type + ' ' + msg.id, msg );
 	}
 });
@@ -62,6 +65,49 @@ webapp.configure('production', function() {
 	webapp.use(express.errorHandler() );
 });
 
+var state = require('./state.js').ctor();
+
+// Copy in config.controls
+function traverse(obj, func, stack) {
+	if( stack == null ) { stack = []; }
+	for(var prop in obj) {
+		var newstack = stack.slice();
+		newstack.push(prop);
+		if( Array.isArray( obj[prop] ) ) {
+			func.apply(this, [ newstack, obj[prop] ]);
+		} else if( typeof( obj[prop] ) == "object" ) {
+			traverse( obj[prop], func, newstack );
+		} else {
+			func.apply(this, [ newstack, obj[prop] ]);
+		}
+	}
+}
+traverse( config.controls, function(prop, value) {
+	var propname = prop.join('.');
+	state.set(propname, value);
+});
+
+var sockjs = require('sockjs');
+var sockjs_stream = sockjs.createServer( {
+	sockjs_url: "/js/sockjs.js"
+});
+sockjs_stream.installHandlers(webapp, { prefix:'/events' });
+
+sockjs_stream.on('connection', function(conn) {
+	// Start by sending the full object
+	conn.write( state.dump() );
+
+	var fonupdate = function(data) { // Assign function to a variable, so we can remove it later
+		// Closure over conn object
+		conn.write(data);
+	};
+	state.on('update', fonupdate);
+	conn.on('close', function() {
+		state.removeListener('update', fonupdate);
+	});
+});
+
+
 webapp.listen(config.webapp.port, config.webapp.bind);
 util.log("webserver listening on [" +
 	config.webapp.bind + ']:' + config.webapp.port +
@@ -74,29 +120,44 @@ webapp.get('/js/controls.js', function(req, res, next) {
 		var body = '';
 		for( var f in files ) {
 			var fn = files[f];
-			// Read all files
-			fs.readFile('public/js/controls/' + fn, function(err, data) {
-				if( err !== null ) { next(err); }
-				// Append content to the body
-				body += data + "\n";
-				// Remove us from the todo list
-				files.splice( files.indexOf(fn), 1 );
+			if( fn.substr( fn.length-3 ) == ".js" ) {
+				// Read all files
+				fs.readFile('public/js/controls/' + fn, function(err, data) {
+					if( err !== null ) { next(err); }
+					// Append content to the body
+					body += data + "\n";
+					// Remove us from the todo list
+					files.splice( files.indexOf(fn), 1 );
 
-				if( files.length == 0 ) {
-					// We are the last one to finish, send output
-					res.send(body, {'Content-Type': 'application/javascript'} );
-				}
-			});
+					if( files.length == 0 ) {
+						// We are the last one to finish, send output
+						res.send(body, {'Content-Type': 'application/javascript'} );
+					}
+				});
+			} else {
+				process.nextTick(function() {
+					// Remove us from the todo list right away
+					files.splice( files.indexOf(fn), 1 );
+				});
+			}
 		}
 	});
 });
 
 
-webapp.get('/data/coords.json', function(req, res, next) {
-	res.json(config.controls);
+webapp.get('/state.json', function(req, res, next) {
+	res.json(state.properities);
+});
+
+webapp.get('/now', function(req, res, next) {
+	var now = +new Date();
+	res.send(''+now, {'Content-Type': 'text/plain'});
 });
 
 var controls = fs.readdirSync('./controls');
 for( var i = 0; i < controls.length; i++ ) {
-	require('./controls/' + controls[i]).add_routes(webapp, velbus, config);
+	var r = require('./controls/' + controls[i]);
+	r.add_routes(webapp, velbus, config);
+	r.add_watchers(velbus, state, config);
 }
+

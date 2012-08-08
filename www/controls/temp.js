@@ -4,6 +4,8 @@ exports.add_routes = function(webapp, velbus, config) {
 
 function reply_to_get(req, res, next) {
 	var addr = parseInt( req.params[0], 16 );
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
 	var field = req.params[1];
 	if( field != undefined ) {
 		field = field.split('/');
@@ -79,15 +81,15 @@ function reply_to_get(req, res, next) {
 	};
 
 	if( need_cmd['temperature sensor status'] ) {
-		velbus.once('temp sensor status ' + addr, save_tss);
+		velbus.once('temp sensor status ' + addr_h, save_tss);
 	}
 	if( need_cmd['sensor temperature'] ) {
-		velbus.once('sensor temperature ' + addr, save_st);
+		velbus.once('sensor temperature ' + addr_h, save_st);
 	}
 
 	timeout = setTimeout(function() {
-			velbus.removeListener('temp sensor status ' + addr, save_tss);
-			velbus.removeListener('sensor temperature ' + addr, save_st);
+			velbus.removeListener('temp sensor status ' + addr_h, save_tss);
+			velbus.removeListener('sensor temperature ' + addr_h, save_st);
 			res.send("Timeout", 500);
 		}, config.webapp.timeout);
 
@@ -321,9 +323,9 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 	var name = config.controls[ addr_s ].name;
 	var relay = config.controls[ addr_s ].relay;
 
-	var width = req.query.width != undefined ? parseInt(req.query.width) : 200;
-	var height = req.query.height != undefined ? parseInt(req.query.height) : 100;
-	var graph_only = req.query.graph_only != undefined ? parseInt(req.query.graph_only) : 1;
+	var width = req.query.width != undefined ? parseInt(req.query.width) : 400;
+	var height = req.query.height != undefined ? parseInt(req.query.height) : 150;
+	var graph_only = req.query.graph_only != undefined ? parseInt(req.query.graph_only) : 0;
 	var start = strtotime( req.query.start != undefined ? req.query.start : "-1 day" );
 	var end = strtotime( req.query.end != undefined ? req.query.end : "now" );
 	var title = req.query.title ? req.query.title : name;
@@ -387,4 +389,31 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 
 });
 
+}
+
+exports.add_watchers = function(velbus, state, config) {
+	velbus.on('temp sensor status', function(msg) {
+		state.set( msg.id + '.output.heater', msg.output.heater);
+	});
+	velbus.on('sensor temperature', function(msg) {
+		state.set( msg.id + '.temperature', msg['current temperature']);
+	});
+
+	// And initialize the current status of all temp sensors in the config
+	for(var control in config.controls) {
+		if( config.controls[control].type != "temp" ) continue;
+
+		velbus.once('connect', function(id, control) { return function() {
+			// Closure with id and control
+
+			var addr = id;
+
+			// Spread queries in time in order not to overload the bus when starting up
+			var starttime = Math.random() * Object.keys(config.controls).length * 100;
+			setTimeout(function() {
+				velbus.send_message(3, parseInt(addr, 16), 0, "\xfa\x00" );
+				}, starttime);
+
+		}}(control, config.controls[control]));
+	}
 }

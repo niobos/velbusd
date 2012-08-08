@@ -7,74 +7,89 @@
 		position: absolute;
 		width: 1.2em;
 		height: 1.2em;
+		margin-top: -.6em;
+		margin-left: -.6em;
 		cursor: pointer;
-		background-image: url(images/unknown);
+		background-image: url(images/unknown.png);
 		background-size: contain;
 	}
-	div.icon div {
+	div.icon > div {
 		cursor: auto;
 	}
 
 	div.popover {
-		top: 1.3em; /* Place them below the icon */
-		background-color: #000000;
-		color: #dddddd;
-		padding: 10px;
-		z-index: 1000;
 		position: absolute;
+		top: 1.4em; /* Place them below the icon */
+		left: -.8em;
+		z-index: 1000;
+	}
+	div.popover img.arrow {
+		position: relative;
+		left: 1em;
+		width: .8em;
+		opacity:0.9;
+		filter:alpha(opacity=90); /* For IE8 and earlier */
+	}
+	div.popover div.bubble {
+		background-color: rgba(210,210,210,.9);
+		color: #000000;
+		padding: 1em;
 		min-width: 10em;
+		border-radius: .7em;
+
+		/* Drop shadow */
+		box-shadow: 3px 3px 4px rgba(0,0,0,0.7);
+		-moz-box-shadow: 3px 3px 4px rgba(0,0,0,0.7);
+		-webkit-box-shadow: 3px 3px 4px rgba(0,0,0,0.7);
+		/* For IE 8 */
+		-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+		/* For IE 5.5 - 7 */
+		filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000');
 	}
-	span.tech {
+
+	div.popover span.name {
+		font-size: 1.1em;
+		font-weight: bold;
+	}
+	div.popover span.tech {
 		font-size: 0.75em;
-	}
-	div.template {
-		display: none;
 	}
   </style>
   </head>
  <body>
   <h1>Domotica control</h1>
   <div style="position: relative" id="floormap">
-   <div id="control" class="popover template">
-    <!-- Header line, common for all -->
-    <div style="white-space: nowrap; padding-bottom: .4em;">
-     <span class="name">Name</span>
-     <span class="tech">(<span class="type">type</span> @ <span class="id">FF</span>)</span>
-    </div>
-   </div>
-
    <img src="data/floorplan.svg" />
 
+   <script src="js/sockjs.js"></script>
    <script type="text/javascript">
-	var coords;
-	$.ajax({ url: 'data/coords.json', dataType: 'json'})
-	  .error(function(jqXHR, text, error) { alert('error:'+text); })
-	  .success(function(data) {
-		coords = data; // Store data for later
-		$.each(data, function(id, el) {
+	velbus_state = {};
+	gui_state = {};
 
-			if( el.type == undefined ) {
-				console.log('Elements must have at least `type` attributes, '+
-					'ignoring this one');
-				return true; // continue to next iteration
-			}
+	constructors = {};
+	var Unknown = function(addr, state, coord) {
+		var that = this; // Prepare closure
+		this.addr = addr;
+		this.id = addr + "-" + coord;
+		this.state = state;
+		this.div = $('<div class="icon"/>').attr('id', this.id)
+				.addClass(state.type)
+				.css('left', state.coords[coord].left)
+				.css('top', state.coords[coord].top)
+				.click(function(e) {
+					that.show();
 
-			for( var i in el.coords ) {
-				var icon = $('<div class="icon"/>').addClass( el.type );
-				$("#floormap").append( icon );
-				icon.css('left', el.coords[i].left - icon.width()/2 )
-				    .css('top', el.coords[i].top - icon.height()/2);
-
-				icon.click( (function (i) { return function() { // Create closure with `i` in it
-					// Closure with all details
-					var popover = $('.popover');
-					popover.find('.control').addClass('template');
-					popover.removeClass('template').appendTo(icon);
-
-					popover.find('.name').text(el.name);
-					popover.find('.id').text(id);
-					popover.find('.type').text(el.type);
-					$('.control.' + el.type).removeClass('template').trigger('update', [id, el, i]);
+					var hideme = function(e) {
+						// Did we click on ourselves?
+						var t = $(e.target);
+						while( t.length > 0 ) {
+							if( t[0] == that.div[0] ) return;
+							t = t.parent();
+						}
+						that.hide();
+						$("body").unbind('click', hideme);
+					};
+					$("body").bind('click', hideme);
 
 					// Undo selection which has happened while clicking and appending at the same time
 					if (window.getSelection) {
@@ -86,52 +101,101 @@
 					} else if (document.selection) {  // IE?
 						document.selection.empty();
 					}
+				} );
+		$("#floormap").append(this.div);
+	};
+	Unknown.prototype.show = function() {
+		if( this.div.find('div.popover').length > 0 ) return;
 
-					return false;
-				}})(i));
+		var popover = $('<div class="popover"><img class="arrow" src="images/arrow.svg"/><div class="bubble"/></div>');
+
+		var bubble = popover.find('.bubble');
+		bubble.append( $('<div class="generic" style="white-space: nowrap; padding-bottom: .4em;"><span class="name"/> <span class="tech"/></div>') );
+
+		this.div.append( popover );
+		this.update();
+		return bubble;
+	}
+	Unknown.prototype.update = function(attr) {
+		if( this.div.find(".popover").length == 0 ) {
+			// We're not visible, don't bother...
+			return "not displayed";
+		}
+
+		this.div.find("span.name").text(this.state.name);
+		this.div.find("span.tech").text('(' + this.state.type + " @ " + this.addr + ')');
+	}
+	Unknown.prototype.hide = function() {
+		this.div.find(".popover").remove();
+	}
+
+	function onSockJSmessage(e) {
+		var d = JSON.parse(e.data);
+		if( d.changetype == 'new' ) {
+			velbus_state = d.value;
+
+			$("#floormap div.control").remove();
+			for(var addr in velbus_state) {
+				if( addr == "00" ) continue;
+
+				gui_state[addr] = {};
+				for( var coord in velbus_state[ addr ].coords ) {
+					if( constructors[ velbus_state[addr].type ] == undefined ) {
+						gui_state[addr][coord] = new Unknown(addr, velbus_state[addr], coord);
+					} else {
+						gui_state[addr][coord] = new constructors[ velbus_state[addr].type ]( addr, velbus_state[addr], coord );
+					}
+				}
 			}
+
+		} else if( d.changetype == 'update' ) {
+			var p = velbus_state;
+			var k = d.key.split(".");
+			for(var i=0; i<k.length-1; i++ ) {
+				if( p[ k[i] ] === undefined ) {
+					p[ k[i] ] = {};
+				}
+				p = p[ k[i] ];
+			}
+			p[ k[ k.length-1 ] ] = d.value;
+
+			if( gui_state[ k[0] ] != undefined ) {
+				for( var coord in gui_state[ k[0] ] ) {
+					gui_state[ k[0] ][ coord ].update();
+				}
+			}
+		} else {
+			console.log("Unknown message received");
+			console.log(e);
+		}
+	};
+
+	var SockJS_retry_wait = 100;
+	function newSockJSconn() {
+		var sockjs = new SockJS('/events');
+		sockjs.onopen = function() {
+			console.log("SockJS connected");
+			this.onmessage = onSockJSmessage;
+			SockJS_retry_wait = 100;
+		};
+		sockjs.onclose = function() {
+			console.log("SockJS closed, reconnecting in " + SockJS_retry_wait);
+			setTimeout(function() { newSockJSconn() }, SockJS_retry_wait);
+			SockJS_retry_wait *= 2; // Exponential backoff
+			SockJS_retry_wait = Math.min(SockJS_retry_wait, 128000); // With a limit of 2 minutes
+		};
+	}
+	newSockJSconn();
+
+	my_server_time_delta = 0;
+	$.ajax({url: '/now', dataType: 'json' })
+		.success(function(data) {
+			my_server_time_delta = +new Date();
+			my_server_time_delta -= parseInt(data);
 		});
-		$(document).click( function() { $('.popover').addClass('template'); } );
-	});
+
    </script>
    <script src="js/controls.js"></script>
-  </div>
-  <div id="macros">
-   <input type="button" id="macro-all-lights-off" value="All lights off" />
-   <script language="javascript">
-    $("#macro-all-lights-off").click(function() {
-		for( var id in coords ) {
-			if( coords[id].type == "light" ) {
-				console.log(id);
-				$.ajax({
-					type: 'POST',
-					url: 'control/relay/' + id + "/status",
-					data: 'off',
-				});
-			}
-		}
-		return false;
-	});
-   </script><br/>
-   <input type="button" id="macro-all-blinds-up" value="All blinds up" /><br/>
-   <input type="button" id="macro-all-blinds-down" value="All blinds down" />
-   <script language="javascript">
-    function macro_all_blinds( status ) {
-		for( var id in coords ) {
-			if( coords[id].type == "blind" ) {
-				console.log(id);
-				$.ajax({
-					type: 'POST',
-					url: 'control/blind/' + id + "/status",
-					data: status,
-				});
-			}
-		}
-		return false;
-	}
-    $("#macro-all-blinds-up").click(function() { macro_all_blinds('up'); });
-    $("#macro-all-blinds-down").click(function() { macro_all_blinds('down'); });
-   </script>
   </div>
  </body>
 </html>

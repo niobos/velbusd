@@ -5,6 +5,8 @@ function reply_to_get(req, res, next) {
 	var addr = parseInt( req.params[0], 16 );
 	var blind = parseInt( req.params[1] );
 	var field = req.params[2];
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
 
 	// Set up listener for the answer
 	var timeout;
@@ -23,9 +25,9 @@ function reply_to_get(req, res, next) {
 			res.send(msg);
 		}
 	};
-	velbus.once('blind status ' + addr + '.' + blind, send_answer);
+	velbus.once('blind status ' + addr_h + '-' + blind, send_answer);
 	timeout = setTimeout(function() {
-			velbus.removeListener('blind status ' + addr + '.' + blind, send_answer);
+			velbus.removeListener('blind status ' + addr_h + '-' + blind, send_answer);
 			res.send("Timeout", 500);
 		}, config.webapp.timeout);
 
@@ -34,9 +36,9 @@ function reply_to_get(req, res, next) {
 	velbus.send_message(3, addr, 0, "\xfa" + blindbit );
 };
 
-webapp.get(/\/control\/blind\/([0-9a-fA-F]{2}).([12])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
+webapp.get(/\/control\/blind\/([0-9a-fA-F]{2})-([12])(?:\/([a-zA-Z ]*))?$/, reply_to_get);
 
-webapp.post(/\/control\/blind\/([0-9a-fA-F]{2}).([12])\/([a-zA-Z ]*)$/, function(req, res, next) {
+webapp.post(/\/control\/blind\/([0-9a-fA-F]{2})-([12])\/([a-zA-Z ]*)$/, function(req, res, next) {
 	var addr = parseInt( req.params[0], 16 );
 	var blind = parseInt( req.params[1] );
 	var field = req.params[2];
@@ -83,4 +85,29 @@ webapp.post(/\/control\/blind\/([0-9a-fA-F]{2}).([12])\/([a-zA-Z ]*)$/, function
 	reply_to_get(req, res, next);
 });
 
+}
+
+exports.add_watchers = function(velbus, state, config) {
+	velbus.on('blind status', function(msg) {
+		state.set( msg.id + '.status', msg.status );
+		state.set( msg.id + '.position', { 'value': msg.position, 'ref': +new Date() });
+	});
+
+	// And initialize the current status of all relays in config
+	for(var control in config.controls) {
+		if( config.controls[control].type != "blind" ) continue;
+
+		velbus.once('connect', function(id, control) { return function() {
+			// Closure with id and control
+
+			var addr = id.split('-');
+			var blindbit = String.fromCharCode( 3 << (addr[1]-1)*2 );
+
+			// Spread queries in time in order not to overload the bus when starting up
+			var starttime = Math.random() * Object.keys(config.controls).length * 100;
+			setTimeout(function() {
+				velbus.send_message(3, parseInt(addr[0],16), 0, "\xfa" + blindbit );
+				}, starttime);
+		}}(control, config.controls[control]));
+	}
 }
