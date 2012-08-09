@@ -6,16 +6,22 @@
   <h1>Temperature history</h1>
   <script src="/js/jquery.js"></script>
   <div>Time range: <select id="timerange"></select> :
-   <input type="text" name="from"/> - <input type="text" name="to"/>
-   <input type="button" value="go"/>
+   <input type="text" name="start"/> - <input type="text" name="end"/>
+   <input type="button" value="go" onClick="update();"/>
   </div>
   <p></p>
+  <script src="/js/date.js"></script>
   <script type="text/javascript">
 	function make_preset(options, select_element) {
 		$(select_element).append( $('<option value="">&lt;custom&gt;</option>') );
 		var target_element = {};
 		for( var name in options ) {
-			$(select_element).append( $('<option>' + name + '</option>') );
+			var o = $('<option>' + name + '</option>');
+			if( options[name]['_selected'] == 'selected' ) {
+				o.attr('selected', 'selected');
+				setTimeout(function() { $(select_element).trigger('change'); }, 100);
+			}
+			$(select_element).append( o );
 			for( var t in options[ name ] ) {
 				target_element[ t ] = 1;
 			}
@@ -33,13 +39,20 @@
 				for( var k in values ) {
 					$('input[name=' + k + ']').val( values[k] );
 				}
+				update();
 			});
 	}
 
 	make_preset({
-			"last hour" : { from: "-1 hour", to: "now" },
-			"last 12 hours" : { from: "-12 hour", to: "now" },
-			"last day" : { from: "-1 day", to: "now" },
+			"last hour" : { start: "now -1 hour", end: "now" },
+			"last 12 hours" : { start: "now -12 hour", end: "now" },
+			"last day" : { start: "now -1 day", end: "now", '_selected': 'selected'},
+			"last week" : { start: "-1 week now", end: "now" },
+			"last month" : { start: "-1 month now", end: "now" },
+			"last year" : { start: "-1 year now", end: "now" },
+			"today" : { start: "today", end: "tomorrow" },
+			"yesterday": { start: "yesterday", end: "today" },
+			"this week" : { start: "last Monday", end: "next Monday" },
 		}, $("#timerange"));
   </script>
   <img id="graph" src="/images/loading.gif"/>
@@ -65,12 +78,19 @@
 	function reload_graph() {
 		var src = 'temp/' + id + '?';
 		for( var k in param ) {
-			src += URLencode(k) + '=' + URLencode(param[k]);
+			src += '&' + URLencode(k) + '=' + URLencode(param[k]);
 		}
 
 		$('#graph').attr('src', src);
 	}
-	reload_graph();
+
+	function update() {
+		console.log( Date.parse( $("input[name=start]").val() ) );
+		console.log( Date.parse( $("input[name=end]").val() ) );
+		param.start = Math.floor( Date.parse( $("input[name=start]").val() ) / 1000 );
+		param.end   = Math.floor( Date.parse( $("input[name=end]").val() ) / 1000 );
+		reload_graph();
+	}
   </script>
  </body>
 </html>
