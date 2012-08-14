@@ -23,8 +23,8 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-if [ "$DATA" == "on" ]; then STATE="1"
-elif [ "$DATA" == "off" ]; then STATE="0"
+if [ "$DATA" == "true" ]; then STATE="1"
+elif [ "$DATA" == "false" ]; then STATE="0"
 else STATE=""
 fi
 

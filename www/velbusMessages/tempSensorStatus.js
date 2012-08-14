@@ -59,11 +59,11 @@ module.exports.parse = function(msg, config, next) {
 		( msg.data[2] & 0x80 ? 'available' : 'not available' );
 
 	msg['output'] = {};
-	msg['output']['heater']     = ( msg.data[3] & 0x01 ? 'on' : 'off' );
+	msg['output']['valve']      = ( msg.data[3] & 0x01 ? 'on' : 'off' );
 	msg['output']['boost']      = ( msg.data[3] & 0x02 ? 'on' : 'off' );
 	msg['output']['day']        = ( msg.data[3] & 0x04 ? 'on' : 'off' );
 	msg['output']['cooler']     = ( msg.data[3] & 0x08 ? 'on' : 'off' );
-	msg['output']['valve']      = ( msg.data[3] & 0x10 ? 'on' : 'off' );
+	msg['output']['pump']       = ( msg.data[3] & 0x10 ? 'on' : 'off' );
 	msg['output']['low alarm']  = ( msg.data[3] & 0x20 ? 'on' : 'off' );
 	msg['output']['high alarm'] = ( msg.data[3] & 0x40 ? 'on' : 'off' );
 
