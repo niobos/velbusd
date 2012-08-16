@@ -224,6 +224,7 @@ void process_read_data(EV_P_ ev_idle *w, int revents) {
 			serial.rx_ready = false;
 			// Stop all processing_todo and read_ready watchers
 			stop_all_net_watchers(EV_A);
+			return; // don't relay flow control messages
 
 		} else if( typeid(*m) ==typeid(VelbusMessage::RxReady) ) {
 			serial.rx_ready = true;
