@@ -6,10 +6,6 @@
 #include <stdio.h>
 #include "Unknown.hpp"
 
-#ifdef WANT_PARSER
-#include "ModuleTypeRequest.hpp"
-#endif
-
 namespace VelbusMessage {
 
 VelbusMessage* parse_and_consume(std::string &msges, std::string *msg)
@@ -55,7 +51,8 @@ VelbusMessage* parse_and_consume(std::string &msges, std::string *msg)
 	// Now identify the type of message
 	try {
 		if( data.length() == 0 ) {
-			return ModuleTypeRequest::factory(prio, addr, rtr, data);
+			// Module Type Request, has no data, so no command to look up
+			return Unknown::factory(prio, addr, rtr, data);
 		}
 
 		struct registrar_key k;

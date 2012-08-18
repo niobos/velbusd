@@ -7,7 +7,6 @@ Parser_SOURCES = Parser.cpp \
                  ../src/VelbusMessage/VelbusMessage.cpp ../src/VelbusMessage/VelbusMessage.hpp \
                  ../src/VelbusMessage/Registrar.cpp ../src/VelbusMessage/Registrar.hpp \
                  ../src/VelbusMessage/Unknown.cpp ../src/VelbusMessage/Unknown.hpp \
-                 ../src/VelbusMessage/ModuleTypeRequest.cpp ../src/VelbusMessage/ModuleTypeRequest.hpp \
                  ../src/VelbusMessage/BusOff.cpp ../src/VelbusMessage/BusOff.hpp \
                  ../src/VelbusMessage/BusActive.cpp ../src/VelbusMessage/BusActive.hpp \
                  ../src/VelbusMessage/RxBuffFull.cpp ../src/VelbusMessage/RxBuffFull.hpp \
