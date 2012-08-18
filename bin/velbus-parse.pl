@@ -25,36 +25,6 @@ push @parser, sub { # Module Type Request {{{
 	return sprintf("ModuleTypeRequest to 0x%02x", $addr);
 }; # }}}
 
-push @parser, sub { # Push Button Status {{{
-	my ($prio, $addr, $rtr, $data, @data) = @_;
-	return undef unless $rtr  == 0;
-	return undef unless @data == 4;
-	return undef unless $data[0] == 0x00;
-
-	my $just_pressed = $data[1];
-	my $just_released = $data[2];
-	my $long_pressed = $data[3];
-
-	return sprintf("PushButtonStatus from 0x%02x: on=%s long=%s off=%s",
-			$addr, binary($just_pressed), binary($just_released),
-			binary($long_pressed));
-}; # }}}
-
-push @parser, sub { # Push Button Status {{{
-	my ($prio, $addr, $rtr, $data, @data) = @_;
-	return undef unless $rtr  == 0;
-	return undef unless @data == 4;
-	return undef unless $data[0] == 0x00;
-
-	my $just_pressed = $data[1];
-	my $just_released = $data[2];
-	my $long_pressed = $data[3];
-
-	return sprintf("PushButtonStatus from 0x%02x: on=%s long=%s off=%s",
-			$addr, binary($just_pressed), binary($just_released),
-			binary($long_pressed));
-}; # }}}
-
 push @parser, sub { # Blind Status {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
@@ -78,6 +48,361 @@ push @parser, sub { # Blind Status {{{
 			"Status1=%s Status2=%s Led=%s Timer=%d",
 			$addr, $channel, $timeout, $status1, $status2, $led, $timer);
 }; # }}}
+
+push @parser, sub { # Bus Error Counter {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 4;
+	return undef unless $data[0] == 0xda;
+
+	my $tx_errors = $data[1];
+	my $rx_errors = $data[2];
+	my $bus_off = $data[3];
+
+	return sprintf("BusErrorCounter from 0x%02x: Tx=%d Rx=%d Bus off=%d",
+			$addr, $tx_errors, $rx_errors, $bus_off);
+}; # }}}
+
+push @parser, sub { # Bus Error Counter Request {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 1;
+	return undef unless $data[0] == 0xd9;
+
+	return sprintf("BusErrorCounterRequest to 0x%02x", $addr);
+}; # }}}
+
+push @parser, sub { # {Clear,Set,SlowBlink,FastBlink,VFastBlink} Leds {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 2;
+
+	my $cmd;
+	if( $data[0] == 0xf5 ) {
+		$cmd = "ClearLeds";
+	} elsif( $data[0] == 0xf6 ) {
+		$cmd = "SetLeds";
+	} elsif( $data[0] == 0xf7 ) {
+		$cmd = "SlowBlinkLeds";
+	} elsif( $data[0] == 0xf8 ) {
+		$cmd = "FastBlinkLeds";
+	} elsif( $data[0] == 0xf9 ) {
+		$cmd = "VFastBlinkLeds";
+	} else {
+		return undef;
+	}
+
+	my $leds = $data[1];
+
+	return sprintf("$cmd to 0x%02x: %s", $addr, binary($leds) );
+}; # }}}
+
+push @parser, sub { # Memory Block {,Write} {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 7;
+
+	my ($cmd, $direction, $assign);
+	if( $data[0] == 0xcc ) {
+		$cmd = "MemoryBlock";
+		$direction = "from";
+		$assign = "=";
+	} elsif( $data[0] == 0xca ) {
+		$cmd = "MemoryBlockWrite";
+		$direction = "to";
+		$assign = "<=";
+	} else {
+		return undef;
+	}
+
+	my $mem_addr = ($data[1] << 8) + $data[2];
+	my @mem_data = @data[3..6];
+
+	return sprintf("$cmd $direction 0x%02x: \@0x%04x $assign %s",
+			$addr, $mem_addr, join ' ', map { sprintf "%02x", $_; } @mem_data);
+}; # }}}
+
+push @parser, sub { # Memory Block Request {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 3;
+	return undef unless $data[0] == 0xc9;
+
+	my $mem_addr = ($data[1] << 8) + $data[2];
+
+	return sprintf("MemoryBlockRequest to 0x%02x: start address 0x%04x",
+			$addr, $mem_addr);
+}; # }}}
+
+push @parser, sub { # Memory Data {,Write} {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 4;
+
+	my ($cmd, $direction, $assign);
+	if( $data[0] == 0xfe ) {
+		$cmd = "MemoryData";
+		$direction = "from";
+		$assign = "=";
+	} elsif( $data[0] == 0xfc ) {
+		$cmd = "MemoryDataWrite";
+		$direction = "to";
+		$assign = "<=";
+	} else {
+		return undef;
+	}
+
+	my $mem_addr = ($data[1] << 8) + $data[2];
+	my $mem_data = $data[3];
+
+	return sprintf("$cmd $direction 0x%02x: \@0x%04x $assign 0x%02x",
+			$addr, $mem_addr, $mem_data);
+}; # }}}
+
+push @parser, sub { # Memory Data Request {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 3;
+	return undef unless $data[0] == 0xfd;
+
+	my $mem_addr = ($data[1] << 8) + $data[2];
+
+	return sprintf("MemoryDataRequest to 0x%02x: Address 0x%04x",
+			$addr, $mem_addr);
+}; # }}}
+
+push @parser, sub { # Memory Dump Request {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 1;
+	return undef unless $data[0] == 0xcb;
+
+	return sprintf("MemoryDumpRequest to 0x%02x", $addr);
+}; # }}}
+
+push @parser, sub { # Module Status (5-byte version) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 5;
+	return undef unless $data[0] == 0xed;
+
+	my $input_status = $data[1];
+	my $leds_on = $data[2];
+	my $leds_slow_blink = $data[3];
+	my $leds_fast_blink = $data[4];
+
+	return sprintf("ModuleStatus from 0x%02x: inputs=0b%s LEDs: cont=0b%s slow=0b%s fast=0b%s",
+			$addr, binary($input_status), binary($leds_on),
+			binary($leds_slow_blink), binary($leds_fast_blink) );
+}; # }}}
+
+push @parser, sub { # Module Status (7-byte version) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 7;
+	return undef unless $data[0] == 0xed;
+
+	my $input_status        = $data[1];
+	my $enabled_status      = $data[2];
+	my $not_inverted_status = $data[3];
+	my $locked_status       = $data[4];
+	my $program_disabled    = $data[5];
+
+	my $program       = enum( $data[6] & 0x03,
+			0=>"None", 1=>"Summer", 2=>"Winter", 3=>"Holiday" );
+	my $alarm1        = $data[6] & 0x04 ? "on" : "off";
+	my $alarm1_global = $data[6] & 0x80 ? "global" : "local";
+	my $alarm2        = $data[6] & 0x10 ? "on" : "off";;
+	my $alarm2_global = $data[6] & 0x20 ? "global" : "local";
+	my $sunrise       = $data[6] & 0x40 ? "enabled" : "disabled";
+	my $sunset        = $data[6] & 0x80 ? "enabled" : "disabled";
+
+	return sprintf("ModuleStatus from 0x%02x: inputs=0b%s enabled=0b%s " .
+			"noninverted=0b%s locked=0b%s progdisabled=0b%s " .
+			"program=$program Alarms: 1($alarm1 $alarm1_global) " .
+			"2($alarm2 $alarm2_global)  " .
+			"Sunrise $sunrise Sunset $sunset",
+			$addr, binary($input_status), binary($enabled_status),
+			binary($not_inverted_status), binary($locked_status),
+			binary($program_disabled));
+}; # }}}
+
+push @parser, sub { # Module Status Request {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 2;
+	return undef unless $data[0] == 0xfa;
+
+	my $what = enum( $data[1],
+			0x00 => "generic",
+			0x03 => "Blind=1",
+			0x0c => "Blind=2",
+			0x01 => "Relay=1",
+			0x02 => "Relay=2",
+			0x04 => "Relay=3",
+			0x08 => "Relay=4",
+			0x10 => "Relay=5",
+		);
+
+	return sprintf("ModuleStatusRequest to 0x%02x: $what", $addr);
+}; # }}}
+
+# TODO: ModuleType
+
+push @parser, sub { # Name {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+
+	my $part;
+	if( $data[0] == 0xf0 && @data == 8 ) {
+		$part = 0;
+	} elsif( $data[0] == 0xf1 && @data == 8 ) {
+		$part = 1;
+	} elsif( $data[0] == 0xf2 && @data == 6 ) {
+		$part = 2;
+	} else {
+		return undef;
+	}
+
+	my $channel = $data[1];
+	my $name = substr $data, 2;
+	$name =~ s/\xff.*//;
+
+	return sprintf("Name from 0x%02x: Item %s pt%d/3 \"$name\"",
+			$addr, binary($channel), $part);
+}; # }}}
+
+push @parser, sub { # Name Request {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 2;
+	return undef unless $data[0] == 0xef;
+
+	my $what = enum($data[1],
+			0x01 => "Relay/Pushbutton 1",
+			0x02 => "Relay/Pushbutton 1",
+			0x04 => "Relay/Pushbutton 1",
+			0x08 => "Relay/Pushbutton 1",
+			0x10 => "Relay/Pushbutton 1",
+			0x20 => "Relay/Pushbutton 1",
+			0x40 => "Relay/Pushbutton 1",
+			0x80 => "Relay/Pushbutton 1",
+			0x03 => "Blind 1",
+			0x0c => "Blind 2",
+		);
+
+	return sprintf("NameRequest to 0x%02x: $what", $addr);
+}; # }}}
+
+push @parser, sub { # Push Button Status {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 4;
+	return undef unless $data[0] == 0x00;
+
+	my $just_pressed = $data[1];
+	my $just_released = $data[2];
+	my $long_pressed = $data[3];
+
+	return sprintf("PushButtonStatus from 0x%02x: on=%s long=%s off=%s",
+			$addr, binary($just_pressed), binary($just_released),
+			binary($long_pressed));
+}; # }}}
+
+push @parser, sub { # RTC status {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 4;
+	return undef unless $data[0] == 0xd8;
+
+	my $day = enum( $data[1],
+			0 => "Monday",
+			1 => "Tuesday",
+			2 => "Wednesday",
+			3 => "Thursday",
+			4 => "Friday",
+			5 => "Saturday",
+			6 => "Sunday",
+		);
+	my $hour = $data[2];
+	my $min = $data[3];
+
+	return sprintf("RTCstatus to 0x%02x: %s %d:%02d",
+			$addr, $day, $hour, $min);
+}; # }}}
+
+push @parser, sub { # Relay Status {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 8;
+	return undef unless $data[0] == 0xfb;
+
+	my $relay_num = enum( $data[1],
+			0x01 => 1,
+			0x02 => 2,
+			0x04 => 3,
+			0x08 => 4,
+			0x10 => 5,
+		);;
+	my $channel_mode = enum( $data[2],
+			0 => "normal",
+			1 => "inhibited",
+			2 => "forced on",
+			3 => "disabled",
+		);
+	my $relay_status = enum( $data[3],
+			0 => "off",
+			1 => "on",
+			3 => "interval",
+		);
+	my $led_status = enum( $data[4],
+			0x00 => "off",
+			0x80 => "on",
+			0x40 => "SlowBlink",
+			0x20 => "FastBlink",
+			0x10 => "VFastBlink",
+		);
+	my $timer = ($data[5] << 16) + ($data[6] << 8) + $data[7];
+
+	return sprintf("RelayStatus of 0x%02x / %d : relay=%s status=%s LED=%s " .
+			"timer=%d",
+			$addr, $relay_num, $relay_status, $channel_mode, $led_status,
+			$timer);
+}; # }}}
+
+push @parser, sub { # Sensor Temp {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 7;
+	return undef unless $data[0] == 0xe6;
+
+	my $temp_cur = ( ($data[1]<<8) + $data[2] ) / 512;
+	my $temp_min = ( ($data[3]<<8) + $data[4] ) / 512;
+	my $temp_max = ( ($data[5]<<8) + $data[6] ) / 512;
+
+	return sprintf("SensorTemp from 0x%02x: Current=%3.2fC Min=%3.2fC Max=%3.2fC",
+			$addr, $temp_cur, $temp_min, $temp_max);
+}; # }}}
+
+push @parser, sub { # Sensor Temp Request {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 2;
+	return undef unless $data[0] == 0xe5;
+
+	my $autosend;
+	if( $data[1] == 0 ) {
+		$autosend = "disabled";
+	} elsif( $data[1] <= 0 ) {
+		$autosend = "onChange";
+	} else {
+		$autosend = $data[1] . "sec";
+	}
+
+	return sprintf("SensorTempRequest to 0x%02x: AutoSend %s", $addr, $autosend);
+}; # }}}
+
+
 
 
 
