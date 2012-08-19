@@ -217,7 +217,7 @@ exports.add_watchers = function(velbus, state, config) {
 		state.set( msg.id + '.temp_mode', msg['operating mode']['temperature mode'] );
 		state.set( msg.id + '.prog_temp_mode', msg['program step']['received'] );
 		state.set( msg.id + '.sleep_timer', { 'value': msg['sleep timer'], 'ref': +new Date() });
-
+		state.set( msg.id + '.target_temp', msg['target temperature'] );
 	});
 	velbus.on('sensor temperature', function(msg) {
 		state.set( msg.id + '.temperature', msg['current temperature']);

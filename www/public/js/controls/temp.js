@@ -60,7 +60,8 @@ Temp.prototype.update = function(attr) {
 		} else if( that.state['schedule_mode'] == "manual" ) {
 			reason = "manual";
 		}
-		that.div.find('div.temp span.state').text( that.state['temp_mode'] + ', ' +
+		that.div.find('div.temp span.state').text( that.state['temp_mode'] +
+				' (' + that.state['target_temp'] + 'ºC), ' +
 				reason);
 	};
 	clearInterval( this.interval.state ); this.interval.state = undefined;
