@@ -535,7 +535,102 @@ push @parser, sub { # Switch To Mode {{{
 			$addr, $mode);
 }; # }}}
 
-# TODO: TempSensorStatus
+push @parser, sub { # Temp Sensor Status {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 8;
+	return undef unless $data[0] == 0xea;
+
+	my $s = Struct("TSS",
+		Magic("\xea"),
+		BitStruct("operating mode",
+			Bit("cooler mode"),
+			BitField("mode2", 3),
+			Bit("auto send sensor temp"),
+			BitField("mode", 2),
+			Bit("push button locked"),
+		),
+		BitStruct("program step mode",
+			Bit("all program"),
+			BitField("program step", 3),
+			Bit("zone program"),
+			Bit("sensor program"),
+			Bit("unjamming valve"),
+			Bit("unjamming pump"),
+		),
+		BitStruct("output status",
+			Bit("reserved"),
+			Bit("high alarm"),
+			Bit("low alarm"),
+			Bit("pump"),
+			Bit("cooler"),
+			Bit("day"),
+			Bit("boost"),
+			Bit("valve"),
+		),
+		Byte("temp halfC"),
+		Value("temp C", sub { $_->ctx->{"temp halfC"} * 0.5; } ),
+		Byte("target temp halfC"),
+		Value("target temp C", sub { $_->ctx->{"target temp halfC"} * 0.5; } ),
+		UBInt16("timer"),
+	)->parse($data);
+
+	$s->{"operating mode"}->{"mode"} = enum( $s->{"operating mode"}->{"mode"},
+			0 => "run",
+			1 => "manual",
+			2 => "timer",
+			3 => "disable",
+		);
+	my %mode = (
+			0 => "safe",
+			1 => "night",
+			2 => "day",
+			4 => "comfort",
+		);
+	$s->{"operating mode"}->{"mode2"} = enum( $s->{"operating mode"}->{"mode2"},
+			%mode
+		);
+	$s->{"program step mode"}->{"program step"} = enum( $s->{"program step mode"}->{"program step"},
+			%mode
+		);
+
+	return sprintf("TempSensorStatus from 0x%02x:" .
+			" PB=" . ( $s->{"operating mode"}->{"push button locked"} ? "locked" : "unlocked" ) .
+			" Mode=" . $s->{"operating mode"}->{"mode"} .
+			" AutoSend=" . ( $s->{"operating mode"}->{"auto send sensor temp"} ? "on" : "off" ) .
+			" Mode=" . $s->{"operating mode"}->{"mode2"} .
+			" " . ( $s->{"operating mode"}->{"cooler"} ? "Cooler" : "Heater" ) .
+			" Unjam={" .
+				( $s->{"program step mode"}->{"unjamming pump"} ? "pump" : "no_pump" ) .
+				" " .
+				( $s->{"program step mode"}->{"unjamming valve"} ? "valve" : "no_valve" ) .
+			"}" .
+			" Program={" .
+				( $s->{"program step mode"}->{"all program"} ? "all" : "no_all" ) .
+				" " .
+				( $s->{"program step mode"}->{"all zone"} ? "zone" : "no_zone" ) .
+				" " .
+				( $s->{"program step mode"}->{"all sensor"} ? "sensor" : "no_sensor" ) .
+			"}" .
+			" ProgramStep=" . $s->{"program step mode"}->{"program step"} .
+			" Output={" .
+				( $s->{"output status"}->{"valve"} ? "valve" : "no_valve" ) .
+				" " .
+				( $s->{"output status"}->{"boost"} ? "boost" : "no_boost" ) .
+				" " .
+				( $s->{"output status"}->{"day"} ? "day" : "no_day" ) .
+				" " .
+				( $s->{"output status"}->{"cooler"} ? "cooler" : "no_cooler" ) .
+				" " .
+				( $s->{"output status"}->{"pump"} ? "pump" : "no_pump" ) .
+				" " .
+				( $s->{"output status"}->{"low alarm"} ? "low_alarm" : "no_low_alarm" ) .
+				" " .
+				( $s->{"output status"}->{"high alarm"} ? "high_alarm" : "no_high_alarm" ) .
+			"}" .
+			" Temp=%2.1fC Target=%2.1fC Timer=%d",
+			$addr, $s->{"temp C"}, $s->{"target temp C"}, $s->{"timer"});
+}; # }}}
 
 push @parser, sub { # Update LEDs {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
