@@ -25,7 +25,7 @@ push @parser, sub { # Module Type Request {{{
 	return sprintf("ModuleTypeRequest to 0x%02x", $addr);
 }; # }}}
 
-push @parser, sub { # Blind Status {{{
+push @parser, sub { # Blind Status (0xec) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 8;
@@ -49,7 +49,7 @@ push @parser, sub { # Blind Status {{{
 			$addr, $channel, $timeout, $status1, $status2, $led, $timer);
 }; # }}}
 
-push @parser, sub { # Bus Error Counter {{{
+push @parser, sub { # Bus Error Counter (0xda) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 4;
@@ -63,7 +63,7 @@ push @parser, sub { # Bus Error Counter {{{
 			$addr, $tx_errors, $rx_errors, $bus_off);
 }; # }}}
 
-push @parser, sub { # Bus Error Counter Request {{{
+push @parser, sub { # Bus Error Counter Request (0xd9) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 1;
@@ -72,7 +72,7 @@ push @parser, sub { # Bus Error Counter Request {{{
 	return sprintf("BusErrorCounterRequest to 0x%02x", $addr);
 }; # }}}
 
-push @parser, sub { # {Clear,Set,SlowBlink,FastBlink,VFastBlink} Leds {{{
+push @parser, sub { # {Clear,Set,SlowBlink,FastBlink,VFastBlink} Leds (0xf5, 0xf6, 0xf7, 0xf8, 0xf9) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 2;
@@ -97,7 +97,7 @@ push @parser, sub { # {Clear,Set,SlowBlink,FastBlink,VFastBlink} Leds {{{
 	return sprintf("$cmd to 0x%02x: %s", $addr, binary($leds) );
 }; # }}}
 
-push @parser, sub { # Memory Block {,Write} {{{
+push @parser, sub { # Memory Block {,Write} (0xcc, 0xca) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 7;
@@ -122,7 +122,7 @@ push @parser, sub { # Memory Block {,Write} {{{
 			$addr, $mem_addr, join ' ', map { sprintf "%02x", $_; } @mem_data);
 }; # }}}
 
-push @parser, sub { # Memory Block Request {{{
+push @parser, sub { # Memory Block Request (0xc9) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 3;
@@ -134,7 +134,7 @@ push @parser, sub { # Memory Block Request {{{
 			$addr, $mem_addr);
 }; # }}}
 
-push @parser, sub { # Memory Data {,Write} {{{
+push @parser, sub { # Memory Data {,Write} (0xfe, 0xfc) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 4;
@@ -159,7 +159,7 @@ push @parser, sub { # Memory Data {,Write} {{{
 			$addr, $mem_addr, $mem_data);
 }; # }}}
 
-push @parser, sub { # Memory Data Request {{{
+push @parser, sub { # Memory Data Request (0xfd) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 3;
@@ -171,7 +171,7 @@ push @parser, sub { # Memory Data Request {{{
 			$addr, $mem_addr);
 }; # }}}
 
-push @parser, sub { # Memory Dump Request {{{
+push @parser, sub { # Memory Dump Request (0xcb) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 1;
@@ -180,7 +180,7 @@ push @parser, sub { # Memory Dump Request {{{
 	return sprintf("MemoryDumpRequest to 0x%02x", $addr);
 }; # }}}
 
-push @parser, sub { # Module Status (5-byte version) {{{
+push @parser, sub { # Module Status (0xed, 5-byte version) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 5;
@@ -196,7 +196,7 @@ push @parser, sub { # Module Status (5-byte version) {{{
 			binary($leds_slow_blink), binary($leds_fast_blink) );
 }; # }}}
 
-push @parser, sub { # Module Status (7-byte version) {{{
+push @parser, sub { # Module Status (0xed, 7-byte version) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 7;
@@ -227,7 +227,7 @@ push @parser, sub { # Module Status (7-byte version) {{{
 			binary($program_disabled));
 }; # }}}
 
-push @parser, sub { # Module Status Request {{{
+push @parser, sub { # Module Status Request (0xfa) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 2;
@@ -247,9 +247,49 @@ push @parser, sub { # Module Status Request {{{
 	return sprintf("ModuleStatusRequest to 0x%02x: $what", $addr);
 }; # }}}
 
-# TODO: ModuleType
+push @parser, sub { # Module Type (0xff) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data >= 2;
+	return undef unless $data[0] == 0xff;
 
-push @parser, sub { # Name {{{
+	my $descr;
+	if( $data[1] == 0x09 ) { # VMB2BL {{{
+		return undef unless @data == 5;
+
+		my %timeout = ( 0 => "15s", 1 => "30s", 2 => "1m", 3 => "2m" );
+		my $timeout1 = enum( $data[2] & 0x03, %timeout );
+		my $timeout2 = enum( ($data[2] >> 2) & 0x03, %timeout );
+		my $build_year = $data[3];
+		my $build_week = $data[4];
+
+		$descr = "VMB2BL  Timeout blind 1=$timeout1 blind 2=$timeout2" .
+			" Build $build_year-W$build_week";
+
+	} # }}}
+	elsif( $data[1] == 0x11 ) { # VMB4RYNO {{{
+		return undef unless @data == 7;
+
+		my $sn = ($data[2] << 8) + $data[3];
+		my $mmap = $data[4];
+		my $build_year = $data[5];
+		my $build_week = $data[6];
+
+		$descr = sprintf "VMB4RYNO  S/N: 0x%04x mmap v$mmap" .
+			" Build $build_year-W$build_week",
+			$sn;
+
+	} # }}}
+	else { # {{{
+		$descr = sprintf "Unknown module [0x%02x] Data[%d]: %s",
+			$data[1], scalar(@data)-2,
+			join ' ', map { sprintf "%02x", $_ } @data[2..@data-1];
+	} # }}}
+
+	return sprintf("ModuleType from 0x%02x: $descr", $addr);
+}; # }}}
+
+push @parser, sub { # Name (0xf0, 0xf1, 0xf2) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 
@@ -272,7 +312,7 @@ push @parser, sub { # Name {{{
 			$addr, binary($channel), $part);
 }; # }}}
 
-push @parser, sub { # Name Request {{{
+push @parser, sub { # Name Request (0xef) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 2;
@@ -294,7 +334,7 @@ push @parser, sub { # Name Request {{{
 	return sprintf("NameRequest to 0x%02x: $what", $addr);
 }; # }}}
 
-push @parser, sub { # Push Button Status {{{
+push @parser, sub { # Push Button Status (0x00) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 4;
@@ -309,7 +349,7 @@ push @parser, sub { # Push Button Status {{{
 			binary($long_pressed));
 }; # }}}
 
-push @parser, sub { # RTC status {{{
+push @parser, sub { # RTC status (0xd8) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 4;
@@ -331,7 +371,7 @@ push @parser, sub { # RTC status {{{
 			$addr, $day, $hour, $min);
 }; # }}}
 
-push @parser, sub { # Relay Status {{{
+push @parser, sub { # Relay Status (0xfb) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 8;
@@ -370,7 +410,7 @@ push @parser, sub { # Relay Status {{{
 			$timer);
 }; # }}}
 
-push @parser, sub { # Sensor Temp {{{
+push @parser, sub { # Sensor Temp (0xe6) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 7;
@@ -384,7 +424,7 @@ push @parser, sub { # Sensor Temp {{{
 			$addr, $temp_cur, $temp_min, $temp_max);
 }; # }}}
 
-push @parser, sub { # Sensor Temp Request {{{
+push @parser, sub { # Sensor Temp Request (0xe5) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 2;
@@ -402,7 +442,7 @@ push @parser, sub { # Sensor Temp Request {{{
 	return sprintf("SensorTempRequest to 0x%02x: AutoSend %s", $addr, $autosend);
 }; # }}}
 
-push @parser, sub { # Start Relay {,Interval} Timer {{{
+push @parser, sub { # Start Relay {,Interval} Timer (0x03, 0x0d) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 5;
@@ -430,7 +470,7 @@ push @parser, sub { # Start Relay {,Interval} Timer {{{
 			$addr, $relay, $timeout);
 }; # }}}
 
-push @parser, sub { # Switch Blind Off {{{
+push @parser, sub { # Switch Blind Off (0x04) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 2;
@@ -445,7 +485,7 @@ push @parser, sub { # Switch Blind Off {{{
 			$addr, $blind);
 }; # }}}
 
-push @parser, sub { # Switch Blind {Up,Down} {{{
+push @parser, sub { # Switch Blind {Up,Down} (0x05, 0x06) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 5;
@@ -476,7 +516,7 @@ push @parser, sub { # Switch Blind {Up,Down} {{{
 			$addr, $blind);
 }; # }}}
 
-push @parser, sub { # Switch Relay {On,Off} {{{
+push @parser, sub { # Switch Relay {On,Off} (0x01, 0x02) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 2;
@@ -502,7 +542,7 @@ push @parser, sub { # Switch Relay {On,Off} {{{
 			$addr, $relay);
 }; # }}}
 
-push @parser, sub { # Switch To Mode {{{
+push @parser, sub { # Switch To Mode (0xdb, 0xdc, 0xdd, 0xde) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 3;
@@ -535,7 +575,7 @@ push @parser, sub { # Switch To Mode {{{
 			$addr, $mode);
 }; # }}}
 
-push @parser, sub { # Temp Sensor Status {{{
+push @parser, sub { # Temp Sensor Status (0xea) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 8;
@@ -632,7 +672,7 @@ push @parser, sub { # Temp Sensor Status {{{
 			$addr, $s->{"temp C"}, $s->{"target temp C"}, $s->{"timer"});
 }; # }}}
 
-push @parser, sub { # Update LEDs {{{
+push @parser, sub { # Update LEDs (0xf4) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 4;
@@ -657,7 +697,7 @@ push @parser, sub { # Update LEDs {{{
 			binary($fblink), binary($vfblink) );
 }; # }}}
 
-push @parser, sub { # Write Address {{{
+push @parser, sub { # Write Address (0x6a) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
 	return undef unless @data == 7;
