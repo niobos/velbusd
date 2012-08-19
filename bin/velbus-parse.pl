@@ -464,10 +464,14 @@ push @parser, sub { # Start Relay {,Interval} Timer (0x03, 0x0d) {{{
 			0x10 => "5",
 		);
 	my $timeout = ($data[2] << 16) + ($data[3] << 8) + $data[4];
-	$timeout = "permanent" if $timeout == 0xffffff;
+	if( $timeout == 0xffffff ) {
+		$timeout = "permanent";
+	} else {
+		$timeout = sprintf "%ds", $timeout;
+	}
 
-	return sprintf("$cmd to 0x%02x: Relay=%s Timeout=%ds",
-			$addr, $relay, $timeout);
+	return sprintf("$cmd to 0x%02x: Relay=%s Timeout=$timeout",
+			$addr, $relay);
 }; # }}}
 
 push @parser, sub { # Switch Blind Off (0x04) {{{
