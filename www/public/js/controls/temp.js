@@ -33,7 +33,6 @@ Temp.prototype.show = function() {
 
 Temp.prototype.update = function(attr) {
 	var d = Unknown.prototype.update.call(this, attr);
-	var now = +new Date();
 
 	switch( this.state.output.valve ) {
 	case "on":	this.div.addClass('heating'); break;
@@ -46,6 +45,7 @@ Temp.prototype.update = function(attr) {
 
 	var that = this;
 	var update_state = function() {
+		var now = +new Date();
 		var reason = '?';
 		if( that.state['schedule_mode'] == "run" ) {
 			if( that.state['prog_temp_mode'] == that.state['temp_mode'] ) {
