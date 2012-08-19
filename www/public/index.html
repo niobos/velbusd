@@ -208,6 +208,41 @@
    </script>
    <script src="js/controls.js"></script>
   </div>
+  <div id="macros">
+   <input type="button" id="macro-all-lights-off" value="All lights off" />
+   <script language="javascript">
+	$("#macro-all-lights-off").click(function() {
+		for( var id in velbus_state ) {
+			if( velbus_state[id].type == "light" ) {
+				$.ajax({
+					type: 'POST',
+					url: 'control/relay/' + id + "/status",
+					data: 'off',
+				});
+			}
+		}
+		return false;
+	});
+   </script><br/>
+   <input type="button" id="macro-all-blinds-up" value="All blinds up" /><br/>
+   <input type="button" id="macro-all-blinds-down" value="All blinds down" />
+   <script language="javascript">
+	function macro_all_blinds( status ) {
+		for( var id in velbus_state ) {
+			if( velbus_state[id].type == "blind" ) {
+				$.ajax({
+					type: 'POST',
+					url: 'control/blind/' + id + "/status",
+					data: status,
+				});
+			}
+		}
+		return false;
+	}
+	$("#macro-all-blinds-up").click(function() { macro_all_blinds('up'); });
+	$("#macro-all-blinds-down").click(function() { macro_all_blinds('down'); });
+   </script>
+  </div>
   <div class="state">
    <div id="socket"></div>
    <div id="timesync"></div>
