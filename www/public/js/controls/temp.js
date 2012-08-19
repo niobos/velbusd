@@ -31,7 +31,7 @@ Temp.prototype.show = function() {
 Temp.prototype.update = function(attr) {
 	var d = Unknown.prototype.update.call(this, attr);
 
-	switch( this.state.output.heater ) {
+	switch( this.state.output.valve ) {
 	case "on":	this.div.addClass('heating'); break;
 	case "off":	this.div.removeClass('heating'); break;
 	}

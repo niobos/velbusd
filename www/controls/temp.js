@@ -212,7 +212,7 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 
 exports.add_watchers = function(velbus, state, config) {
 	velbus.on('temp sensor status', function(msg) {
-		state.set( msg.id + '.output.heater', msg.output.heater);
+		state.set( msg.id + '.output.valve', msg.output.valve);
 	});
 	velbus.on('sensor temperature', function(msg) {
 		state.set( msg.id + '.temperature', msg['current temperature']);
