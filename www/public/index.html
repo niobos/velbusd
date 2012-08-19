@@ -192,10 +192,12 @@
 	}
 	newSockJSconn();
 
-	my_server_time_delta = 0;
+	my_server_time_delta = +new Date();
 	$.ajax({url: '/now', dataType: 'json' })
 		.success(function(data) {
-			my_server_time_delta = +new Date();
+			my_server_time_delta += +new Date();
+			my_server_time_delta /= 2; // Average time between start & end of ajax call
+
 			my_server_time_delta -= parseInt(data);
 
 			$("#timesync").text("Synced clock with server: offset = " +
