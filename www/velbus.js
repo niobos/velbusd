@@ -5,6 +5,8 @@ var events = require('events'),
 var velbus = function(host, port) {
 	var that = this;
 	events.EventEmitter.call(this); // Inherit EventEmitter
+	this.setMaxListeners(256);
+
 	that.host = host;
 	that.port = port;
 	that.retry_after_ms = 1000;
