@@ -212,7 +212,12 @@ webapp.get(/\/graph\/temp\/([0-9a-fA-F]{2})$/, function(req, res, next) {
 
 exports.add_watchers = function(velbus, state, config) {
 	velbus.on('temp sensor status', function(msg) {
-		state.set( msg.id + '.output.valve', msg.output.valve);
+		state.set( msg.id + '.output.valve', msg.output.valve );
+		state.set( msg.id + '.schedule_mode', msg['operating mode']['schedule mode'] );
+		state.set( msg.id + '.temp_mode', msg['operating mode']['temperature mode'] );
+		state.set( msg.id + '.prog_temp_mode', msg['program step']['received'] );
+		state.set( msg.id + '.sleep_timer', { 'value': msg['sleep timer'], 'ref': +new Date() });
+
 	});
 	velbus.on('sensor temperature', function(msg) {
 		state.set( msg.id + '.temperature', msg['current temperature']);
