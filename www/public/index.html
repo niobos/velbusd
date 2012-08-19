@@ -78,6 +78,7 @@
 		this.state = state;
 		this.div = $('<div class="icon"/>').attr('id', this.id)
 				.addClass(state.type)
+				.addClass(state.icon)
 				.css('left', state.coords[coord].left)
 				.css('top', state.coords[coord].top)
 				.click(function(e) {
@@ -213,7 +214,7 @@
    <script language="javascript">
 	$("#macro-all-lights-off").click(function() {
 		for( var id in velbus_state ) {
-			if( velbus_state[id].type == "light" ) {
+			if( velbus_state[id].icon == "light" ) {
 				$.ajax({
 					type: 'POST',
 					url: 'control/relay/' + id + "/status",

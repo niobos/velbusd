@@ -97,8 +97,7 @@ exports.add_watchers = function(velbus, state, config) {
 
 	// And initialize the current status of all relays in config
 	for(var control in config.controls) {
-		if( config.controls[control].type != "light"
-		 && config.controls[control].type != "relay" ) continue;
+		if( config.controls[control].type != "relay" ) continue;
 
 		velbus.once('connect', function(id, control) { return function() {
 			// Closure with id and control

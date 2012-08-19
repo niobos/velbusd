@@ -1,6 +1,9 @@
 $('<style type="text/css">' +
 		'div.icon.light { background-image: url(images/light-on.svg) }' +
 		'div.icon.light.off { background-image: url(images/light-off.svg) }' +
+
+		'div.icon.fan.on { background-image: url(images/fan-ani.svg) }' +
+		'div.icon.fan { background-image: url(images/fan.svg) }' +
 	'</style>').appendTo("head");
 
 var Relay = function(addr, state, coord) {
@@ -115,8 +118,8 @@ Relay.prototype.update = function(attr) {
 	var d = Unknown.prototype.update.call(this, attr);
 
 	switch( this.state.status ) {
-	case true:	this.div.removeClass('off'); break;
-	case false:	this.div.addClass('off'); break;
+	case true:	this.div.removeClass('off').addClass("on"); break;
+	case false:	this.div.addClass('off').removeClass("on"); break;
 	}
 
 	if( d == "not displayed" ) return d;
@@ -147,5 +150,4 @@ Relay.prototype.update = function(attr) {
 
 }
 
-constructors["light"] = Relay;
 constructors["relay"] = Relay;

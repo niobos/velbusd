@@ -18,7 +18,14 @@ exports.controls = {
 	"0a-1": {
 		"name": "Master bedroom light",
 		"coords": [ {"left": 590, "top": 270} ],
-		"type": "light"
+		"type": "relay",
+		"icon": "light"
+	},
+	"0a-2": {
+		"name": "Master bedroom fan",
+		"coords": [ {"left": 560, "top": 270} ],
+		"type": "relay",
+		"icon": "fan"
 	},
 	"01-1": {
 		"name": "Master bedroom blind",
