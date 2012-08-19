@@ -402,6 +402,182 @@ push @parser, sub { # Sensor Temp Request {{{
 	return sprintf("SensorTempRequest to 0x%02x: AutoSend %s", $addr, $autosend);
 }; # }}}
 
+push @parser, sub { # Start Relay {,Interval} Timer {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 5;
+
+	my $cmd;
+	if( $data[0] == 0x03 ) {
+		$cmd = "StartRelayTimer";
+	} elsif( $data[0] == 0x0d ) {
+		$cmd = "StartRelayIntervalTimer";
+	} else {
+		return undef;
+	}
+
+	my $relay = enum( $data[1],
+			0x01 => "1",
+			0x02 => "2",
+			0x04 => "3",
+			0x08 => "4",
+			0x10 => "5",
+		);
+	my $timeout = ($data[2] << 16) + ($data[3] << 8) + $data[4];
+	$timeout = "permanent" if $timeout == 0xffffff;
+
+	return sprintf("$cmd to 0x%02x: Relay=%s Timeout=%ds",
+			$addr, $relay, $timeout);
+}; # }}}
+
+push @parser, sub { # Switch Blind Off {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 2;
+	return undef unless $data[0] == 0x04;
+
+	my $blind = enum( $data[1],
+			0x03 => "1",
+			0x0c => "2",
+		);
+
+	return sprintf("SwitchBlindOff to 0x%02x: Blind=%s",
+			$addr, $blind);
+}; # }}}
+
+push @parser, sub { # Switch Blind {Up,Down} {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 5;
+
+	my $cmd;
+	if( $data[0] == 0x05 ) {
+		$cmd = "SwitchBlindUp";
+	} elsif( $data[0] == 0x06 ) {
+		$cmd = "SwitchBlindDown";
+	} else {
+		return undef;
+	}
+
+	my $blind = enum( $data[1],
+			0x03 => "1",
+			0x0c => "2",
+		);
+	my $timeout = ($data[2] << 16) + ($data[3] << 8) + $data[4];
+	if( $timeout == 0 ) {
+		$timeout = "default";
+	} elsif( $timeout == 0xffffff ) {
+		$timeout = "permanent";
+	} else {
+		$timeout = sprintf "%ds", $timeout;
+	}
+
+	return sprintf("$cmd to 0x%02x: Blind=%s Timeout=$timeout",
+			$addr, $blind);
+}; # }}}
+
+push @parser, sub { # Switch Relay {On,Off} {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 2;
+
+	my $cmd;
+	if( $data[0] == 0x01 ) {
+		$cmd = "SwitchRelayOff";
+	} elsif( $data[0] == 0x02 ) {
+		$cmd = "SwitchRelayOn";
+	} else {
+		return undef;
+	}
+
+	my $relay = enum( $data[1],
+			0x01 => "1",
+			0x02 => "2",
+			0x04 => "3",
+			0x08 => "4",
+			0x10 => "5",
+		);
+
+	return sprintf("$cmd to 0x%02x: Relay=%s",
+			$addr, $relay);
+}; # }}}
+
+push @parser, sub { # Switch To Mode {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 3;
+
+	my $mode;
+	if( $data[0] == 0xdb ) {
+		$mode = "comfort";
+	} elsif( $data[0] == 0xdc ) {
+		$mode = "day";
+	} elsif( $data[0] == 0xdd ) {
+		$mode = "night";
+	} elsif( $data[0] == 0xde ) {
+		$mode = "safe";
+	} else {
+		return undef;
+	}
+
+	my $timer = ($data[1] << 8) + $data[2];
+	if( $timer == 0 ) {
+		$timer = "Cancel";
+	} elsif( $timer == 0xff00 ) {
+		$timer = "Program step";
+	} elsif( $timer == 0xffff ) {
+		$timer = "Manual";
+	} else {
+		$timer = sprintf "%dsec", $timer;
+	}
+
+	return sprintf("SwitchToMode to 0x%02x: switch to %s; Timer: $timer",
+			$addr, $mode);
+}; # }}}
+
+# TODO: TempSensorStatus
+
+push @parser, sub { # Update LEDs {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 4;
+	return undef unless $data[0] == 0xf4;
+
+	my $on = $data[1];
+	my $sblink = $data[2];
+	my $fblink = $data[3];
+
+	# "The continuous on bit overrides the blinking modes"
+	$sblink &= ~$on;
+	$fblink &= ~$on;
+	# "If the slow and fast blinking bits for a LED are both on, the LED
+	#  blinks very fast."
+	my $vfblink = $sblink & $fblink;
+	$sblink &= ~$vfblink;
+	$fblink &= ~$vfblink;
+
+	return sprintf("UpdateLeds to 0x%02x: on=%s slowblink=%s fastblink=%s " .
+			"veryfastblink=%s",
+			$addr, binary($on), binary($sblink),
+			binary($fblink), binary($vfblink) );
+}; # }}}
+
+push @parser, sub { # Write Address {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 7;
+	return undef unless $data[0] == 0x6a;
+
+	my $module_type = $data[1];
+	my $cur_sn = ($data[2] << 8) + $data[3];
+	my $new_addr = $data[4];
+	my $new_sn = ($data[5] << 8) + $data[6];
+
+	return sprintf("WriteAddr to 0x%02x: Current S/N: 0x%04x  " .
+			"New addr: 0x%02x  New S/N: 0x%04x",
+			$addr, $cur_sn, $new_addr, $new_sn);
+}; # }}}
+
 
 
 
