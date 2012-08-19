@@ -54,6 +54,10 @@
 	div.popover span.tech {
 		font-size: 0.75em;
 	}
+
+	div.state {
+		font-size: 0.8em;
+	}
   </style>
   </head>
  <body>
@@ -130,6 +134,7 @@
 	}
 
 	function onSockJSmessage(e) {
+		$("#socket").text(new Date() + ": last message");
 		var d = JSON.parse(e.data);
 		if( d.changetype == 'new' ) {
 			velbus_state = d.value;
@@ -174,12 +179,12 @@
 	function newSockJSconn() {
 		var sockjs = new SockJS('/events');
 		sockjs.onopen = function() {
-			console.log("SockJS connected");
+			$("#socket").text(new Date() + ": connected");
 			this.onmessage = onSockJSmessage;
 			SockJS_retry_wait = 100;
 		};
 		sockjs.onclose = function() {
-			console.log("SockJS closed, reconnecting in " + SockJS_retry_wait);
+			$("#socket").text(new Date() + ": disconnected");
 			setTimeout(function() { newSockJSconn() }, SockJS_retry_wait);
 			SockJS_retry_wait *= 2; // Exponential backoff
 			SockJS_retry_wait = Math.min(SockJS_retry_wait, 128000); // With a limit of 2 minutes
@@ -192,10 +197,18 @@
 		.success(function(data) {
 			my_server_time_delta = +new Date();
 			my_server_time_delta -= parseInt(data);
+
+			$("#timesync").text("Synced clock with server: offset = " +
+				my_server_time_delta + "ms; time of sync: " +
+				new Date() );
 		});
 
    </script>
    <script src="js/controls.js"></script>
+  </div>
+  <div class="state">
+   <div id="socket"></div>
+   <div id="timesync"></div>
   </div>
  </body>
 </html>

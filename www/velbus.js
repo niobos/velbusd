@@ -9,6 +9,7 @@ var velbus = function(host, port) {
 	that.port = port;
 	that.retry_after_ms = 1000;
 
+	util.log("Connecting velbus to " + that.host + ":" + that.port);
 	that.socket = net.connect(that.port, that.host, function() {
 		that.emit('connect');
 	});
