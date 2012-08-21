@@ -149,11 +149,6 @@ webapp.get('/state.json', function(req, res, next) {
 	res.json(state.properities);
 });
 
-webapp.get('/now', function(req, res, next) {
-	var now = +new Date();
-	res.send(''+now, {'Content-Type': 'text/plain'});
-});
-
 var controls = fs.readdirSync('./controls');
 for( var i = 0; i < controls.length; i++ ) {
 	var r = require('./controls/' + controls[i]);

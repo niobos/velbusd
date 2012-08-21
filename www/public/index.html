@@ -134,9 +134,18 @@
 		this.div.find(".popover").remove();
 	}
 
+	my_server_time_delta = 0; // Guess that the local clock is accurate
 	function onSockJSmessage(e) {
 		$("#socket").text(new Date() + ": last message");
+
 		var d = JSON.parse(e.data);
+
+		var t = +new Date();
+		t -= d.timestamp;
+		my_server_time_delta *= .9; // EWMA
+		my_server_time_delta += t * .1;
+		$("#timesync").text("My time - server time estimate: " + my_server_time_delta + "ms");
+
 		if( d.changetype == 'new' ) {
 			velbus_state = d.value;
 
@@ -184,6 +193,10 @@
 			this.onmessage = onSockJSmessage;
 			SockJS_retry_wait = 100;
 		};
+		sockjs.onerror = function(e) {
+			$("#socket").text(new Date() + ": error");
+			console.log(e);
+		};
 		sockjs.onclose = function() {
 			$("#socket").text(new Date() + ": disconnected");
 			setTimeout(function() { newSockJSconn() }, SockJS_retry_wait);
@@ -192,19 +205,6 @@
 		};
 	}
 	newSockJSconn();
-
-	my_server_time_delta = +new Date();
-	$.ajax({url: '/now', dataType: 'json' })
-		.success(function(data) {
-			my_server_time_delta += +new Date();
-			my_server_time_delta /= 2; // Average time between start & end of ajax call
-
-			my_server_time_delta -= parseInt(data);
-
-			$("#timesync").text("Synced clock with server: offset = " +
-				my_server_time_delta + "ms; time of sync: " +
-				new Date() );
-		});
 
    </script>
    <script src="js/controls.js"></script>

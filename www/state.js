@@ -44,6 +44,7 @@ state.prototype.set = function(key, value) {
 	p[ k[ k.length-1 ] ] = value;
 
 	this.emit('update', JSON.stringify({
+		'timestamp': +new Date(),
 		'changetype': 'update',
 		'key': key,
 		'value': value
@@ -54,6 +55,7 @@ state.prototype.set = function(key, value) {
 
 state.prototype.dump = function() {
 	return JSON.stringify( {
+			'timestamp': +new Date(),
 			'changetype': 'new',
 			'value': this.properities
 		});
