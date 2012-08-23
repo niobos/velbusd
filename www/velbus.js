@@ -23,7 +23,7 @@ var velbus = function(host, port) {
 	that.socket.on('close', function() {
 		that.emit('close');
 		setTimeout(function(){
-				that.socket.connect(that.host, that.port);
+				that.socket.connect(that.port, that.host);
 			}, that.retry_after_ms);
 	});
 
