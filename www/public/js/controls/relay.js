@@ -32,8 +32,8 @@ Relay.prototype.show = function() {
 					'style="display: table-cell; vertical-align: middle;">' +
 						'<img src="images/loading.gif"/></div>' +
 				'<div class="duration" style="margin-left: 0.5em;">' +
-					'<div style="white-space: nowrap;">for <input type="text" name="for" size="23" placeholder="permanent"/></div>' +
-					'<div style="white-space: nowrap;">until <input type="text" name="until" size="23" placeholder="permanent"/></div>' +
+					'<div style="white-space: nowrap;"><span class="for">for</span> <input type="text" name="for" size="23" placeholder="permanent"/></div>' +
+					'<div style="white-space: nowrap;"><span class="until">until</span> <input type="text" name="until" size="23" placeholder="permanent"/></div>' +
 				'</div>' +
 				'<div style="clear: both;"></div>' +
 			'</div>' +
@@ -42,11 +42,11 @@ Relay.prototype.show = function() {
 	var that = this;
 	p.find('div.relay div.button').click(function() {
 			var data = {};
-			if( that.state.status ) {
+			var dur = that.div.find('div.relay input[name="for"]').val();
+			if( dur == '' && that.state.status ) {
 				data['off'] = '';
 			} else {
 				data['on'] = '';
-				var dur = that.div.find('div.relay input[name="for"]').val();
 				dur = parse_duration(dur);
 				if( dur != undefined ) data['on'] = dur/1000;
 			}
@@ -145,8 +145,14 @@ Relay.prototype.update = function(attr) {
 	this.div.find('div.relay div.button').text(
 			(this.state.status ? "OFF" : "ON" )
 		);
-	this.div.find('div.relay div.duration').css('display',
-			( this.state.status ? 'none' : 'block' ));
+	this.div.find('div.relay div.duration span.for').text(
+			this.state.status ? 'in' : 'for')
+	this.div.find('div.relay input[name="for"]').attr('placeholder',
+			this.state.status ? 'now' : 'permanent')
+	this.div.find('div.relay div.duration span.until').text(
+			this.state.status ? 'at' : 'until')
+	this.div.find('div.relay input[name="until"]').attr('placeholder',
+			this.state.status ? 'now' : 'permanent')
 
 }
 
