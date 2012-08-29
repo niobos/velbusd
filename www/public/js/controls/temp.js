@@ -1,6 +1,7 @@
 $('<style type="text/css">' +
 		'div.icon.temp         { background-image: url(images/temp-blue.svg) }' +
 		'div.icon.temp.heating { background-image: url(images/temp-red.svg) }' +
+		'div.temp div.button   { display: table-cell; vertical-align: middle; }' +
 	'</style>').appendTo("head");
 
 var Temp = function(addr, state, coord) {
@@ -28,7 +29,51 @@ Temp.prototype.show = function() {
 			'<div style="padding-bottom: 0.2em; white-space: nowrap;">' +
 				'Current state: <span class="state">' +
 					'<img src="images/loading.gif"/></span></div>' +
+			'<div style="display: table;">' +
+				'<div class="button comfort">' +
+						'<img src="images/temp-comfort.svg"/></div>' +
+				'<div class="button day">' +
+						'<img src="images/temp-day.svg"/></div>' +
+				'<div class="button night">' +
+						'<img src="images/temp-night.svg"/></div>' +
+				'<div class="button safe">' +
+						'<img src="images/temp-safe.svg"/></div>' +
+				'<div class="duration" style="margin-left: 0.5em;"></div>' +
+				'<div style="clear: both;"></div>' +
+			'</div>' +
 		'</div>');
+
+	var that = this;
+	p.find("div.temp div.button").click(function() {
+			var data = {};
+			var dur = that.div.find('div.temp input[name="for"]').val();
+			dur = parse_duration(dur);
+			if( dur != undefined ) {
+				dur = dur/1000/60; // temp works in minutes
+			} else {
+				dur = ''; // until next step
+			}
+			if( $(this).hasClass("comfort") ) {
+				data["comfort"] = dur;
+			} else if( $(this).hasClass("day") ) {
+				data["day"] = dur;
+			} else if( $(this).hasClass("night") ) {
+				data["night"] = dur;
+			} else if( $(this).hasClass("safe") ) {
+				data["safe"] = dur;
+			} else {
+				console.log("Got click on button, but couldn't figure out which one");
+				console.log(this);
+				return false;
+			}
+			$.post('control/temp/' + that.addr + '/operating%20mode/temperature%20mode', data );
+			return false; // don't update
+		});
+
+	make_duration( p.find('div.temp div.duration'), {
+			placeholder_for: 'this step duration',
+			placeholder_until: 'next step received',
+		});
 };
 
 Temp.prototype.update = function(attr) {
