@@ -6,15 +6,35 @@ use Data::ParseBinary;
 use Data::Dumper;
 
 
-sub binary ($) {
+sub binary ($) { # {{{
 	return join '', unpack "B8", pack "C", $_[0];
-}
+} # }}}
 
-sub enum {
+sub enum { # {{{
 	my ($key, %hash) = @_;
 	return $hash{$key} if defined $hash{$key};
 	return sprintf "Unknown[0x%02x]", $key;
-}
+} # }}}
+
+sub twos_complement { # {{{
+	my (@byte) = @_;
+	my $ret = 0;
+	if( $byte[0] & 0x80 ) {
+		# negative
+		while( @byte ) {
+			$ret <<= 8;
+			$ret |= (shift @byte) ^ 0xff;
+		}
+		$ret = -($ret + 1);
+	} else {
+		# positive
+		while( @byte ) {
+			$ret <<= 8;
+			$ret |= shift @byte;
+		}
+	}
+	return $ret;
+} # }}}
 
 my @parser;
 
@@ -416,9 +436,9 @@ push @parser, sub { # Sensor Temp (0xe6) {{{
 	return undef unless @data == 7;
 	return undef unless $data[0] == 0xe6;
 
-	my $temp_cur = ( ($data[1]<<8) + $data[2] ) / 512;
-	my $temp_min = ( ($data[3]<<8) + $data[4] ) / 512;
-	my $temp_max = ( ($data[5]<<8) + $data[6] ) / 512;
+	my $temp_cur = twos_complement( @data[1..2] ) / 512;
+	my $temp_min = twos_complement( @data[3..4] ) / 512;
+	my $temp_max = twos_complement( @data[5..6] ) / 512;
 
 	return sprintf("SensorTemp from 0x%02x: Current=%3.2fC Min=%3.2fC Max=%3.2fC",
 			$addr, $temp_cur, $temp_min, $temp_max);
@@ -612,9 +632,9 @@ push @parser, sub { # Temp Sensor Status (0xea) {{{
 			Bit("boost"),
 			Bit("valve"),
 		),
-		Byte("temp halfC"),
+		SBInt8("temp halfC"),
 		Value("temp C", sub { $_->ctx->{"temp halfC"} * 0.5; } ),
-		Byte("target temp halfC"),
+		SBInt8("target temp halfC"),
 		Value("target temp C", sub { $_->ctx->{"target temp halfC"} * 0.5; } ),
 		UBInt16("timer"),
 	)->parse($data);
