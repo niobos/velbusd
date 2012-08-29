@@ -177,3 +177,99 @@ function pretty_print_datetime(dt) {
 
 	return s;
 }
+
+
+// TODO: jQueryUI-ify this
+function make_duration(jqe, options) {
+/** Options is an object with properities:
+  *  - enter_trigger_element: the element to trigger when enter is pressed (default: none)
+  *  - enter_trigger_eventType: the eventType to trigger (default: click)
+  */
+	default_options = {
+		enter_trigger_eventType: 'click',
+	};
+	if( options == undefined ) { options = {}; }
+	for(var p in default_options) {
+		if( ! options.hasOwnProperty(p) ) options[p] = default_options[p];
+	}
+
+	jqe.html('<div style="white-space: nowrap;">' +
+				'<span class="for">for</span> ' +
+				'<input type="text" name="for" size="23" placeholder="permanent"/>' +
+			'</div>' +
+			'<div style="white-space: nowrap;">' +
+				'<span class="until">until</span> ' +
+				'<input type="text" name="until" size="23" placeholder="permanent"/>' +
+			'</div>');
+
+	jqe.find('input').click(function(e) {
+		e.stopPropagation(); // because that would undo the selection
+	});
+
+	jqe.find('input').focus(function(e) {
+		return $(this).trigger('keyup');
+	});
+
+	var jqe_i_for = jqe.find('input[name="for"]');
+	var jqe_i_until = jqe.find('input[name="until"]');
+	var interval;
+
+	jqe_i_for.keyup(function(e) {
+		if( e.keyCode == 13 ) { // Enter
+			if( options.enter_trigger_element != undefined ) {
+				return options.enter_trigger_element.trigger(
+					options.enter_trigger_eventType);
+			}
+			return; // anyway
+		}
+
+		clearInterval( interval );
+		var v = $(this).val();
+		var f = parse_duration( v );
+		if( f != undefined ) {
+			jqe_i_for.removeClass('invalid').addClass('valid');
+			jqe_i_until.removeClass('invalid').removeClass('valid');
+			var update_f = function() {
+				var until = +new Date();
+				until += f;
+				jqe_i_until.val( pretty_print_datetime(until) );
+			};
+			interval = setInterval( update_f, 1000 );
+			update_f();
+		} else if( v == '' ) {
+			jqe_i_until.val('');
+			jqe_i_for.removeClass('invalid').removeClass('valid');
+		} else {
+			jqe_i_for.removeClass('valid').addClass('invalid');
+		}
+	});
+	jqe_i_until.keyup(function(e) {
+		if( e.keyCode == 13 ) { // Enter
+			if( options.enter_trigger_element != undefined ) {
+				return options.enter_trigger_element.trigger(
+					options.enter_trigger_eventType);
+			}
+			return; // anyway
+		}
+
+		clearInterval( interval );
+		var v = $(this).val();
+		var u = parse_datetime( v );
+		if( u != undefined ) {
+			jqe_i_until.removeClass('invalid').addClass('valid');
+			jqe_i_for.removeClass('invalid').removeClass('valid');
+			var update_f = function() {
+				var f = +new Date();
+				f = u - f;
+				jqe_i_for.val( pretty_print_duration(f) );
+			};
+			interval = setInterval( update_f, 1000 );
+			update_f();
+		} else if( v == '' ) {
+			jqe_i_for.val('');
+			jqe_i_until.removeClass('invalid').removeClass('valid');
+		} else {
+			jqe_i_until.removeClass('valid').addClass('invalid');
+		}
+	});
+}

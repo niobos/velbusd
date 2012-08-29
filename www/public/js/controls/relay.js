@@ -31,10 +31,7 @@ Relay.prototype.show = function() {
 				'<div class="button" ' +
 					'style="display: table-cell; vertical-align: middle;">' +
 						'<img src="images/loading.gif"/></div>' +
-				'<div class="duration" style="margin-left: 0.5em;">' +
-					'<div style="white-space: nowrap;"><span class="for">for</span> <input type="text" name="for" size="23" placeholder="permanent"/></div>' +
-					'<div style="white-space: nowrap;"><span class="until">until</span> <input type="text" name="until" size="23" placeholder="permanent"/></div>' +
-				'</div>' +
+				'<div class="duration" style="margin-left: 0.5em;"></div>' +
 				'<div style="clear: both;"></div>' +
 			'</div>' +
 		'</div>');
@@ -54,64 +51,8 @@ Relay.prototype.show = function() {
 			return false; // don't update
 		});
 
-	p.find('div.relay input').click(function(e) {
-		e.stopPropagation(); // because that would undo the selection
-	});
-
-	p.find('div.relay input').focus(function(e) {
-		return $(this).trigger('keyup');
-	});
-	p.find('div.relay input[name="for"]').keyup(function(e) {
-			if( e.keyCode == 13 ) { // Enter
-				return p.find('div.relay div.button').trigger('click');
-			}
-
-			clearInterval( that.interval.for_until );
-			var v = $(this).val();
-			var until_input = p.find('div.relay input[name="until"]');
-			var f = parse_duration( v );
-			if( f != undefined ) {
-				$(this).removeClass('invalid').addClass('valid');
-				until_input.removeClass('invalid').removeClass('valid');
-				var update_f = function() {
-					var until = +new Date();
-					until += f;
-					until_input.val( pretty_print_datetime(until) );
-				};
-				that.interval.for_until = setInterval( update_f, 1000 );
-				update_f();
-			} else if( v == '' ) {
-				until_input.val('');
-				$(this).removeClass('invalid').removeClass('valid');
-			} else {
-				$(this).removeClass('valid').addClass('invalid');
-			}
-		});
-	p.find('div.relay input[name="until"]').keyup(function(e) {
-			if( e.keyCode == 13 ) { // Enter
-				return p.find('div.relay div.button').trigger('click');
-			}
-
-			clearInterval( that.interval.for_until );
-			var v = $(this).val();
-			var for_input = p.find('div.relay input[name="for"]');
-			var u = parse_datetime( v );
-			if( u != undefined ) {
-				$(this).removeClass('invalid').addClass('valid');
-				for_input.removeClass('invalid').removeClass('valid');
-				var update_f = function() {
-					var f = +new Date();
-					f = u - f;
-					for_input.val( pretty_print_duration(f) );
-				};
-				that.interval.for_until = setInterval( update_f, 1000 );
-				update_f();
-			} else if( v == '' ) {
-				for_input.val('');
-				$(this).removeClass('invalid').removeClass('valid');
-			} else {
-				$(this).removeClass('valid').addClass('invalid');
-			}
+	make_duration( p.find('div.relay div.duration'), {
+			'enter_trigger_element': p.find('div.relay div.button'),
 		});
 }
 
