@@ -38,7 +38,7 @@ function reply_to_get(req, res, next) {
 	// Now send the request
 	util.log("[" + req.connection.remoteAddress + "]:"
 			+ req.connection.remotePort + " : "
-			+ "Sending ModuleStatusRequest to 0x" + addr + " to get input status");
+			+ "Sending ModuleStatusRequest to 0x" + addr_h + " to get input status");
 	velbus.send_message(3, addr, 0, "\xfa\x3f" );
 }
 

@@ -35,7 +35,7 @@ function reply_to_get(req, res, next) {
 	// Now send the request
 	util.log("[" + req.connection.remoteAddress + "]:"
 			+ req.connection.remotePort + " : "
-			+ "Sending ModuleStatusRequest to 0x" + addr + " to get blind status");
+			+ "Sending ModuleStatusRequest to 0x" + addr_h + " to get blind status");
 	var blindbit = String.fromCharCode( 3 << (blind-1)*2 );
 	velbus.send_message(3, addr, 0, "\xfa" + blindbit );
 };
@@ -46,6 +46,8 @@ webapp.post(/\/control\/blind\/([0-9a-fA-F]{2})-([12])\/([a-zA-Z ]*)$/, function
 	var addr = parseInt( req.params[0], 16 );
 	var blind = parseInt( req.params[1] );
 	var field = req.params[2];
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
 
 	var blindbit = String.fromCharCode( 3 << (blind-1)*2 );
 
@@ -65,21 +67,21 @@ webapp.post(/\/control\/blind\/([0-9a-fA-F]{2})-([12])\/([a-zA-Z ]*)$/, function
 			command = "\x05" + blindbit + "\0\0\0"; // Use dip switch settings
 			util.log("[" + req.connection.remoteAddress + "]:"
 					+ req.connection.remotePort + " : "
-					+ "Sending SwitchBlindUp to 0x" + addr);
+					+ "Sending SwitchBlindUp to 0x" + addr_h);
 			break;
 
 		case "down":
 			command = "\x06" + blindbit + "\0\0\0";
 			util.log("[" + req.connection.remoteAddress + "]:"
 					+ req.connection.remotePort + " : "
-					+ "Sending SwitchBlindDown to 0x" + addr);
+					+ "Sending SwitchBlindDown to 0x" + addr_h);
 			break;
 
 		case "stop":
 			command = "\x04" + blindbit;
 			util.log("[" + req.connection.remoteAddress + "]:"
 					+ req.connection.remotePort + " : "
-					+ "Sending SwitchBlindOff to 0x" + addr);
+					+ "Sending SwitchBlindOff to 0x" + addr_h);
 			break;
 
 		default:

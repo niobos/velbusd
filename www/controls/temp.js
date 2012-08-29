@@ -99,13 +99,13 @@ function reply_to_get(req, res, next) {
 	if( need_cmd['temperature sensor status'] ) {
 		util.log("[" + req.connection.remoteAddress + "]:"
 				+ req.connection.remotePort + " : "
-				+ "Sending ModuleStatusRequest to 0x" + addr + " to get temp status");
+				+ "Sending ModuleStatusRequest to 0x" + addr_h + " to get temp status");
 		velbus.send_message(3, addr, 0, "\xfa\x00" );
 	}
 	if( need_cmd['sensor temperature'] ) {
 		util.log("[" + req.connection.remoteAddress + "]:"
 				+ req.connection.remotePort + " : "
-				+ "Sending SensorTempRequest to 0x" + addr + " to get temp status");
+				+ "Sending SensorTempRequest to 0x" + addr_h + " to get temp status");
 		velbus.send_message(3, addr, 0, "\xe5\x00" ); // high precision temp
 	}
 }

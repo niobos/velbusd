@@ -35,7 +35,7 @@ function reply_to_get(req, res, next) {
 	// Now send the request
 	util.log("[" + req.connection.remoteAddress + "]:"
 			+ req.connection.remotePort + " : "
-			+ "Sending ModuleStatusRequest to 0x" + addr + " to get relay status");
+			+ "Sending ModuleStatusRequest to 0x" + addr_h + " to get relay status");
 	var relaybit = String.fromCharCode( 1 << (relay-1) );
 	velbus.send_message(3, addr, 0, "\xfa" + relaybit );
 }
@@ -46,6 +46,8 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])\/([a-zA-Z ]*)$/, functio
 	var addr = parseInt( req.params[0], 16 );
 	var relay = parseInt( req.params[1] );
 	var field = req.params[2];
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
 
 	var relaybit = 1 << (relay-1);
 
@@ -66,14 +68,14 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])\/([a-zA-Z ]*)$/, functio
 				command = new Buffer([ 0x02, relaybit ] );
 				util.log("[" + req.connection.remoteAddress + "]:"
 						+ req.connection.remotePort + " : "
-						+ "Sending SwitchRelayOn to 0x" + addr);
+						+ "Sending SwitchRelayOn to 0x" + addr_h);
 			} else {
 				// Start timer for the specified number of seconds
 				var delay = parseInt( req.body[ value ] );
 				command = new Buffer([ 0x03, relaybit, (delay>>16) & 0xff, (delay>>8) & 0xff, (delay) & 0xff ]);
 				util.log("[" + req.connection.remoteAddress + "]:"
 						+ req.connection.remotePort + " : "
-						+ "Sending StartRelayTimer to 0x" + addr);
+						+ "Sending StartRelayTimer to 0x" + addr_h);
 			}
 			break;
 
