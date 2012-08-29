@@ -51,7 +51,7 @@ var express = require('express');
 var webapp = express.createServer();
 
 webapp.configure(function() {
-	webapp.use( express.logger() );
+	//webapp.use( express.logger() );
 	webapp.use( express.bodyParser() );
 	//webapp.use( express.cookieParser(...) );
 	//webapp.use( express.session(...) );
@@ -89,7 +89,8 @@ traverse( config.controls, function(prop, value) {
 
 var sockjs = require('sockjs');
 var sockjs_stream = sockjs.createServer( {
-	sockjs_url: "/js/sockjs.js"
+	sockjs_url: "/js/sockjs.js",
+	log: function(severity, message) {},
 });
 sockjs_stream.installHandlers(webapp, { prefix:'/events' });
 

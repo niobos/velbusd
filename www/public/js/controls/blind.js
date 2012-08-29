@@ -39,6 +39,7 @@ Blind.prototype.show = function() {
 		if( el.hasClass('down') ) data['down'] = '';
 		if( el.hasClass('stop') ) data['stop'] = '';
 		$.post('control/blind/' + that.addr + '/status', data );
+		return false; // don't update
 	});
 }
 

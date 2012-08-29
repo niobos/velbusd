@@ -1,3 +1,4 @@
+var util = require('util');
 
 exports.add_routes = function(webapp, velbus, config) {
 
@@ -32,6 +33,9 @@ function reply_to_get(req, res, next) {
 		}, config.webapp.timeout);
 
 	// Now send the request
+	util.log("[" + req.connection.remoteAddress + "]:"
+			+ req.connection.remotePort + " : "
+			+ "Sending ModuleStatusRequest to 0x" + addr + " to get relay status");
 	var relaybit = String.fromCharCode( 1 << (relay-1) );
 	velbus.send_message(3, addr, 0, "\xfa" + relaybit );
 }
@@ -60,15 +64,24 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])\/([a-zA-Z ]*)$/, functio
 		case "on":
 			if( req.body[ value ] == undefined ) {
 				command = new Buffer([ 0x02, relaybit ] );
+				util.log("[" + req.connection.remoteAddress + "]:"
+						+ req.connection.remotePort + " : "
+						+ "Sending SwitchRelayOn to 0x" + addr);
 			} else {
 				// Start timer for the specified number of seconds
 				var delay = parseInt( req.body[ value ] );
 				command = new Buffer([ 0x03, relaybit, (delay>>16) & 0xff, (delay>>8) & 0xff, (delay) & 0xff ]);
+				util.log("[" + req.connection.remoteAddress + "]:"
+						+ req.connection.remotePort + " : "
+						+ "Sending StartRelayTimer to 0x" + addr);
 			}
 			break;
 
 		case "off":
 			command = new Buffer([ 0x01, relaybit ]);
+			util.log("[" + req.connection.remoteAddress + "]:"
+					+ req.connection.remotePort + " : "
+					+ "Sending SwitchRelayOff to 0x" + addr);
 			break;
 
 		default:
@@ -108,6 +121,8 @@ exports.add_watchers = function(velbus, state, config) {
 			// Spread queries in time in order not to overload the bus when starting up
 			var starttime = Math.random() * Object.keys(config.controls).length * 100;
 			setTimeout(function() {
+				util.log("startup : "
+						+ "Sending ModuleStatusRequest to 0x" + addr + " to get relay status");
 				velbus.send_message(3, parseInt(addr[0],16), 0, "\xfa" + relaybit );
 				}, starttime);
 		}}(control, config.controls[control]));

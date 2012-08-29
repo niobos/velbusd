@@ -51,6 +51,7 @@ Relay.prototype.show = function() {
 				if( dur != undefined ) data['on'] = dur/1000;
 			}
 			$.post('control/relay/' + that.addr + '/status', data );
+			return false; // don't update
 		});
 
 	p.find('div.relay input').click(function(e) {

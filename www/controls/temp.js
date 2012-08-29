@@ -1,3 +1,5 @@
+var util = require('util');
+
 var child_process = require('child_process');
 
 exports.add_routes = function(webapp, velbus, config) {
@@ -95,9 +97,15 @@ function reply_to_get(req, res, next) {
 
 	// Now send the request
 	if( need_cmd['temperature sensor status'] ) {
+		util.log("[" + req.connection.remoteAddress + "]:"
+				+ req.connection.remotePort + " : "
+				+ "Sending ModuleStatusRequest to 0x" + addr + " to get temp status");
 		velbus.send_message(3, addr, 0, "\xfa\x00" );
 	}
 	if( need_cmd['sensor temperature'] ) {
+		util.log("[" + req.connection.remoteAddress + "]:"
+				+ req.connection.remotePort + " : "
+				+ "Sending SensorTempRequest to 0x" + addr + " to get temp status");
 		velbus.send_message(3, addr, 0, "\xe5\x00" ); // high precision temp
 	}
 }
@@ -235,6 +243,8 @@ exports.add_watchers = function(velbus, state, config) {
 			// Spread queries in time in order not to overload the bus when starting up
 			var starttime = Math.random() * Object.keys(config.controls).length * 100;
 			setTimeout(function() {
+				util.log("startup : "
+						+ "Sending ModuleStatusRequest to 0x" + addr + " to get temp status");
 				velbus.send_message(3, parseInt(addr, 16), 0, "\xfa\x00" );
 				}, starttime);
 

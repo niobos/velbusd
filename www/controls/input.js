@@ -1,3 +1,4 @@
+var util = require('util');
 
 exports.add_routes = function(webapp, velbus, config) {
 
@@ -35,6 +36,9 @@ function reply_to_get(req, res, next) {
 		}, config.webapp.timeout);
 
 	// Now send the request
+	util.log("[" + req.connection.remoteAddress + "]:"
+			+ req.connection.remotePort + " : "
+			+ "Sending ModuleStatusRequest to 0x" + addr + " to get input status");
 	velbus.send_message(3, addr, 0, "\xfa\x3f" );
 }
 
@@ -72,6 +76,8 @@ exports.add_watchers = function(velbus, state, config) {
 			// Spread queries in time in order not to overload the bus when starting up
 			var starttime = Math.random() * Object.keys(config.controls).length * 100;
 			setTimeout(function() { 
+				util.log("startup : "
+						+ "Sending ModuleStatusRequest to 0x" + addr + " to get input status");
 				velbus.send_message(3, parseInt(addr[0],16), 0, "\xfa\x3f" );
 				}, starttime);
 		}}(control, config.controls[control]));

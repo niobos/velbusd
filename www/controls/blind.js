@@ -1,3 +1,4 @@
+var util = require('util');
 
 exports.add_routes = function(webapp, velbus, config) {
 
@@ -32,6 +33,9 @@ function reply_to_get(req, res, next) {
 		}, config.webapp.timeout);
 
 	// Now send the request
+	util.log("[" + req.connection.remoteAddress + "]:"
+			+ req.connection.remotePort + " : "
+			+ "Sending ModuleStatusRequest to 0x" + addr + " to get blind status");
 	var blindbit = String.fromCharCode( 3 << (blind-1)*2 );
 	velbus.send_message(3, addr, 0, "\xfa" + blindbit );
 };
@@ -59,14 +63,23 @@ webapp.post(/\/control\/blind\/([0-9a-fA-F]{2})-([12])\/([a-zA-Z ]*)$/, function
 		switch( value ) {
 		case "up":
 			command = "\x05" + blindbit + "\0\0\0"; // Use dip switch settings
+			util.log("[" + req.connection.remoteAddress + "]:"
+					+ req.connection.remotePort + " : "
+					+ "Sending SwitchBlindUp to 0x" + addr);
 			break;
 
 		case "down":
 			command = "\x06" + blindbit + "\0\0\0";
+			util.log("[" + req.connection.remoteAddress + "]:"
+					+ req.connection.remotePort + " : "
+					+ "Sending SwitchBlindDown to 0x" + addr);
 			break;
 
 		case "stop":
 			command = "\x04" + blindbit;
+			util.log("[" + req.connection.remoteAddress + "]:"
+					+ req.connection.remotePort + " : "
+					+ "Sending SwitchBlindOff to 0x" + addr);
 			break;
 
 		default:
@@ -106,6 +119,8 @@ exports.add_watchers = function(velbus, state, config) {
 			// Spread queries in time in order not to overload the bus when starting up
 			var starttime = Math.random() * Object.keys(config.controls).length * 100;
 			setTimeout(function() {
+				util.log("startup : "
+						+ "Sending ModuleStatusRequest to 0x" + addr + " to get blind status");
 				velbus.send_message(3, parseInt(addr[0],16), 0, "\xfa" + blindbit );
 				}, starttime);
 		}}(control, config.controls[control]));
