@@ -26,7 +26,7 @@ fi
 
 INPUT="2012-01-01T00:00:00+0000 SERIAL : $( echo -ne "\x0f\xfb\xfa\x03\xde\xf0\xf0\x3b\x04" | ./Parser )"
 OUTPUT="$( echo "$INPUT" | ../bin/velbus-parse.pl )"
-test "$OUTPUT" == "2012-01-01T00:00:00+0000 SERIAL : SwitchToMode to 0xfa: switch to safe; Timer: 61680sec"
+test "$OUTPUT" == "2012-01-01T00:00:00+0000 SERIAL : SwitchToMode to 0xfa: switch to safe; Timer: 61680min"
 if [ $? -ne 0 ]; then
 	echo "Wrong output: $OUTPUT"
 	exit 1

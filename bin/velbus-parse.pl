@@ -655,7 +655,7 @@ push @parser, sub { # Switch To Mode (0xdb, 0xdc, 0xdd, 0xde) {{{
 	} elsif( $timer == 0xffff ) {
 		$timer = "Manual";
 	} else {
-		$timer = sprintf "%dsec", $timer;
+		$timer = sprintf "%dmin", $timer;
 	}
 
 	return sprintf("SwitchToMode to 0x%02x: switch to %s; Timer: $timer",
