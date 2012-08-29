@@ -42,6 +42,9 @@ testscripts = Parser-BusOff.sh Parser-BusActive.sh \
               Parser-SwitchToMode.sh \
               Parser-ModuleStatus.sh \
               Parser-SetTemperature.sh \
+              Parser-DimmerStatus.sh \
+              Parser-DimmerSliderStatus.sh \
+              Parser-SetDimvalue.sh \
               Parser-garbage.sh \
               simply-run.sh fork.sh \
               echo.sh echo-with-garbage.sh \

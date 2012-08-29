@@ -117,6 +117,51 @@ push @parser, sub { # {Clear,Set,SlowBlink,FastBlink,VFastBlink} Leds (0xf5, 0xf
 	return sprintf("$cmd to 0x%02x: %s", $addr, binary($leds) );
 }; # }}}
 
+push @parser, sub { # Dimmer Status (0xee) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 8;
+	return undef unless $data[0] == 0xee;
+
+	my $mode = enum( $data[1],
+			0 => "start/stop timer",
+			1 => "staircase timer",
+			2 => "dimmer",
+			3 => "dimmer with memory",
+			4 => "multi step dimmer",
+			5 => "slow on dimmer",
+			6 => "slow off dimmer",
+			7 => "slow on/off dimmer",
+		);
+	my $dimvalue = $data[2];
+	my $led = enum( $data[3],
+			0x00 => "off",
+			0x80 => "on",
+			0x40 => "slow blinking",
+			0x20 => "fast blinking",
+			0x10 => "very fast blinking",
+		);
+	my $delay = ($data[4] << 16) | ($data[5] << 8) | ($data[6] << 8);
+	my $config = $data[7];
+
+	return sprintf("DimmerStatus from 0x%02x: mode=%s dim=%d%% LED=%s timer=%d config=0x%02x",
+			$addr, $mode, $dimvalue, $led, $delay, $config);
+}; # }}}
+
+push @parser, sub { # Dimmer Slider Status (0x0f) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 4;
+	return undef unless $data[0] == 0x0f;
+
+	return undef unless $data[1] == 0x01;
+	my $dim = $data[2];
+	return undef unless $data[3] == 0x00;
+
+	return sprintf("DimmerSliderStatus from 0x%02x: dim=%d%%",
+			$addr, $dim);
+}; # }}}
+
 push @parser, sub { # Memory Block {,Write} (0xcc, 0xca) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
@@ -462,6 +507,33 @@ push @parser, sub { # Sensor Temp Request (0xe5) {{{
 	return sprintf("SensorTempRequest to 0x%02x: AutoSend %s", $addr, $autosend);
 }; # }}}
 
+push @parser, sub { # Set Dimvalue (at last used value) (0x07, 0x11) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 5;
+
+	my $speed = ($data[3] << 8) | $data[4];
+	if( $speed == 0 ) {
+		$speed = "set by hex-switch";
+	} elsif( $speed == 0xffff ) {
+		$speed = "1.5 sec";
+	} else {
+		$speed = "$speed sec";
+	}
+	return undef unless $data[1] == 0x01;
+
+	if( $data[0] == 0x07 ) {
+		my $dim = $data[2];
+		return sprintf("SetDimvalue to 0x%02x: dim=%d%% speed=$speed", $addr, $dim);
+
+	} elsif( $data[0] == 0x11 ) {
+		return sprintf("SetDimvalueToLast to 0x%02x: speed=$speed", $addr);
+
+	} else {
+		return undef;
+	}
+}; # }}}
+
 push @parser, sub { # Set Temperature (0xe4) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
@@ -555,6 +627,26 @@ push @parser, sub { # Start Relay {,Interval} Timer (0x03, 0x0d) {{{
 
 	return sprintf("$cmd to 0x%02x: Relay=%s Timeout=$timeout",
 			$addr, $relay);
+}; # }}}
+
+push @parser, sub { # Start Dimmer Timer (0x08) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 5;
+	return undef unless $data[0] == 0x08;
+
+	return undef unless $data[1] == 0x01;
+	my $timeout = ($data[2] << 16) + ($data[3] << 8) + $data[4];
+	if( $timeout == 0 ) {
+		$timeout = "set by hex-switch";
+	} elsif( $timeout >= 0xff0000 ) {
+		$timeout = "permanent";
+	} else {
+		$timeout = sprintf "%ds", $timeout;
+	}
+
+	return sprintf("StartDimmerTimer to 0x%02x: Timeout=$timeout",
+			$addr);
 }; # }}}
 
 push @parser, sub { # Switch Blind Off (0x04) {{{
