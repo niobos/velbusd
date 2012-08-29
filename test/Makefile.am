@@ -41,6 +41,7 @@ testscripts = Parser-BusOff.sh Parser-BusActive.sh \
               Parser-TempSensorStatus.sh \
               Parser-SwitchToMode.sh \
               Parser-ModuleStatus.sh \
+              Parser-SetTemperature.sh \
               Parser-garbage.sh \
               simply-run.sh fork.sh \
               echo.sh echo-with-garbage.sh \
