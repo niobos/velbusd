@@ -462,6 +462,69 @@ push @parser, sub { # Sensor Temp Request (0xe5) {{{
 	return sprintf("SensorTempRequest to 0x%02x: AutoSend %s", $addr, $autosend);
 }; # }}}
 
+push @parser, sub { # Set Temperature (0xe4) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 3;
+	return undef unless $data[0] == 0xe4;
+
+	my %temp_subcmd = (
+		0 => "Current temperature set",
+		1 => "Comfort temperature for heating set",
+		2 => "Day temperature for heating set",
+		3 => "Night temperature for heating set",
+		4 => "Safe temperature for heating set",
+		5 => "Temperature difference for turbo mode",
+		5 => "Hysteresis",
+		7 => "Comfort temperature for cooling set",
+		8 => "Day temperature for cooling set",
+		9 => "Night temperature for cooling set",
+		10 => "Safe temperature for cooling set",
+		11 => "Callibration",
+		15 => "Low temperature alarm set",
+		16 => "High temperature alarm set",
+		17 => "Lower temperature range cool mode",
+		18 => "Upper temperature range heat mode",
+		20 => "Target temperature set for diff-sensor",
+	);
+
+	if( defined $temp_subcmd{ $data[1] } ) {
+		return sprintf("SetTemperature to 0x%02x: %s <= %dºC",
+				$addr, $temp_subcmd{$data[1]} , twos_complement($data[2]) / 2);
+	} elsif( $data[1] == 12 ) {
+		return sprintf("SetTemperature to 0x%02x: Reset %s temp",
+				$addr, enum($data[2], 0x01 => "min", 0x02 => "max") );
+	} elsif( $data[1] == 13 ) {
+		return sprintf("SetTemperature to 0x%02x: Reset time statistics: %s %s",
+				$addr,
+				( $data[2] & 0x80 ? "heating" : "cooling" ),
+				enum( $data[2] & 0x7f,
+					0x01 => "safe",
+					0x02 => "night",
+					0x04 => "day",
+					0x08 => "comfort",
+					0x10 => "global",
+				) );
+	} elsif( $data[1] == 14 ) {
+		return sprintf("SetTemperature to 0x%02x: Set unjamming: %svalve %spump",
+				$addr,
+				$data[2] & 0x02 ? "" : "no_",
+				$data[2] & 0x01 ? "" : "no_",
+			);
+	} elsif( $data[1] == 19 ) {
+		return sprintf("SetTemperature to 0x%02x: Set diff-sensor address <= 0x%02x",
+				$addr, $data[2]);
+	} elsif( $data[1] == 21 ) {
+		my $min = $data[2];
+		if( $min == 0xff ) { $min = 1; }
+		return sprintf("SetTemperature to 0x%02x: Set minimum switching time <= %d mins",
+				$addr, $min);
+
+	} else {
+		return sprintf("SetTemperature to 0x%02x: Unknown pointer 0x%02x (data=0x%02x)", $addr, $data[1], $data[2]);
+	}
+}; # }}}
+
 push @parser, sub { # Start Relay {,Interval} Timer (0x03, 0x0d) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
