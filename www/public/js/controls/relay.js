@@ -52,6 +52,8 @@ Relay.prototype.show = function() {
 		});
 
 	make_duration( p.find('div.relay div.duration'), {
+			'placeholder_for': 'permanent',
+			'placeholder_until': 'permanent',
 			'enter_trigger_element': p.find('div.relay div.button'),
 		});
 }

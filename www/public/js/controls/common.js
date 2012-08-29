@@ -182,6 +182,8 @@ function pretty_print_datetime(dt) {
 // TODO: jQueryUI-ify this
 function make_duration(jqe, options) {
 /** Options is an object with properities:
+  *  - placeholder_for: text to show when nothing is filled in
+  *  - placeholder_until
   *  - enter_trigger_element: the element to trigger when enter is pressed (default: none)
   *  - enter_trigger_eventType: the eventType to trigger (default: click)
   */
@@ -195,12 +197,19 @@ function make_duration(jqe, options) {
 
 	jqe.html('<div style="white-space: nowrap;">' +
 				'<span class="for">for</span> ' +
-				'<input type="text" name="for" size="23" placeholder="permanent"/>' +
+				'<input type="text" name="for" size="23"/>' +
 			'</div>' +
 			'<div style="white-space: nowrap;">' +
 				'<span class="until">until</span> ' +
-				'<input type="text" name="until" size="23" placeholder="permanent"/>' +
+				'<input type="text" name="until" size="23"/>' +
 			'</div>');
+
+	if( options.placeholder_for != undefined ) {
+		jqe.find('input[name="for"]').attr('placeholder', options.placeholder_for);
+	}
+	if( options.placeholder_until != undefined ) {
+		jqe.find('input[name="until"]').attr('placeholder', options.placeholder_until);
+	}
 
 	jqe.find('input').click(function(e) {
 		e.stopPropagation(); // because that would undo the selection
