@@ -112,6 +112,48 @@ function reply_to_get(req, res, next) {
 
 webapp.get(/\/control\/temp\/([0-9a-fA-F]{2})((?:\/(?:[a-zA-Z]|%20)+)*)\/?$/, reply_to_get);
 
+webapp.post(/\/control\/temp\/([0-9a-fA-F]{2})((?:\/(?:[a-zA-Z]|%20)+)*)\/?$/, function(req, res, next) {
+	var addr = parseInt( req.params[0], 16 );
+	var field = req.params[1];
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
+
+	// We expect a single value in the body
+	var value = Object.keys( req.body )
+	if( value.length != 1 ) {
+		res.send("Expecting single value in POST body", 400);
+		return;
+	}
+	value = value[0];
+
+	var command;
+	switch( field ) {
+	case "/target temperature":
+		var tt = parseFloat(value);
+		if( isNaN(tt) ) {
+			res.send("Didn't understand temperature, float expected", 400);
+			return;
+		}
+		tt = Math.floor(tt*2); // To half degrees
+		tt &= 0xff; // to two's complement in 1 byte
+		command = new Buffer([ 0xe4, 0x00, tt ]);
+		util.log("[" + req.connection.remoteAddress + "]:"
+				+ req.connection.remotePort + " : "
+				+ "Sending SetTemperature (target temperature) to 0x" + addr_h);
+		break;
+
+	default:
+		res.send("Not implemented", 501);
+		return;
+	}
+
+	velbus.send_message(3, addr, 0, command);
+
+	// And fall through to the GET response
+	reply_to_get(req, res, next);
+});
+
+
 function dts(dt) {
 	var days = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ];
 	var wday = days[ dt.getDay() ];
