@@ -131,7 +131,7 @@ webapp.post(/\/control\/temp\/([0-9a-fA-F]{2})((?:\/(?:[a-zA-Z]|%20)+)*)\/?$/, f
 	case "/target temperature":
 		var tt = parseFloat(value);
 		if( isNaN(tt) ) {
-			res.send("Didn't understand temperature, float expected", 400);
+			res.send("Didn't understand temperature, float expected", 418);
 			return;
 		}
 		tt = Math.floor(tt*2); // To half degrees
@@ -140,6 +140,38 @@ webapp.post(/\/control\/temp\/([0-9a-fA-F]{2})((?:\/(?:[a-zA-Z]|%20)+)*)\/?$/, f
 		util.log("[" + req.connection.remoteAddress + "]:"
 				+ req.connection.remotePort + " : "
 				+ "Sending SetTemperature (target temperature) to 0x" + addr_h);
+		break;
+
+	case "/operating mode/temperature mode":
+		var c;
+		switch( value ) {
+		case "comfort":
+			c = 0xdb;
+			break;
+		case "day":
+			c = 0xdc;
+			break;
+		case "night":
+			c = 0xdd;
+			break;
+		case "safe":
+			c = 0xde;
+			break;
+		default:
+			res.send("Didn't understand mode", 418);
+			return;
+		}
+		var sleep;
+		if( req.body[ value ] == undefined ) {
+			sleep = 0x0000; // Until next program step
+		} else {
+			sleep = parseInt( req.body[ value ] );
+		}
+		command = new Buffer([ c, (sleep>>8) & 0xff, (sleep) & 0xff ]);
+		util.log("[" + req.connection.remoteAddress + "]:"
+				+ req.connection.remotePort + " : "
+				+ "Sending SwitchToMode to 0x" + addr_h + " to set temp status");
+
 		break;
 
 	default:
