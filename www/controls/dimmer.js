@@ -40,6 +40,37 @@ function reply_to_get(req, res, next) {
 
 webapp.get(/\/control\/dimmer\/([0-9a-fA-F]{2})(?:\/([a-zA-Z ]*))?$/, reply_to_get);
 
+webapp.post(/\/control\/dimmer\/([0-9a-fA-F]{2})(?:\/([a-zA-Z ]*))?$/, function(req, res, next) {
+	var addr = parseInt( req.params[0], 16 );
+	var field = req.params[1];
+	var addr_h = addr.toString(16);
+	if( addr_h.length == 1 ) addr_h = '0' + addr_h;
+
+	// We expect a single value in the body
+	var value = Object.keys( req.body )
+	if( value.length != 1 ) {
+		res.send("Expecting single value in POST body", 400);
+		return;
+	}
+	value = parseInt(value[0]);
+	if( value < 0 ) { value = 0; }
+	if( value > 100 ) { value = 100; }
+
+	switch( field ) {
+	case "dimvalue":
+		var command = new Buffer([ 0x07, 0x01, value, 0xff, 0xff ]);
+		velbus.send_message(0, addr, 0, command);
+		break;
+
+	default:
+		res.send("Not implemented", 501);
+		return;
+	}
+
+	// And fall through to the GET response
+	reply_to_get(req, res, next);
+});
+
 }
 
 exports.add_watchers = function(velbus, state, config) {
