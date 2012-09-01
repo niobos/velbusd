@@ -59,6 +59,9 @@ webapp.post(/\/control\/dimmer\/([0-9a-fA-F]{2})(?:\/([a-zA-Z ]*))?$/, function(
 	switch( field ) {
 	case "dimvalue":
 		var command = new Buffer([ 0x07, 0x01, value, 0xff, 0xff ]);
+		util.log("[" + req.connection.remoteAddress + "]:"
+				+ req.connection.remotePort + " : "
+				+ "Sending SetDimmerValue to 0x" + addr);
 		velbus.send_message(0, addr, 0, command);
 		break;
 
