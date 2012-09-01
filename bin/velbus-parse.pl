@@ -141,7 +141,7 @@ push @parser, sub { # Dimmer Status (0xee) {{{
 			0x20 => "fast blinking",
 			0x10 => "very fast blinking",
 		);
-	my $delay = ($data[4] << 16) | ($data[5] << 8) | ($data[6] << 8);
+	my $delay = ($data[4] << 16) | ($data[5] << 8) | ($data[6]);
 	my $config = $data[7];
 
 	return sprintf("DimmerStatus from 0x%02x: mode=%s dim=%d%% LED=%s timer=%d config=0x%02x",
