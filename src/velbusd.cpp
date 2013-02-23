@@ -434,7 +434,7 @@ int main(int argc, char* argv[]) {
 		 *   - hostname:portname
 		 *   - [numeric ip]:portname
 		 *   - hostname:[portnumber]
-		 *   - [numeric ip:[portnumber]
+		 *   - [numeric ip]:[portnumber]
 		 */
 		size_t c = options.bind_addr.rfind(":");
 		if( c == std::string::npos ) {

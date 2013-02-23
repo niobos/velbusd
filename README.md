@@ -43,8 +43,8 @@ your-velbus-machine$ sudo cp contrib/velbusd.conf contrib/velbusweb.conf /etc/in
 
 optionally change the configuration:
 
-* velbusd has its (very limited) config in /etc/default/velbusd.conf (see the
-  upstart script for the supported variables and their default)
+* velbusd has its (very limited) config in /etc/default/velbusd (see the upstart
+  script for the supported variables and their default)
 * velbusweb has its config in /usr/local/share/velbusd/velbusweb/config.js.
 
 ```
