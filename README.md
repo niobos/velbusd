@@ -38,7 +38,7 @@ your-velbus-machine$ tar jxvf velbusd.tar.bz2
 your-velbus-machine$ cd velbusd
 your-velbus-machine$ ./configure && make
 your-velbus-machine$ sudo make install
-your-velbus-machine$ cp contrib/velbusd.conf contrib/velbusweb.conf /etc/init/.
+your-velbus-machine$ sudo cp contrib/velbusd.conf contrib/velbusweb.conf /etc/init/.
 ```
 
 optionally change the configuration:
