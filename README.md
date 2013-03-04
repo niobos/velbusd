@@ -41,17 +41,20 @@ your-velbus-machine$ sudo make install
 your-velbus-machine$ sudo cp contrib/velbusd.conf contrib/velbusweb.conf /etc/init/.
 ```
 
-optionally change the configuration:
-
-* velbusd has its (very limited) config in /etc/default/velbusd (see the upstart
-  script for the supported variables and their default)
-* velbusweb has its config in /usr/local/share/velbusd/velbusweb/config.js.
+optionally change the configuration in /etc/default/velbusd (see the upstart
+script for the supported variables and their default)
 
 ```
 your-velbus-machine$ sudo start velbusd
-your-velbus-machine$ sudo start velbusweb
 ```
 
+To use velbusdweb, you should probably change
+/usr/local/share/velbusd/velbusweb/public/data/floorplan.svg to match your
+floorplan, and add your modules to /usr/local/share/velbusd/velbusweb/config.js.
+Next, start the daemon
+```
+your-velbus-machine$ sudo start velbusweb
+```
 
 Copyright / License
 ------------------
