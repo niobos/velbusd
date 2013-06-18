@@ -64,7 +64,7 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])\/([a-zA-Z ]*)$/, functio
 		var command;
 		switch( value ) {
 		case "on":
-			if( req.body[ value ] == undefined ) {
+			if( req.body[ value ] == undefined || req.body[ value ] == '' ) {
 				command = new Buffer([ 0x02, relaybit ] );
 				util.log("[" + req.connection.remoteAddress + "]:"
 						+ req.connection.remotePort + " : "
@@ -75,7 +75,7 @@ webapp.post(/\/control\/relay\/([0-9a-fA-F]{2})-([1-4])\/([a-zA-Z ]*)$/, functio
 				command = new Buffer([ 0x03, relaybit, (delay>>16) & 0xff, (delay>>8) & 0xff, (delay) & 0xff ]);
 				util.log("[" + req.connection.remoteAddress + "]:"
 						+ req.connection.remotePort + " : "
-						+ "Sending StartRelayTimer to 0x" + addr_h);
+						+ "Sending StartRelayTimer(" + delay + ") to 0x" + addr_h);
 			}
 			break;
 
