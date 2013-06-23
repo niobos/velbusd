@@ -459,6 +459,8 @@ push @parser, sub { # Relay Status (0xfb) {{{
 			0 => "off",
 			1 => "on",
 			3 => "interval",
+			0x11 => "interval", # VMB1RY
+			0x08 => "?on?", # VMB1RY undocumented
 		);
 	my $led_status = enum( $data[4],
 			0x00 => "off",

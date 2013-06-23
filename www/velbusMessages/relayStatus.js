@@ -28,6 +28,8 @@ module.exports.parse = function(msg, config, next) {
 		case 0: msg.status = false; break;
 		case 1: msg.status = true; break;
 		case 3: msg.status = "interval"; break;
+		case 8: msg.status = true; break; // VMB1RY undocumented
+		case 0x11: msg.status = "interval"; break;
 		default: msg.status = null; break;
 	}
 	switch(msg.data[4]) {
