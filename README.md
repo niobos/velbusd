@@ -100,36 +100,42 @@ If you get messages from the velbus interface you are in business
 
 Is the daemon active?
 ---------------------
-The velbusd daemon can be found in the process list when typing 'ps -ef'. It will show the interface,
-the logfile reference and the port binding. The velbusweb daemon does NOT show in this process list.
+The velbusd daemon can be found in the process list when typing 'ps -ef'. It
+will show the interface, the logfile reference and the port binding. The
+velbusweb daemon should also show in this process list.
 
 
 Velbus module information
 -------------------------
-In config.js you have to list the modules of your installation. See the default file supplied
-at installation for an example. Only the temperature module is without any channels and can be
-called directly by the module number. All other modules must stage module.channel, even the
-single channel relais modules.
-
-The newer VMB4RYNO allows to directly access all channels from the webpage to start and stop
-the relais. The older VMB4RY only allows this for the first channel. The other channels currently
-can only be started by entering a start time and a duration. This is a known bug for which there 
-is not yet a solution.
+In config.js you have to list the modules of your installation. See the default
+file supplied at installation for an example. Only the temperature module is
+without any channels and can be called directly by the module number. All other
+modules must stage module.channel, even the single channel relays modules.
 
 
 Adding modules or icons (config.js)
 -----------------------------------
-In config.js the configuration file refers to "type" and "icon". The type is the type of Velbus
-module, the icon naturally refers to the icon that must be displayed on the webpage. Currently
-defined icons are: light (on/off), gate, fan, temperature (red-blue). For a new "type", add a file
-to www/controls/ (for the backend code coding) and in www/public/js/controls/ (for the frontend
-coding). A new icon is a .svg type file in www/public/js/controls/. To make the link between the code
-and the icon, you must change the first lines ie.  www/public/js/controls/relay.js.
+In config.js the configuration file refers to "type" and "icon". The type is
+the type of Velbus module, the icon naturally refers to the icon that must be
+displayed on the webpage. Currently defined icons are: light (on/off), gate,
+fan, temperature (red-blue). For a new "type", add a file to www/controls/ (for
+the backend code coding) and in www/public/js/controls/ (for the frontend
+coding). A new icon is a .svg type file in www/public/js/controls/. To make the
+link between the code and the icon, you must change the first lines e.g.
+www/public/js/controls/relay.js.
 
 Logging of velbusd communication
 --------------------------------
-Communication between the daemon and Velbus is logged by default. Some users report problems in not
-getting any logging. If you insist on seeing the logging then modify ......
+Communication between the daemon and Velbus is logged by default to stderr.
+
+
+Bugs
+====
+
+The newer VMB4RYNO allows to directly access all channels from the webpage to
+start and stop the relais. The older VMB4RY only allows this for the first
+channel. The other channels currently can only be started by entering a start
+time and a duration. This is a known bug for which there is not yet a solution.
 
 
 Copyright / License
