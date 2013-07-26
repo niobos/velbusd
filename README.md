@@ -14,7 +14,8 @@ Dependencies
 For the velbusd:
 
 * libev, including the development files (libev-dev on debian-based systems)
-* libboost
+* libboost (build dependency only)
+* autotools (included in ubuntu's `build-essential` package)
 
 
 For velbusweb:
@@ -22,20 +23,27 @@ For velbusweb:
 * Node.js and NPM
 
 
-Brief setup instructions when AUTOMAKE etc. is already installed
-----------------------------------------------------------------
+Sketchy setup instructions
+--------------------------
+These instructions assume 2 machines: your own development machine, and the
+server you want to run the daemons on. You can give both roles to a single
+machine without a problem; just run all commands on the same host.
+
+First, get the source, either by running
+`git clone https://github.com/niobos/velbusd.git` or by downloading and
+extracting the ZIP. Once in the project directory, do:
+
 ```
-your-dev-machine$ git clone https://github.com/niobos/velbusd.git
 your-dev-machine$ ln -s README.md README
-your-dev-machine$ autoreconf
+your-dev-machine$ autoreconf -i
 your-dev-machine$ ./configure
-your-dev-machine$ make dist
+your-dev-machine$ make dist   # Not needed if you don't have 2 machines
 ```
 
 Then copy over the `tar.gz` or `tar.bz2` file to your velbus-machine
 
 ```
-your-velbus-machine$ tar jxvf velbusd.tar.bz2
+your-velbus-machine$ tar jxvf velbusd.tar.bz2   # not needed for 1 machine
 your-velbus-machine$ cd velbusd
 your-velbus-machine$ ./configure && make
 your-velbus-machine$ sudo make install
@@ -49,13 +57,16 @@ script for the supported variables and their default)
 your-velbus-machine$ sudo start velbusd
 ```
 
-To use velbusdweb, you should probably change
+To use velbusweb, you should probably change
 /usr/local/share/velbusd/velbusweb/public/data/floorplan.svg to match your
 floorplan, and add your modules to /usr/local/share/velbusd/velbusweb/config.js.
 Next, start the daemon
 ```
 your-velbus-machine$ sudo start velbusweb
 ```
+
+More detailed instructions contributed
+======================================
 
 Installation instructions when starting from scratch
 ----------------------------------------------------
@@ -139,7 +150,7 @@ time and a duration. This is a known bug for which there is not yet a solution.
 
 
 Copyright / License
-------------------
-Light-bulp image licensed under Creative Commons BY(Ignacio javier igjav)-SA
+==================
+Light-bulb image licensed under Creative Commons BY(Ignacio javier igjav)-SA
 
 The rest of the project is licensed under AGPL3, see COPYING for the details.
