@@ -2,6 +2,9 @@ $('<style type="text/css">' +
 		'div.icon.light { background-image: url(images/light-on.svg) }' +
 		'div.icon.light.off { background-image: url(images/light-off.svg) }' +
 
+		'div.icon.watertap { background-image: url(images/watertap-on.svg) }' +
+		'div.icon.watertap.off { background-image: url(images/watertap-off.svg) }' +
+
 		'div.icon.fan.on { background-image: url(images/fan-ani.svg) }' +
 		'div.icon.fan { background-image: url(images/fan.svg) }' +
 	'</style>').appendTo("head");
