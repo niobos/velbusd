@@ -31,7 +31,8 @@ exports.controls = {
 		"name": "Master bedroom blind",
 		"coords": [ {"left": 730, "top": 270} ],
 		"type": "blind",
-		"time": 18
+		"time": 18   // Time it takes for the blind to fully open/close
+		             // This is used to estimate the open/close percentage
 	},
 	"04": {
 		"name": "Master bedroom temp",
