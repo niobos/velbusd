@@ -409,7 +409,7 @@ push @parser, sub { # Push Button Status (0x00) {{{
 	my $just_released = $data[2];
 	my $long_pressed = $data[3];
 
-	return sprintf("PushButtonStatus from 0x%02x: on=%s long=%s off=%s",
+	return sprintf("PushButtonStatus from 0x%02x: on=%s off=%s long=%s",
 			$addr, binary($just_pressed), binary($just_released),
 			binary($long_pressed));
 }; # }}}
