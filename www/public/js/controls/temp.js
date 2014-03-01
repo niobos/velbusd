@@ -1,7 +1,8 @@
 $('<style type="text/css">' +
-		'div.icon.temp         { background-image: url(images/temp-blue.svg) }' +
-		'div.icon.temp.heating { background-image: url(images/temp-red.svg) }' +
-		'div.temp div.button   { display: table-cell; vertical-align: middle; }' +
+		'div.icon.temp             { background-image: url(images/temp-grey.svg) }' +
+		'div.icon.temp.not_heating { background-image: url(images/temp-blue.svg) }' +
+		'div.icon.temp.heating     { background-image: url(images/temp-red.svg) }' +
+		'div.temp div.button       { display: table-cell; vertical-align: middle; }' +
 	'</style>').appendTo("head");
 
 var Temp = function(addr, state, coord) {
@@ -79,9 +80,17 @@ Temp.prototype.show = function() {
 Temp.prototype.update = function(attr) {
 	var d = Unknown.prototype.update.call(this, attr);
 
-	switch( this.state.output.valve ) {
-	case "on":	this.div.addClass('heating'); break;
-	case "off":	this.div.removeClass('heating'); break;
+	this.div.removeClass('not_heating');
+	this.div.removeClass('heating');
+
+	if( this != null && this.state != null
+		&& this.state.output != null && this.state.output.valve != null) {
+		switch( this.state.output.valve ) {
+		case "on":	this.div.addClass('heating'); break;
+		case "off":	this.div.addClass('not_heating'); break;
+		}
+	} else {
+		console.log("Could not find status of valve");
 	}
 
 	if( d == "not displayed" ) return d;
