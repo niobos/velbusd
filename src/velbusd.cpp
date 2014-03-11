@@ -109,6 +109,7 @@ void kill_connection(EV_P_ ev_io *w) {
 	// Find and erase this connection in the list
 	for( typeof(c_network.begin()) i = c_network.begin(); i != c_network.end(); ++i ) {
 		if( &(i->read_ready) == w ) {
+			*log << i->id << " : Connection removed\n" << std::flush;
 			c_network.erase(i);
 			break; // Stop searching
 		}
@@ -117,6 +118,7 @@ void kill_connection(EV_P_ ev_io *w) {
 void kill_all_connections(EV_P) {
 	typeof(c_network.begin()) i;
 	while( i = c_network.begin(),  i != c_network.end() ) {
+		*log << i->id << " : Connection removed\n" << std::flush;
 		ev_io_stop(EV_A_ &i->read_ready );
 		c_network.erase(i);
 	}
