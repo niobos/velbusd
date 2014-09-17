@@ -23,20 +23,23 @@ Dimmer.prototype.show = function() {
 			'<div style="padding-bottom: 0.2em; white-space: nowrap;">Current state: ' +
 				'<span class="state"><img src="images/loading.gif"/></span></div>' +
 			'</div>');
-	$('<div class="dimvalue"/>').slider({
-			range: "min",
-			value: 0,
-			min: 0,
-			max: 100,
-			change: function(event, ui) {
-					if( ui.value == that.state.dimvalue ) {
-						return;
-					}
-					var data = {};
-					data[ ui.value ] = '';
-					$.post('control/dimmer/' + that.addr + '/dimvalue', data);
-				},
-		}).appendTo( p.find('div.dimmer') );
+	var s = $('<div class="dimvalue"/>')
+	s.appendTo( p.find('div.dimmer') ); // Append before turning it into a slider
+	// Needed for TouchPunch to work
+	s.slider({
+		range: "min",
+		value: 0,
+		min: 0,
+		max: 100,
+		change: function(event, ui) {
+				if( ui.value == that.state.dimvalue ) {
+					return;
+				}
+				var data = {};
+				data[ ui.value ] = '';
+				$.post('control/dimmer/' + that.addr + '/dimvalue', data);
+			},
+	});
 }
 
 Dimmer.prototype.update = function(attr) {
