@@ -1,4 +1,4 @@
-#!/usr/bin/env nodejs
+#!/usr/bin/env node
 
 var util = require('util');
 var config = require('./config');
