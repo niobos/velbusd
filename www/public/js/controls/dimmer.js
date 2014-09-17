@@ -2,8 +2,7 @@ $('<link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />' +
 	'<style type="text/css">' +
 		'div.icon.dimmer { background-image: url(images/light-on.svg) }' +
 		'div.icon.dimmer.off { background-image: url(images/light-off.svg) }' +
-	'</style>' +
-	'<script src="js/jquery-ui.js"></script>').appendTo("head");
+	'</style>').appendTo("head");
 
 var Dimmer = function(addr, state, coord) {
 	Unknown.call(this, addr, state, coord);
