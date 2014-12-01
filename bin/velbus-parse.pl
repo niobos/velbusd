@@ -51,22 +51,72 @@ push @parser, sub { # Blind Status (0xec) {{{
 	return undef unless @data == 8;
 	return undef unless $data[0] == 0xec;
 
-	my $channel = enum(  $data[1], 0x03=> "1", 0x0c => "2" );
-	my $timeout = enum(  $data[2], 0=>"15s", 1=>"30s", 2=>"1m", 3=>"2m");
-	my $status1 = enum(  $data[3]&0x03,        0=>"off", 1=>"up", 2=>"down");
-	my $status2 = enum( ($data[3]&0x0c) >> 2,  0=>"off", 1=>"up", 2=>"down");
-	my $led = enum( $data[4],
-				0 => "off",
-				0x80 => "down on", 0x40 => "down slow blink",
-				0x20 => "down fast blink", 0x10 => "down very fast blink",
-				0x08 => "up on", 0x04 => "up slow blink",
-				0x02 => "up fast blink", 0x01 => "up very fast blink"
+	my $version = enum(  $data[1],
+				0x03 => "VMB2BL", 0x0c => "VMB2BL",
+				0x01 => "VMB2BLE", 0x02 => "VMB2BLE",
 			);
-	my $timer = ($data[5] << 16) + ($data[6] << 8) + $data[7];
+	if( $version eq "VMB2BL" ) {
+		my $channel = enum(  $data[1], 0x03=> "1", 0x0c => "2" );
+		my $timeout = enum(  $data[2], 0=>"15s", 1=>"30s", 2=>"1m", 3=>"2m");
+		my $status1 = enum(  $data[3]&0x03,        0=>"off", 1=>"up", 2=>"down");
+		my $status2 = enum( ($data[3]&0x0c) >> 2,  0=>"off", 1=>"up", 2=>"down");
+		my $led = enum( $data[4],
+					0 => "off",
+					0x80 => "down on", 0x40 => "down slow blink",
+					0x20 => "down fast blink", 0x10 => "down very fast blink",
+					0x08 => "up on", 0x04 => "up slow blink",
+					0x02 => "up fast blink", 0x01 => "up very fast blink"
+				);
+		my $timer = ($data[5] << 16) + ($data[6] << 8) + $data[7];
 
-	return sprintf("BlindStatus from 0x%02x: Blind=%s Timeout=%s " .
-			"Status1=%s Status2=%s Led=%s Timer=%d",
-			$addr, $channel, $timeout, $status1, $status2, $led, $timer);
+		return sprintf("BlindStatus from 0x%02x: Blind=%s Timeout=%s " .
+				"Status1=%s Status2=%s Led=%s Timer=%d",
+				$addr, $channel, $timeout, $status1, $status2, $led, $timer);
+
+	} elsif( $version eq "VMB2BLE" ) {
+		my $channel = enum(  $data[1], 0x01=> "1", 0x02 => "2" );
+		my $timeout = $data[2];
+		my $status = enum(  $data[3], 0=>"off", 1=>"up", 2=>"down");
+		my $led = enum( $data[4],
+					0 => "off",
+					0x80 => "down on", 0x40 => "down slow blink",
+					0x20 => "down fast blink", 0x10 => "down very fast blink",
+					0x08 => "up on", 0x04 => "up slow blink",
+					0x02 => "up fast blink", 0x01 => "up very fast blink"
+				);
+		my $pos = $data[5];
+		my $lock = enum( $data[6]&0x07,
+					0x00 => "normal",
+					0x01 => "inhibited",
+					0x02 => "inhibit preset down",
+					0x03 => "inhibit preset up",
+					0x04 => "forced down",
+					0x05 => "forced up",
+					0x06 => "lock"
+				);
+		my $automode = enum( $data[7] & 0x03,
+					0x00 => "disabled",
+					0x01 => "1", 0x02 => "2", 0x03 => "3"
+				);
+		my $alarm1 = enum( $data[7] & 0x04, 0x00=>"off", 0x04=>"on" );
+		my $alarm1_loc = enum( $data[7] & 0x08, 0x00=>"local", 0x08=>"global" );
+		my $alarm2 = enum( $data[7] & 0x10, 0x00=>"off", 0x10=>"on" );
+		my $alarm2_loc = enum( $data[7] & 0x20, 0x00=>"local", 0x20=>"global" );
+		my $sunrise = enum( $data[7] & 0x40, 0x00=>"disabled", 0x40=>"enabled" );
+		my $sunset = enum( $data[7] & 0x80, 0x00=>"disabled", 0x80=>"enabled" );
+
+		return sprintf("BlindStatus from 0x%02x: BLE Blind=%s Timeout=%s " .
+				"Status=%s Led=%s Pos=%d Lock=%s Auto=%s Alarm1=%s,%s " .
+				"Alarm2=%s,%s Sunrise=%s Sunset=%s",
+				$addr, $channel, $timeout, $status, $led, $pos, $lock,
+				$automode, $alarm1, $alarm1_loc, $alarm2, $alarm2_loc,
+				$sunrise, $sunset);
+
+	} else {
+		my $channel = $data[1];
+		return sprintf("BlindStatus from 0x%02x: Blind=0x%02x unknown status version",
+				$addr, $channel);
+	}
 }; # }}}
 
 push @parser, sub { # Bus Error Counter (0xda) {{{
