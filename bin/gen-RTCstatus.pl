@@ -5,7 +5,7 @@ use warnings;
 
 sub checksum ($) {
 	my $sum = unpack("%8C*", $_[0]);
-	return chr( 256-$sum );
+	return chr( (256-$sum)%256 );
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
