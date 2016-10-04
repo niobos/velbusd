@@ -198,6 +198,33 @@ push @parser, sub { # Dimmer Status (0xee) {{{
 			$addr, $mode, $dimvalue, $led, $delay, $config);
 }; # }}}
 
+push @parser, sub { # Dimmer Channel Status (0xb8) {{{
+	my ($prio, $addr, $rtr, $data, @data) = @_;
+	return undef unless $rtr  == 0;
+	return undef unless @data == 8;
+	return undef unless $data[0] == 0xb8;
+
+	my $chan = $data[1];
+	my $status = enum( $data[2] & 0x03,
+			0x00 => "normal",
+			0x01 => "inhibit",
+			0x02 => "forced on",
+			0x03 => "disabled",
+		);
+	my $dimvalue = $data[3];
+	my $led = enum( $data[4],
+			0x00 => "off",
+			0x80 => "on",
+			0x40 => "slow blinking",
+			0x20 => "fast blinking",
+			0x10 => "very fast blinking",
+		);
+	my $delay = ($data[5] << 16) | ($data[6] << 8) | ($data[7]);
+
+	return sprintf("DimmerChannelStatus from 0x%02x chan %d: status=%s dim=%d%% LED=%s timer=%d",
+			$addr, $chan, $status, $dimvalue, $led, $delay);
+}; # }}}
+
 push @parser, sub { # Dimmer Slider Status (0x0f) {{{
 	my ($prio, $addr, $rtr, $data, @data) = @_;
 	return undef unless $rtr  == 0;
