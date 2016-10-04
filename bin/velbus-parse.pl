@@ -204,12 +204,12 @@ push @parser, sub { # Dimmer Slider Status (0x0f) {{{
 	return undef unless @data == 4;
 	return undef unless $data[0] == 0x0f;
 
-	return undef unless $data[1] == 0x01;
+	my $chan = $data[1];
 	my $dim = $data[2];
 	return undef unless $data[3] == 0x00;
 
-	return sprintf("DimmerSliderStatus from 0x%02x: dim=%d%%",
-			$addr, $dim);
+	return sprintf("DimmerSliderStatus from 0x%02x channel %d: dim=%d%%",
+			$addr, $chan, $dim);
 }; # }}}
 
 push @parser, sub { # Memory Block {,Write} (0xcc, 0xca) {{{
@@ -572,14 +572,14 @@ push @parser, sub { # Set Dimvalue (at last used value) (0x07, 0x11) {{{
 	} else {
 		$speed = "$speed sec";
 	}
-	return undef unless $data[1] == 0x01;
+	my $chan = $data[1];
 
 	if( $data[0] == 0x07 ) {
 		my $dim = $data[2];
-		return sprintf("SetDimvalue to 0x%02x: dim=%d%% speed=$speed", $addr, $dim);
+		return sprintf("SetDimvalue to 0x%02x chan %d: dim=%d%% speed=%s", $addr, $chan, $dim, $speed);
 
 	} elsif( $data[0] == 0x11 ) {
-		return sprintf("SetDimvalueToLast to 0x%02x: speed=$speed", $addr);
+		return sprintf("SetDimvalueToLast to 0x%02x chan %d: speed=%s", $addr, $chan, $speed);
 
 	} else {
 		return undef;
