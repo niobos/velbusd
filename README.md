@@ -1,6 +1,13 @@
 Velbusd
 =======
 
+This project is superceded by [velbuspy] and [velbusjs]. This is no longer
+maintained.
+
+[velbuspy]: https://github.com/niobos/velbuspy
+[velbusjs]: https://github.com/niobos/velbusjs
+
+
 Velbusd is a project to extend the Velbus home automation to HTTP-based
 clients. It contains a deamon program `velbusd` that acts as a proxy between
 the serial port and TCP sockets. The second part `velbusweb` is a web
